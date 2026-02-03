@@ -7,13 +7,15 @@
     "dev": "vite --host 0.0.0.0 --port 3001",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "test": "turbo run test"
+    "test": "turbo run test",
+    "start": "serve -s dist -l 8080"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "serve": "^14.2.5",
     "three": "^0.182.0"
   },
   "devDependencies": {
