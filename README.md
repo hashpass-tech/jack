@@ -1,10 +1,9 @@
 <div align="center">
-<img width="1200" alt="JACK Logo" src="./apps/landing/public/Jack.png" />
+<img width="400" alt="JACK Logo" src="./apps/landing/public/Jack.png" />
 </div>
 
 # JACK - XChain Exec Kernel
 
-[![Actions](https://github.com/hashpass-tech/jack/workflows/CI/badge.svg)](https://github.com/hashpass-tech/jack/actions)
 [![Docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://github.com/hashpass-tech/jack/docs)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
