@@ -9,7 +9,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo run test",
     "start": "serve -s dist -l 8080",
-    "prepare": "husky"
+    "prepare": "husky || true"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
