@@ -20,10 +20,10 @@ const Scene3Dv2: React.FC<Scene3DProps> = ({ onViewDetails, selectedLayer, onSel
     texture.colorSpace = THREE.SRGBColorSpace;
 
     const layers = useMemo(() => [
-        { text: "INTENT", color: "#F2B94B", radius: 2.2, rotation: [Math.PI / 2, 0.2, 0], speed: 0.4 },
-        { text: "ROUTE", color: "#38BDF8", radius: 3.2, rotation: [Math.PI / 2.2, -0.3, 0], speed: 0.3 },
-        { text: "CONSTRAINTS", color: "#F2B94B", radius: 4.2, rotation: [Math.PI / 1.8, 0.1, 0], speed: 0.2 },
-        { text: "SETTLEMENT", color: "#38BDF8", radius: 5.2, rotation: [Math.PI / 2.5, 0.4, 0], speed: 0.15 },
+        { text: "INTENT", color: "#F2B94B", radius: 3.0, rotation: [Math.PI / 2, 0.2, 0], speed: 0.4 },
+        { text: "ROUTE", color: "#38BDF8", radius: 4.0, rotation: [Math.PI / 2.2, -0.3, 0], speed: 0.3 },
+        { text: "CONSTRAINTS", color: "#F2B94B", radius: 5.0, rotation: [Math.PI / 1.8, 0.1, 0], speed: 0.2 },
+        { text: "SETTLEMENT", color: "#38BDF8", radius: 6.0, rotation: [Math.PI / 2.5, 0.4, 0], speed: 0.15 },
     ], []);
 
     useFrame((state) => {
@@ -36,14 +36,16 @@ const Scene3Dv2: React.FC<Scene3DProps> = ({ onViewDetails, selectedLayer, onSel
 
     return (
         <group ref={groupRef} position={[0, -0.5, 0]}>
-            {/* The "Jack" Hero - Billboarded to always be readable */}
+            {/* The "Jack" Hero - Optimized Transparency */}
             <Billboard position={[0, 0.5, 0]}>
                 <Float speed={2} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.1, 0.1]}>
                     <Image
                         url={jackUrl}
-                        scale={[4.8, 4.8]}
+                        scale={[3.2, 3.2]}
                         transparent
                         side={THREE.DoubleSide}
+                        material-alphaTest={0.5}
+                        material-depthWrite={true}
                     />
                 </Float>
             </Billboard>
@@ -60,9 +62,9 @@ const Scene3Dv2: React.FC<Scene3DProps> = ({ onViewDetails, selectedLayer, onSel
                     />
                 ))}
 
-                {/* Environmental Dust */}
-                <Sparkles count={100} scale={10} size={2} speed={0.2} opacity={0.5} color="#F2B94B" />
-                <Sparkles count={50} scale={12} size={4} speed={0.1} opacity={0.3} color="#38BDF8" />
+                {/* Enhanced Environmental Dust */}
+                <Sparkles count={150} scale={15} size={1.5} speed={0.2} opacity={0.4} color="#38BDF8" />
+                <Sparkles count={100} scale={12} size={2.5} speed={0.1} opacity={0.3} color="#F2B94B" />
             </group>
         </group>
     );
@@ -76,7 +78,7 @@ const LayerRing: React.FC<{
     speed: number,
     isSelected: boolean,
     onSelect: () => void,
-    onViewDetails: () => void
+    onViewDetails: () => void,
 }> = ({ text, color, radius, rotation, speed, isSelected, onSelect, onViewDetails }) => {
     const ringRef = useRef<THREE.Group>(null);
     const torusRef = useRef<THREE.Mesh>(null);
@@ -107,7 +109,6 @@ const LayerRing: React.FC<{
     return (
         <group rotation={rotation}>
             <group ref={ringRef}>
-                {/* The Orbital Line - Interactive */}
                 <mesh
                     ref={torusRef}
                     onClick={(e) => { e.stopPropagation(); onSelect(); }}
