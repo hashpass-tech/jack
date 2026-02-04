@@ -1,0 +1,49 @@
+name: Agent Task Automation
+
+on:
+  workflow_dispatch:
+    inputs:
+      label:
+        description: 'Which tasks to run (label)'
+        default: 'auto-execute'
+
+jobs:
+  execute-tasks:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      
+      - name: Install pnpm
+        run: npm install -g pnpm
+      
+      - name: Install dependencies
+        run: pnpm install
+      
+      - name: Sync issues to YAML
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          pnpm agent:sync ${{ github.event.inputs.label }}
+      
+      - name: Execute tasks
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          KIRO_API_KEY: ${{ secrets.KIRO_API_KEY }}
+          PREFERRED_AGENT: claude-code
+        run: |
+          pnpm agent:run .agent-tasks/${{ github.event.inputs.label }}.yaml
+      
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "chore: agent-generated code execution results" || true
+          git push

@@ -14,6 +14,7 @@ export interface Task {
         type: string;
     };
     depends_on?: string[];
+    github_issue?: number;
 }
 
 export interface TaskResult {
@@ -185,9 +186,12 @@ export class TaskOrchestrator {
     private async verifyAndCommit(task: Task, result: TaskResult) {
         console.log(`✅ Task ${task.id} completed. committing...`);
         try {
-            // In a real scenario, we'd run 'forge build' or 'npm test' here
+            // Extract issue number for closure message
+            const issueNum = task.github_issue || task.id.match(/\d+/)?.[0];
+            const closeMsg = issueNum ? `\n\nCloses #${issueNum}` : '';
+
             execSync(`git add ${result.output_path}`, { stdio: 'ignore' });
-            execSync(`git commit -m "feat: ${task.title} (agent: ${result.agent_log})"`, { stdio: 'ignore' });
+            execSync(`git commit -m "feat: ${task.title} (agent: ${result.agent_log})${closeMsg}"`, { stdio: 'ignore' });
         } catch (e) {
             console.warn(`⚠️ Failed to commit: ${e}`);
         }

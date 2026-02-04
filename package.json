@@ -11,7 +11,9 @@
     "start": "serve -s dist -l 8080",
     "prepare": "husky || true",
     "agent:run": "tsx scripts/agent-runner.ts",
-    "agent:dashboard": "tsx scripts/agent-dashboard.ts"
+    "agent:dashboard": "tsx scripts/agent-dashboard.ts",
+    "agent:sync": "tsx scripts/sync-github-tasks.ts",
+    "agent:verify-gh": "tsx scripts/verify-gh-integration.ts"
   },
   "dependencies": {
     "@react-three/drei": "^9.122.0",
