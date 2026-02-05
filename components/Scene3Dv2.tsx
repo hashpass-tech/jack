@@ -19,7 +19,7 @@ const Scene3Dv2: React.FC<Scene3DProps> = ({ onViewDetails, selectedLayer, onSel
     // Scale factor for mobile
     const isMobile = viewport.width < 5;
     const baseScale = isMobile ? viewport.width / 5.5 : 0.8;
-    const groupYOffset = isMobile ? 2.0 : -0.2;
+    const groupYOffset = isMobile ? 0.8 : -0.2;
 
     // Load texture
     const texture = useTexture(jackUrl);

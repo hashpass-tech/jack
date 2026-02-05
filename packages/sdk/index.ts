@@ -16,6 +16,7 @@ export interface IntentParams {
   amountIn: string;
   minAmountOut: string;
   deadline: number;
+  [key: string]: string | number;
 }
 
 export interface Intent {

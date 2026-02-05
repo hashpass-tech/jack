@@ -3,9 +3,10 @@ import { getIntent } from '@/lib/store';
 
 export async function GET(
     request: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
-    const intent = getIntent(params.id);
+    const { id } = await params;
+    const intent = getIntent(id);
 
     if (!intent) {
         return NextResponse.json({ error: 'Intent not found' }, { status: 404 });
