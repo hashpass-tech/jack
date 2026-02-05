@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, Stars } from '@react-three/drei';
 import Scene3D from '@/components/Scene3Dv2';
@@ -71,6 +71,8 @@ const LandingPage: React.FC = () => {
   const [activeModalLayer, setActiveModalLayer] = useState<string | null>(null);
   const [selected3DLayer, setSelected3DLayer] = useState<number | null>(0);
   const [contentVisible, setContentVisible] = useState(false);
+  const [whitepaperOpen, setWhitepaperOpen] = useState(false);
+  const whitepaperRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const stripTempoAttrs = () => {
@@ -104,6 +106,21 @@ const LandingPage: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!whitepaperRef.current) return;
+      if (!whitepaperRef.current.contains(event.target as Node)) {
+        setWhitepaperOpen(false);
+      }
+    };
+
+    if (whitepaperOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [whitepaperOpen]);
+
   const scrollToContent = () => {
     document.getElementById('content')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -119,7 +136,7 @@ const LandingPage: React.FC = () => {
 
     return (
       <div className="relative w-full min-h-screen bg-[#0B1020] text-white">
-      <div className="absolute inset-0 z-0 h-screen overflow-hidden">
+      <div className="absolute inset-0 z-0 h-screen overflow-hidden pointer-events-none">
         <Canvas
           shadows
           dpr={[1, 2]}
@@ -153,7 +170,7 @@ const LandingPage: React.FC = () => {
       </div>
 
       <div className="relative z-10 flex min-h-screen flex-col">
-        <header className="pointer-events-auto absolute inset-x-0 top-0 flex items-center justify-between px-6 py-6 md:px-12">
+        <header className="pointer-events-auto absolute inset-x-0 top-0 z-30 flex items-center justify-between px-6 py-6 md:px-12">
           <div className="flex items-center space-x-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#F2B94B] shadow-[0_0_25px_rgba(242,185,75,0.6)]">
               <span className="font-space text-lg font-bold text-[#0B1020]">J</span>
@@ -163,22 +180,35 @@ const LandingPage: React.FC = () => {
               <p className="text-sm font-semibold text-white">Kernel</p>
             </div>
           </div>
-          <nav className="hidden items-center space-x-8 text-xs uppercase tracking-[0.2em] text-gray-400 md:flex">
+          <nav className="pointer-events-auto hidden items-center space-x-8 text-xs uppercase tracking-[0.2em] text-gray-400 md:flex">
             <a href="https://github.com/hashpass-tech/JACK" target="_blank" rel="noreferrer" className="hover:text-[#38BDF8] transition-colors">Docs</a>
             <a href="https://github.com/hashpass-tech/JACK" target="_blank" rel="noreferrer" className="hover:text-[#38BDF8] transition-colors">SDK</a>
-            <div className="relative group">
+            <div className="relative group" ref={whitepaperRef}>
               <button
                 type="button"
                 className="flex items-center gap-1 hover:text-[#38BDF8] transition-colors"
                 aria-haspopup="true"
-                aria-expanded="false"
+                aria-expanded={whitepaperOpen}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setWhitepaperOpen((prev) => !prev);
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape') {
+                    setWhitepaperOpen(false);
+                  }
+                }}
               >
                 Whitepaper
                 <svg className="h-3 w-3 stroke-current" viewBox="0 0 24 24" fill="none">
                   <path d="M6 9l6 6 6-6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </button>
-              <div className="invisible absolute right-0 mt-3 w-56 rounded-2xl border border-white/10 bg-[#0B1020]/90 px-4 py-3 text-left text-[11px] uppercase tracking-[0.4em] text-gray-300 shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-200 ease-out group-hover:visible">
+              <div
+                className={`absolute right-0 mt-3 w-56 rounded-2xl border border-white/10 bg-[#0B1020]/90 px-4 py-3 text-left text-[11px] uppercase tracking-[0.4em] text-gray-300 shadow-[0_20px_50px_rgba(0,0,0,0.6)] transition-all duration-200 ease-out ${
+                  whitepaperOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 -translate-y-1'
+                } group-hover:visible group-hover:opacity-100 group-hover:translate-y-0`}
+              >
                 <p className="text-[9px] uppercase tracking-[0.6em] text-gray-500">Download</p>
                 <div className="mt-2 space-y-1 text-[10px] tracking-[0.3em]">
                   {whitepaperVersions.map((paper) => (
@@ -187,6 +217,7 @@ const LandingPage: React.FC = () => {
                       href={`/whitepapper/${paper.filename}`}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() => setWhitepaperOpen(false)}
                       className="block rounded-xl border border-white/10 px-3 py-2 text-white transition hover:border-white/40"
                     >
                       {paper.label}
