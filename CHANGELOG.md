@@ -1,3 +1,19 @@
+## [0.1.5](https://github.com/hashpass-tech/JACK/compare/v0.1.3...v0.1.5) (2026-02-05)
+
+
+
+
+
+## [0.1.4](https://github.com/hashpass-tech/JACK/compare/v0.1.3...v0.1.4) (2026-02-04)
+
+
+### Bug Fixes
+
+* align landing build config with app root and surface app versions in footers
+* remove unused root landing artifacts to keep releases clean
+
+
+
 ## [0.1.3](https://github.com/hashpass-tech/JACK/compare/v0.1.2...v0.1.3) (2026-02-05)
 
 

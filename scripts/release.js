@@ -38,7 +38,7 @@ const run = (command) => {
 
 try {
   console.log('Starting versioning + release pipeline');
-  const versioningCommand = `pnpm exec versioning ${releaseLevel} --packages "apps/dashboard" --message "${releaseMessage}"`;
+  const versioningCommand = `pnpm exec versioning ${releaseLevel} --message "${releaseMessage}"`;
   run(versioningCommand);
 
   // Reload package.json to read the bumped version
@@ -68,12 +68,12 @@ try {
   if (process.env.GCLOUD_LANDING_BUCKET) {
     transferBucket({
       bucket: process.env.GCLOUD_LANDING_BUCKET,
-      source: 'dist',
+      source: 'apps/landing/dist',
       target: ''
     });
     transferBucket({
       bucket: process.env.GCLOUD_LANDING_BUCKET,
-      source: 'dist',
+      source: 'apps/landing/dist',
       target: `${releaseToken}/landing`
     });
   }

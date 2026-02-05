@@ -9,6 +9,7 @@ import AgentCostDashboard from './AgentCostDashboard';
 const Dashboard: FC = () => {
 	const [activeTab, setActiveTab] = useState<'create' | 'executions' | 'cost-dashboard'>('create');
 	const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(null);
+	const dashboardVersion = process.env.NEXT_PUBLIC_DASHBOARD_VERSION ?? '0.0.0';
 	const handleBack = () => {
 		if (typeof window !== 'undefined') {
 			window.history.back();
@@ -97,6 +98,9 @@ const Dashboard: FC = () => {
 					{renderContent()}
 				</div>
 			</main>
+			<footer className="border-t border-white/5 bg-[#0F1A2E] px-6 py-3 text-center text-[10px] uppercase tracking-[0.4em] text-gray-500">
+				v{dashboardVersion}
+			</footer>
 		</div>
 	);
 };

@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { OrbitControls, PerspectiveCamera, Environment, Stars } from '@react-three/drei';
 import Scene3D from '@/components/Scene3Dv2';
@@ -50,22 +50,23 @@ const momentumMetrics = [
 
 const deriveDashboardUrl = (): string => {
   const envUrl = import.meta.env.VITE_DASHBOARD_URL?.trim();
-  if (envUrl) {
-    return envUrl;
-  }
-
   if (typeof window !== 'undefined') {
     const { origin, hostname } = window.location;
-    if (hostname.includes('localhost')) {
+    if (hostname.includes('localhost') || hostname === '127.0.0.1') {
       return 'http://localhost:3001';
     }
-    return new URL('/dashboard', origin).href;
+    if (envUrl) {
+      return envUrl;
+    }
+    // Always use /dashboard relative to current origin for production/testnet
+    return `${origin}/dashboard`;
   }
-
-  return 'http://localhost:3001';
+  return envUrl || '/dashboard';
 };
 
 const LandingPage: React.FC = () => {
+  const landingVersion = import.meta.env.VITE_LANDING_VERSION ?? '0.0.0';
+  const dashboardVersion = import.meta.env.VITE_DASHBOARD_VERSION ?? '0.0.0';
   const dashboardUrl = deriveDashboardUrl();
   const [activeModalLayer, setActiveModalLayer] = useState<string | null>(null);
   const [selected3DLayer, setSelected3DLayer] = useState<number | null>(0);
@@ -298,6 +299,9 @@ const LandingPage: React.FC = () => {
 
           <footer className="pointer-events-auto relative mt-auto w-full px-6 pb-8 pt-4 text-center text-[10px] uppercase tracking-[0.5em] text-gray-500 snap-start">
             <p>Built for the future of cross-chain interoperability · Research by lukas.money</p>
+            <p className="mt-2 text-[9px] uppercase tracking-[0.35em] text-gray-400">
+              v{landingVersion}
+            </p>
           </footer>
 
           <button
