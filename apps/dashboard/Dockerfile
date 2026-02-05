@@ -1,4 +1,4 @@
-FROM node:22-bullseye-slim AS builder
+FROM node:22-bookworm-slim AS builder
 
 WORKDIR /workspace
 
@@ -9,7 +9,7 @@ COPY packages ./packages
 RUN corepack enable && pnpm install --frozen-lockfile
 RUN pnpm --filter dashboard build
 
-FROM node:22-bullseye-slim AS runner
+FROM node:22-bookworm-slim AS runner
 
 WORKDIR /workspace
 
