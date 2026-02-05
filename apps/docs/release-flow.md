@@ -33,7 +33,14 @@ Create a Cloud Build trigger:
 - **Config**: `apps/dashboard/cloudbuild.testnet.yaml`
 
 ## Landing (GCS Bucket)
-The landing build is deployed to the bucket configured in `.env.testnet` for testnet and `.env` for prod.
+The landing build is deployed to the bucket configured in `.env.testnet` for testnet and `.env.production` for prod.
+
+## Production Setup Checklist
+1. Create a **production** GCS bucket for landing (and enable static website hosting).
+2. Create a **backend bucket + URL map** that serves https://jack.lukas.money.
+3. Point DNS for `jack.lukas.money` to the load balancer IP.
+4. Create `.env.production` locally (see `.env.production.example`).
+5. Run release from `main` to publish `vX.Y.Z` tags and deploy mainnet.
 
 ## Notes
 - Keep secrets in CI/Cloud Build or Secret Manager; never commit them.

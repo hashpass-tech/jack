@@ -17,9 +17,26 @@ const loadEnvFile = (file) => {
   }
 };
 
+const getBranchNameForEnv = () => {
+  if (process.env.GIT_BRANCH) {
+    return process.env.GIT_BRANCH;
+  }
+  try {
+    return execSync('git rev-parse --abbrev-ref HEAD', { stdio: 'pipe' }).toString().trim();
+  } catch {
+    return '';
+  }
+};
+
+const branchForEnv = getBranchNameForEnv();
+const defaultEnvFiles = branchForEnv === 'main' || branchForEnv === 'master'
+  ? ['.env.production']
+  : ['.env.testnet'];
+
 const envFiles = process.env.RELEASE_ENV_FILES
   ? process.env.RELEASE_ENV_FILES.split(',').map((file) => file.trim())
-  : ['.env', '.env.testnet'];
+  : defaultEnvFiles;
+
 envFiles.forEach((file) => {
   if (file) {
     loadEnvFile(file);

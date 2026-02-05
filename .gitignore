@@ -25,6 +25,7 @@ dist-ssr
 **/tempobook/**
 config/private.json
 .env
+.env.production
 .env.local
 .env.development.local
 set-gcloud-project.sh
