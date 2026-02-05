@@ -104,7 +104,7 @@ try {
       throw new Error('GCLOUD_RUN_IMAGE or GCLOUD_PROJECT must be set to deploy to Cloud Run');
     }
 
-    run(`gcloud builds submit --tag ${imageUri} --region ${region} ${project} --timeout=1800s . -- -f apps/dashboard/Dockerfile`);
+    run(`gcloud builds submit --region ${region} ${project} --config apps/dashboard/cloudbuild.yaml --substitutions=_IMAGE=${imageUri} .`);
     run(`gcloud run deploy ${process.env.GCLOUD_RUN_SERVICE} --image ${imageUri} --region ${region} ${project} ${allowUnauth}`);
   }
 
