@@ -1,3 +1,14 @@
+## [0.1.12](https://github.com/hashpass-tech/JACK/compare/v0.1.11...v0.1.12) (2026-02-05)
+
+
+### Bug Fixes
+
+* make landing nav clickable ([73c90e5](https://github.com/hashpass-tech/JACK/commit/73c90e5c43936ddbeca3a9b991fda216a6d36e1e))
+
+
+
+
+
 ## [0.1.11](https://github.com/hashpass-tech/JACK/compare/v0.1.10...v0.1.11) (2026-02-05)
 
 
