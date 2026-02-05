@@ -1,0 +1,102 @@
+# Auto-generated from GitHub Issues
+# Generated: 2026-02-04T04:40:09.480Z
+
+version: "1.0"
+tasks:
+  - id: "GH-6"
+    github_issue: 6
+    title: "[D1-CRIT-F1] Documentation & Demo Script: Hackathon Submission"
+    requirement: |
+      Prepare materials for hackathon submission and final demo.
+      - Write README with clear mission and installation guide.
+      - Create architecture.md with Mermaid diagrams.
+      - Draft the 2-minute demo script for final recording.
+    output:
+      path: "docs/demo-script.md"
+      type: "md"
+    acceptance:
+      - "README provides a 3-step setup guide"
+      - "Architecture diagram clearly explains the Hook/Kernel relationship"
+      - "Demo script covers all critical path features"
+
+  - id: "GH-5"
+    github_issue: 5
+    title: "[D1-CRIT-E1] 3D Landing Polish: Premium Visuals"
+    requirement: |
+      Polish the high-end 3D landing page experience.
+      - Refine 3D orbits and core glow animation.
+      - Optimize performance for mobile devices.
+      - Ensure CTA leads directly to Dashboard intent creation.
+    output:
+      path: "apps/landing/LandingPage.tsx"
+      type: "tsx"
+    acceptance:
+      - "3D scene scores high on visual polish (no clipping/glitches)"
+      - "Mobile Lighthouse score for Performance > 70"
+      - "Clear conversion path for users"
+
+  - id: "GH-4"
+    github_issue: 4
+    title: "[D1-CRIT-D1] SDK Core: Typed Infrastructure"
+    requirement: |
+      Develop the JACK TypeScript SDK.
+      - Export typed Intent and Constraint interfaces.
+      - Implement createIntent() and hashIntent() logic.
+      - Implement getQuote() consumer.
+    output:
+      path: "packages/sdk/index.ts"
+      type: "ts"
+    acceptance:
+      - "SDK exports are usable in the Dashboard app"
+      - "Types are correctly exported and consistent with API"
+
+  - id: "GH-3"
+    github_issue: 3
+    title: "[D1-CRIT-C1] Dashboard Flow: Multi-step User Experience"
+    requirement: |
+      Build the end-to-end dashboard interface.
+      - Connect wallet integration.
+      - Intent Creation Form (Token selection, Amount, Constraints).
+      - Route selection view showing quotes.
+      - Execution tracking timeline.
+    output:
+      path: "apps/dashboard/LandingPage.tsx"
+      type: "tsx"
+    acceptance:
+      - "User can complete full flow (Intent -> Quote -> Execute)"
+      - "UI displays real-time execution status transitions"
+      - "On-chain events from Hook are displayed in UI"
+
+  - id: "GH-2"
+    github_issue: 2
+    title: "[D1-CRIT-B1] API Orchestrator: Intent & Quote API"
+    requirement: |
+      Build the backend orchestrator for intent management.
+      - POST /api/intents: Create and persist intent.
+      - GET /api/quote: Fetch normalized route quotes (integrate LI.FI mock).
+      - POST /api/execute: Trigger execution pipeline.
+    output:
+      path: "apps/dashboard/api/intents/route.ts"
+      type: "ts"
+    acceptance:
+      - "API successfully persists intents in store"
+      - "/api/quote returns valid JSON route summary"
+      - "Execution state machine transitions correctly"
+
+  - id: "GH-1"
+    github_issue: 1
+    title: "[D1-CRIT-A1] Contracts MVP: Uniswap v4 Hook + Adapter"
+    requirement: |
+      Implement the core Uniswap v4 hook for JACK.
+      - Inherit from BaseHook.
+      - Implement beforeSwap to enforce constraints.
+      - Emit PolicyChecked(bytes32 intentId, bool allowed, bytes32 reason) events.
+      - Implement access control for policy updates.
+    output:
+      path: "contracts/src/JACKPolicyHook.sol"
+      type: "sol"
+    acceptance:
+      - "forge test passes"
+      - "Hook correctly rejects swaps exceeding slippage logic"
+      - "PolicyChecked events are emitted correctly"
+

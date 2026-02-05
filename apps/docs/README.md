@@ -1,68 +1,166 @@
+# JACK Documentation
 
-# ⚓ JACK: Just-in-time Autonomous Cross-chain Kernel
+Welcome to the JACK project documentation.
 
-> "The bridge is a bottleneck. The intent is the destination."
+## Quick Links
 
-JACK is a production-grade, intent-based execution kernel designed to orchestrate cross-chain operations through autonomous agents. By utilizing JIT (Just-In-Time) settlement and FHE (Fully Homomorphic Encryption) constraints, JACK ensures optimal execution with zero-leakage of user strategies.
-
-## 🏗 System Architecture
-
-```mermaid
-graph TD
-    User((User)) -->|Signs Intent| SDK[Packages/SDK]
-    SDK -->|Broadcast| SolverNetwork[Off-chain Solver Network]
-    SolverNetwork -->|Matched Route| JIT_Agent[JIT Autonomous Agent]
-    JIT_Agent -->|Execution| V4_Hook[Uniswap v4 Policy Hook]
-    V4_Hook -->|Settlement| MultiChain((Multi-Chain Liquidity))
-```
-
-## 📂 Monorepo Structure
-
-| Path | Purpose | Stack |
-| :--- | :--- | :--- |
-| `apps/landing` | High-fidelity 3D Cinematic Entry | React + Three.js + R3F |
-| `apps/dashboard` | Mission Control & Intent Builder | React + Tailwind + Lucide |
-| `packages/sdk` | Core logic, EIP-712 signing, & API | TypeScript + Viem |
-| `packages/ui` | Shared Design System Components | Shadcn + Radix |
-| `contracts` | Policy Hooks & Settlement Adapters | Solidity + Foundry |
-
-## 🛠 Tech Stack
-
-- **Monorepo Management:** [Turborepo](https://turbo.build/) + [pnpm](https://pnpm.io/)
-- **Frontend:** React 19, Tailwind CSS, Framer Motion
-- **3D Engine:** Three.js / @react-three/fiber
-- **Blockchain:** Solidity, Foundry, Viem
-- **Privacy:** Fhenix (FHE) for encrypted constraints
-
-## 🚦 Getting Started
-
-### Prerequisites
-- Node.js >= 18
-- pnpm >= 8
-- Foundry (for contracts)
-
-### Installation
-```bash
-pnpm install
-```
-
-### Development
-Launch all applications and packages in development mode:
-```bash
-pnpm dev
-```
-
-### Deployment Pipeline
-```bash
-pnpm build  # Optimized production build across all workspaces
-pnpm test   # Run unit and contract tests
-pnpm lint   # Enforce code quality standards
-```
-
-## 🛡 Security & Compliance
-JACK utilizes **Dual-Constraint Verification**:
-1. **Cryptographic Proof:** EIP-712 signatures for intent integrity.
-2. **On-chain Enforcement:** Uniswap v4 Hooks verify slippage and policy adherence *at the moment of swap*, preventing front-running and solver-malice.
+| Document | Description |
+|----------|-------------|
+| [Agent Orchestration](./agent-orchestration.md) | Overview of the entire agent system |
+| [Spec System](./spec-system.md) | Kiro-style spec workflow details |
+| [Quick Start](./spec-quickstart.md) | 5-minute tutorial for specs |
+| [Multi-Agent Config](./multi-agent-config.md) | Configure different AI agents |
 
 ---
-*Built for the cross-chain future.*
+
+## Getting Started
+
+### For Feature Development (Kiro-style)
+
+1. **Create a spec:**
+   ```bash
+   node .kiro/bin/jack-spec.js new my_feature
+   ```
+
+2. **Fill in requirements, design, and tasks**
+
+3. **Execute tasks:**
+   ```bash
+   node .kiro/bin/jack-spec.js run --task FEAT-1
+   ```
+
+👉 See [Quick Start Guide](./spec-quickstart.md)
+
+---
+
+### For Automated Tasks (CI/CD)
+
+1. **Create issues on GitHub**
+
+2. **Sync to local YAML:**
+   ```bash
+   pnpm agent:sync day-1
+   ```
+
+3. **Run agent:**
+   ```bash
+   pnpm agent:run .agent-tasks/day-1.yaml
+   ```
+
+👉 See [Agent Orchestration](./agent-orchestration.md)
+
+---
+
+## Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    JACK Agent Orchestration                      │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│   ┌──────────────┐     ┌──────────────┐     ┌──────────────┐   │
+│   │    GitHub    │────►│  .agent-tasks│────►│   AI Agent   │   │
+│   │    Issues    │     │    (YAML)    │     │  (Claude,    │   │
+│   └──────────────┘     └──────────────┘     │   Kiro, etc) │   │
+│                                              └──────┬───────┘   │
+│                                                     │           │
+│   ┌──────────────────────────────────────────────────┘          │
+│   │                                                              │
+│   ▼                                                              │
+│   ┌──────────────────────────────────────────────────────────┐  │
+│   │                    .kiro/specs/                           │  │
+│   │   ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │  │
+│   │   │requirements  │ │   design     │ │    tasks     │     │  │
+│   │   │     .md      │ │     .md      │ │     .md      │     │  │
+│   │   └──────────────┘ └──────────────┘ └──────────────┘     │  │
+│   └──────────────────────────────────────────────────────────┘  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Directory Structure
+
+```
+JACK/
+├── .agent-tasks/         # YAML-based task automation
+│   ├── tasks.yaml        # Manual tasks
+│   └── day-1.yaml        # GitHub-synced tasks
+│
+├── .kiro/                # Kiro-style spec system
+│   ├── bin/
+│   │   └── jack-spec.js  # CLI tool
+│   ├── specs/
+│   │   └── <spec>/
+│   │       ├── requirements.md
+│   │       ├── design.md
+│   │       └── tasks.md
+│   └── README.md
+│
+├── .agent/               # Antigravity workflows
+│   └── workflows/
+│       └── spec.md
+│
+├── .vscode/              # VS Code integration
+│   └── tasks.json
+│
+├── .github/              # GitHub Actions
+│   └── workflows/
+│       └── agent-automation.yml
+│
+├── docs/                 # Documentation (you are here)
+│   ├── README.md
+│   ├── agent-orchestration.md
+│   ├── spec-system.md
+│   ├── spec-quickstart.md
+│   └── multi-agent-config.md
+│
+└── scripts/              # Agent automation scripts
+    ├── agent-runner.ts
+    ├── agent-dashboard.ts
+    └── sync-github-tasks.ts
+```
+
+---
+
+## npm Scripts
+
+| Script | Description |
+|--------|-------------|
+| `pnpm agent:run <file>` | Run agent on task YAML |
+| `pnpm agent:sync <label>` | Sync GitHub issues to YAML |
+| `pnpm agent:dashboard` | Open agent dashboard |
+| `pnpm agent:tracker` | Track GitHub project progress |
+
+---
+
+## CLI Commands
+
+| Command | Description |
+|---------|-------------|
+| `jack-spec list` | List all specs |
+| `jack-spec status <spec>` | Show spec status |
+| `jack-spec run --task <id>` | Run specific task |
+| `jack-spec new <name>` | Create new spec |
+
+> **Note:** Run with `node .kiro/bin/jack-spec.js` or add as npm script.
+
+---
+
+## Contributing
+
+When adding new agent integrations or spec features:
+
+1. Update the relevant documentation
+2. Add examples to the quick start guide
+3. Test with multiple agents
+4. Update the architecture diagram if needed
+
+---
+
+## Related Resources
+
+- [Kiro IDE](https://kiro.dev) - Visual spec-driven development
+- [Claude Code](https://anthropic.com) - CLI-based AI coding
+- [Antigravity](https://cloud.google.com/antigravity) - VS Code AI extension

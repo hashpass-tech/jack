@@ -3,7 +3,9 @@ import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, '.', '');
+  const rootEnv = loadEnv(mode, '.', '');
+  const landingEnv = loadEnv(mode, path.resolve(__dirname, 'apps/landing'), '');
+  const env = { ...rootEnv, ...landingEnv };
   return {
     server: {
       // @ts-ignore

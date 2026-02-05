@@ -20,10 +20,10 @@ const Scene3Dv2: React.FC<Scene3DProps> = ({ onViewDetails, selectedLayer, onSel
     texture.colorSpace = THREE.SRGBColorSpace;
 
     const layers = useMemo(() => [
-        { text: "INTENT", color: "#F2B94B", radius: 2.2, rotation: [Math.PI / 2, 0.2, 0], speed: 0.4 },
-        { text: "ROUTE", color: "#38BDF8", radius: 3.2, rotation: [Math.PI / 2.2, -0.3, 0], speed: 0.3 },
-        { text: "CONSTRAINTS", color: "#F2B94B", radius: 4.2, rotation: [Math.PI / 1.8, 0.1, 0], speed: 0.2 },
-        { text: "SETTLEMENT", color: "#38BDF8", radius: 5.2, rotation: [Math.PI / 2.5, 0.4, 0], speed: 0.15 },
+        { text: "INTENT", color: "#F2B94B", radius: 1.8, rotation: [Math.PI / 2, 0.2, 0], speed: 0.4 },
+        { text: "ROUTE", color: "#38BDF8", radius: 2.6, rotation: [Math.PI / 2.2, -0.3, 0], speed: 0.3 },
+        { text: "CONSTRAINTS", color: "#F2B94B", radius: 3.4, rotation: [Math.PI / 1.8, 0.1, 0], speed: 0.2 },
+        { text: "SETTLEMENT", color: "#38BDF8", radius: 4.2, rotation: [Math.PI / 2.5, 0.4, 0], speed: 0.15 },
     ], []);
 
     useFrame((state) => {
@@ -35,7 +35,7 @@ const Scene3Dv2: React.FC<Scene3DProps> = ({ onViewDetails, selectedLayer, onSel
     });
 
     return (
-        <group ref={groupRef} position={[0, -0.5, 0]}>
+        <group ref={groupRef} position={[0, -0.2, 0]} scale={[0.8, 0.8, 0.8]}>
             {/* The "Jack" Hero - Standard Mesh for better transparency handling */}
             <Billboard position={[0, 0.5, 0]} renderOrder={1}>
                 <Float speed={2} rotationIntensity={0.1} floatIntensity={0.5} floatingRange={[-0.1, 0.1]}>
@@ -145,7 +145,7 @@ const LayerRing: React.FC<{
                         <Billboard position={[0, 0, 0]}>
                             <group position={[0.4, 0, 0]}>
                                 <Text
-                                    fontSize={0.35}
+                                    fontSize={0.28}
                                     color="#FFFFFF"
                                     anchorX="left"
                                     anchorY="middle"
@@ -163,7 +163,7 @@ const LayerRing: React.FC<{
                                     onPointerOut={() => (document.body.style.cursor = 'auto')}
                                 >
                                     <Text
-                                        fontSize={0.18}
+                                        fontSize={0.14}
                                         color={color}
                                         anchorX="left"
                                         fillOpacity={0.9}
@@ -172,7 +172,7 @@ const LayerRing: React.FC<{
                                         {"\u27F6"} VIEW DETAILS
                                     </Text>
                                     <mesh position={[1, 0, -0.1]}>
-                                        <planeGeometry args={[2.5, 0.4]} />
+                                        <planeGeometry args={[2, 0.3]} />
                                         <meshBasicMaterial color={color} transparent opacity={0.15} />
                                     </mesh>
                                 </group>

@@ -26,7 +26,9 @@ function parseIssue(issue: GHIssue) {
 
     // Extract output path
     const outputMatch = body.match(/(?:Output|File):\s*([^\n]+)/i);
-    const outputPath = outputMatch ? outputMatch[1].trim().replace(/`/g, '') : '';
+    let outputPath = outputMatch ? outputMatch[1].trim() : '';
+    // Strip markdown bolding and backticks
+    outputPath = outputPath.replace(/[\*`]|(\*\*)/g, '').replace(/^:?\s*/, '').trim();
 
     // Extract acceptance criteria (lines starting with - [ ])
     const acceptance = body
@@ -34,9 +36,21 @@ function parseIssue(issue: GHIssue) {
         .filter(line => line.match(/^[-*]\s*\[[ x]\]/))
         .map(line => line.replace(/^[-*]\s*\[[ x]\]\s*/, '').trim());
 
-    // Extract requirement (first paragraph or everything before "Acceptance" or "Criteria")
-    const reqMatch = body.split(/(?:Acceptance|Criteria|Output|File):/i)[0].trim();
-    const requirement = reqMatch || issue.title;
+    // Extract requirement
+    let requirement = '';
+    // Look for text specifically under the "Requirement" section, ignoring bold markers
+    const reqMatch = body.match(/(?:\*\*|###)?\s*Requirement:?\*?\*?\s*\n?([\s\S]*?)(?=\n?(?:\*\*|###)?\s*(?:Acceptance|Criteria|Output|File|Estimate)|$)/i);
+
+    if (reqMatch && reqMatch[1].trim().length > 10) {
+        requirement = reqMatch[1].trim();
+    } else {
+        // Fallback: take start/middle of body that isn't a known tag
+        requirement = body.split(/(?:Acceptance|Criteria|Output|File|Estimate):/i)[0]
+            .replace(/\*\*[^*]+\*\*:?/g, '')
+            .trim();
+    }
+
+    if (!requirement || requirement.length < 5) requirement = issue.title;
 
     return { outputPath, acceptance, requirement };
 }

@@ -56,18 +56,28 @@ graph TB
 
 2. Install dependencies:
    ```bash
-   npm install
+   pnpm install
    ```
 
-3. Set up environment variables:
+3. Set up environment variables (if needed):
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your configuration
    ```
 
-4. Run the development server:
+4. Run the landing page (http://localhost:3000):
    ```bash
-   npm run dev
+   pnpm dev:landing
+   ```
+
+5. In another terminal, run the dashboard (http://localhost:3001):
+   ```bash
+   pnpm dev:dashboard
+   ```
+
+6. Or run both concurrently:
+   ```bash
+   pnpm dev:all
    ```
 
 ## Project Structure
@@ -94,6 +104,52 @@ jack/
 ## Contributing
 
 We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
+
+## Releases
+
+Releases are driven by `@edcalderon/versioning` and the `pnpm release*` scripts in the root package. After you commit every change set, run the release helper to bump the version, regenerate the changelog, build `landing` + `dashboard`, and (optionally) sync the artifacts to your configured GCloud buckets.
+
+Supported commands:
+
+```bash
+pnpm release        # patch release
+pnpm release:minor  # minor release
+pnpm release:major  # major release
+```
+
+The helper respects these environment variables to upload every release to GCloud:
+
+- `GCLOUD_PROJECT`: target GCloud project ID.
+- `GCLOUD_LANDING_BUCKET`: target bucket for the landing build (`dist/`).
+- `GCLOUD_LANDING_REGION`: bucket region (defaults to `us-west1` in setup script).
+- `GCLOUD_WHITEPAPER_BUCKET`: optional bucket to keep the `public/whitepapper/` exports in sync with the release path.
+- `GCLOUD_RUN_SERVICE`: Cloud Run service name for the dashboard deployment.
+- `GCLOUD_RUN_REGION`: Cloud Run region (e.g. `us-west1`).
+- `GCLOUD_RUN_ALLOW_UNAUTH`: set to `true` to allow unauthenticated access.
+- `GOOGLE_APPLICATION_CREDENTIALS`: path to a service account JSON key used for `gcloud`/`gsutil` auth.
+
+The script uses `gsutil -m rsync -r` to mirror the built artifacts into `gs://<bucket>/` and `gs://<bucket>/releases/v<version>/…`, then deploys the dashboard to Cloud Run if `GCLOUD_RUN_SERVICE` is defined. Make sure `gcloud` + `gsutil` are installed and authenticated before running the release command.
+
+### Testnet setup
+
+Use the helper scripts in `scripts/gcloud/` to configure a bucket for `https://testnet.jack.lukas.money` and deploy the current `develop` release:
+
+```bash
+GCLOUD_PROJECT=your-project \
+GCLOUD_LANDING_BUCKET=your-landing-bucket \
+GCLOUD_LANDING_REGION=us-west1 \
+GCLOUD_LANDING_PUBLIC=true \
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json \
+./scripts/gcloud/setup-testnet.sh
+
+GCLOUD_PROJECT=your-project \
+GCLOUD_LANDING_BUCKET=your-landing-bucket \
+GCLOUD_RUN_SERVICE=jack-dashboard-testnet \
+GCLOUD_RUN_REGION=us-west1 \
+GCLOUD_RUN_ALLOW_UNAUTH=true \
+GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json \
+./scripts/gcloud/deploy-testnet.sh
+```
 
 ## License
 
