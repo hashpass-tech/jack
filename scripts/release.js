@@ -36,6 +36,79 @@ const run = (command) => {
   execSync(command, { stdio: 'inherit', env: process.env });
 };
 
+const runWithOutput = (command) => {
+  return execSync(command, { stdio: 'pipe', env: process.env }).toString().trim();
+};
+
+const getBranchName = () => {
+  if (process.env.GIT_BRANCH) {
+    return process.env.GIT_BRANCH;
+  }
+  try {
+    return runWithOutput('git rev-parse --abbrev-ref HEAD');
+  } catch {
+    return '';
+  }
+};
+
+const tagExists = (tagName) => {
+  try {
+    execSync(`git rev-parse -q --verify refs/tags/${tagName}`, { stdio: 'ignore' });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+const createReleaseTag = (version) => {
+  const branch = getBranchName();
+  if (!branch) {
+    console.log('Skipping tag creation (branch not detected)');
+    return;
+  }
+
+  if (branch === 'develop') {
+    const tagPrefix = `v${version}-testnet`;
+    let next = 1;
+    try {
+      const tagsRaw = runWithOutput(`git tag -l "${tagPrefix}.*"`);
+      const tags = tagsRaw ? tagsRaw.split('\n') : [];
+      const numbers = tags
+        .map((tag) => Number(tag.replace(`${tagPrefix}.`, '')))
+        .filter((value) => Number.isFinite(value));
+      if (numbers.length) {
+        next = Math.max(...numbers) + 1;
+      }
+    } catch {
+      // ignore
+    }
+
+    const tagName = `${tagPrefix}.${next}`;
+    if (tagExists(tagName)) {
+      console.log(`Tag already exists: ${tagName}`);
+      return;
+    }
+    run(`git tag -a ${tagName} -m "Release ${tagName}"`);
+    run(`git push origin ${tagName}`);
+    console.log(`Created testnet tag ${tagName}`);
+    return;
+  }
+
+  if (branch === 'main' || branch === 'master') {
+    const tagName = `v${version}`;
+    if (tagExists(tagName)) {
+      console.log(`Tag already exists: ${tagName}`);
+      return;
+    }
+    run(`git tag -a ${tagName} -m "Release ${tagName}"`);
+    run(`git push origin ${tagName}`);
+    console.log(`Created production tag ${tagName}`);
+    return;
+  }
+
+  console.log(`Skipping tag creation for branch ${branch}`);
+};
+
 try {
   console.log('Starting versioning + release pipeline');
   const versioningCommand = `pnpm exec versioning ${releaseLevel} --message "${releaseMessage}"`;
@@ -46,6 +119,8 @@ try {
   const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
   const version = packageJson.version;
   console.log(`New version: ${version}`);
+
+  createReleaseTag(version);
 
   const dashboardUrl = process.env.GCLOUD_DASHBOARD_URL || process.env.VITE_DASHBOARD_URL;
   if (dashboardUrl) {
