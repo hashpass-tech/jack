@@ -94,7 +94,18 @@ try {
   if (process.env.GCLOUD_RUN_SERVICE && process.env.GCLOUD_RUN_REGION) {
     const project = process.env.GCLOUD_PROJECT ? `--project ${process.env.GCLOUD_PROJECT}` : '';
     const allowUnauth = process.env.GCLOUD_RUN_ALLOW_UNAUTH === 'true' ? '--allow-unauthenticated' : '';
-    run(`gcloud run deploy ${process.env.GCLOUD_RUN_SERVICE} --source apps/dashboard --region ${process.env.GCLOUD_RUN_REGION} ${project} ${allowUnauth}`);
+    const region = process.env.GCLOUD_RUN_REGION;
+    const defaultImage = process.env.GCLOUD_PROJECT
+      ? `${region}-docker.pkg.dev/${process.env.GCLOUD_PROJECT}/cloud-run-source-deploy/${process.env.GCLOUD_RUN_SERVICE}:v${version}`
+      : undefined;
+    const imageUri = process.env.GCLOUD_RUN_IMAGE || defaultImage;
+
+    if (!imageUri) {
+      throw new Error('GCLOUD_RUN_IMAGE or GCLOUD_PROJECT must be set to deploy to Cloud Run');
+    }
+
+    run(`gcloud builds submit --tag ${imageUri} --region ${region} ${project} --timeout=1800s . -- -f apps/dashboard/Dockerfile`);
+    run(`gcloud run deploy ${process.env.GCLOUD_RUN_SERVICE} --image ${imageUri} --region ${region} ${project} ${allowUnauth}`);
   }
 
   console.log('Release pipeline completed successfully');

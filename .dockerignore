@@ -1,0 +1,14 @@
+node_modules
+**/node_modules
+dist
+apps/dashboard/.next
+apps/dashboard/node_modules
+apps/dashboard/.turbo
+apps/dashboard/.vercel
+.pnpm-store
+.pnpm
+pnpm-debug.log
+.env*
+.vscode
+.idea
+.git
