@@ -17,6 +17,7 @@ contract JACKPolicyHook is BaseHook {
     uint256 internal constant BPS_DENOMINATOR = 10_000;
 
     error Unauthorized();
+    error InvalidSlippageBps(uint16 maxSlippageBps);
     error PolicyViolation(bytes32 intentId, bytes32 reason);
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -107,6 +108,7 @@ contract JACKPolicyHook is BaseHook {
     ) external onlyPolicyUpdater(intentId) {
         Policy storage policy = policies[intentId];
         if (!policy.exists) revert PolicyViolation(intentId, REASON_POLICY_MISSING);
+        _validateSlippageBps(maxSlippageBps);
 
         policy.minAmountOut = minAmountOut;
         policy.referenceAmountOut = referenceAmountOut;
@@ -157,7 +159,7 @@ contract JACKPolicyHook is BaseHook {
         uint256 deadline,
         address updater
     ) internal {
-        if (maxSlippageBps > BPS_DENOMINATOR) revert Unauthorized();
+        _validateSlippageBps(maxSlippageBps);
 
         policies[intentId] = Policy({
             minAmountOut: minAmountOut,
@@ -173,5 +175,9 @@ contract JACKPolicyHook is BaseHook {
 
     function _slippageBound(uint256 referenceAmountOut, uint16 maxSlippageBps) internal pure returns (uint256) {
         return (referenceAmountOut * (BPS_DENOMINATOR - maxSlippageBps)) / BPS_DENOMINATOR;
+    }
+
+    function _validateSlippageBps(uint16 maxSlippageBps) internal pure {
+        if (maxSlippageBps > BPS_DENOMINATOR) revert InvalidSlippageBps(maxSlippageBps);
     }
 }
