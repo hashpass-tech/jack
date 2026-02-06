@@ -1,3 +1,14 @@
+## [0.1.32](https://github.com/hashpass-tech/JACK/compare/v0.1.31-testnet.1...v0.1.32) (2026-02-06)
+
+
+### Bug Fixes
+
+* **landing:** reduce hero CTA buttons size and push below JACK icon on desktop ([d2e3cd0](https://github.com/hashpass-tech/JACK/commit/d2e3cd065791976d2c7c880841176f950690bd7e))
+
+
+
+
+
 ## [0.1.31](https://github.com/hashpass-tech/JACK/compare/v0.1.30-testnet.1...v0.1.31) (2026-02-06)
 
 

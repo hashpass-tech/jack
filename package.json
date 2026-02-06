@@ -1,6 +1,6 @@
 {
   "name": "jack-monorepo",
-  "version": "0.1.31",
+  "version": "0.1.32",
   "private": true,
   "scripts": {
     "build": "vite build --config apps/landing/vite.config.ts",
