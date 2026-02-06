@@ -1,0 +1,32 @@
+{
+  "name": "@jack/videos",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JACK Protocol explainer videos — Remotion + React Three Fiber",
+  "scripts": {
+    "dev": "remotion studio",
+    "build": "remotion bundle",
+    "render": "remotion render JACKLayeredExplainer out/jack-explainer.mp4",
+    "render:scene1": "remotion render Scene1KeyManagement out/scene1-key-management.mp4",
+    "render:scene2": "remotion render Scene2MultiChain out/scene2-multi-chain.mp4",
+    "render:scene3": "remotion render Scene3Clearing out/scene3-clearing.mp4",
+    "render:scene4": "remotion render Scene4Automation out/scene4-automation.mp4",
+    "render:scene5": "remotion render Scene5Outro out/scene5-outro.mp4",
+    "render:all": "pnpm render:scene1 && pnpm render:scene2 && pnpm render:scene3 && pnpm render:scene4 && pnpm render:scene5 && pnpm render"
+  },
+  "dependencies": {
+    "@react-three/fiber": "9.0.4",
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.0",
+    "@remotion/three": "^4.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "remotion": "^4.0.0",
+    "three": "^0.175.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/three": "^0.175.0",
+    "typescript": "^5.7.0"
+  }
+}

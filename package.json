@@ -8,6 +8,7 @@
     "dev": "pnpm dev:landing",
     "dev:landing": "vite --config apps/landing/vite.config.ts --host 0.0.0.0 --port 3000",
     "dev:dashboard": "cd apps/dashboard && pnpm dev",
+    "dev:videos": "cd apps/videos && pnpm dev",
     "dev:all": "concurrently \"pnpm dev:landing\" \"pnpm dev:dashboard\"",
     "lint": "turbo run lint",
     "release": "node scripts/release.js patch",
@@ -17,11 +18,11 @@
     "test": "turbo run test",
     "start": "serve -s apps/landing/dist -l 8080",
     "prepare": "husky || true",
-    "agent:run": "tsx scripts/agent-runner.ts",
-    "agent:dashboard": "tsx scripts/agent-dashboard.ts",
-    "agent:sync": "tsx scripts/sync-github-tasks.ts",
-    "agent:verify-gh": "tsx scripts/verify-gh-integration.ts",
-    "agent:tracker": "tsx scripts/github-project-tracker.ts"
+    "agent:run": "node --import tsx scripts/agent-runner.ts",
+    "agent:dashboard": "node --import tsx scripts/agent-dashboard.ts",
+    "agent:sync": "node --import tsx scripts/sync-github-tasks.ts",
+    "agent:verify-gh": "node --import tsx scripts/verify-gh-integration.ts",
+    "agent:tracker": "node --import tsx scripts/github-project-tracker.ts"
   },
   "dependencies": {
     "@metamask/sdk": "^0.34.0",
