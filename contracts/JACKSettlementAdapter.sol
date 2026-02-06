@@ -38,8 +38,8 @@ contract JACKSettlementAdapter {
         bytes calldata /* solverSignature – unused in MVP stub */
     ) external {
         // 1. Verify Intent Signature (Mock for MVP)
-        // 2. Register intent constraint in the policy hook
-        policyHook.setIntentConstraint(intent.id, intent.minAmountOut);
+        // 2. Register intent policy in the hook.
+        policyHook.setPolicy(intent.id, intent.minAmountOut, intent.deadline, msg.sender);
 
         // 3. Execute Swap (Mock for MVP - would call PoolManager.unlock and perform swap)
         // For the demo, we emit a success event.
