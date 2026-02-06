@@ -264,6 +264,9 @@ importers:
         specifier: ^2.0.0
         version: 2.45.1(typescript@5.9.3)(zod@4.3.6)
     devDependencies:
+      '@fast-check/vitest':
+        specifier: ^0.2.4
+        version: 0.2.4(vitest@1.6.1)
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.31
@@ -271,7 +274,7 @@ importers:
         specifier: ^1.0.0
         version: 1.6.1(vitest@1.6.1)
       fast-check:
-        specifier: ^3.0.0
+        specifier: ^3.23.2
         version: 3.23.2
       msw:
         specifier: ^2.0.0
@@ -4126,6 +4129,15 @@ packages:
       ethereum-cryptography: 2.2.1
       micro-ftch: 0.3.1
     dev: false
+
+  /@fast-check/vitest@0.2.4(vitest@1.6.1):
+    resolution: {integrity: sha512-Ilcr+JAIPhb1s6FRm4qoglQYSGXXrS+zAupZeNuWAA3qHVGDA1d1Gb84Hb/+otL3GzVZjFJESg5/1SfIvrgssA==}
+    peerDependencies:
+      vitest: ^1 || ^2 || ^3 || ^4
+    dependencies:
+      fast-check: 3.23.2
+      vitest: 1.6.1(@types/node@20.19.31)
+    dev: true
 
   /@hapi/hoek@9.3.0:
     resolution: {integrity: sha512-/c6rf4UJlmHlC9b5BaNvzAcFv7HZ2QHaV0D4/HNlBdvFnvQq8RI4kYdhyPCl7Xj+oWvTWQ8ujhqS53LIgAe6KQ==}

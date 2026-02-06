@@ -55,7 +55,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Test error serialization for logging
     - _Requirements: 5.2, 5.3_
 
-- [~] 3. HTTP client with retry and caching
+- [x] 3. HTTP client with retry and caching
   - [x] 3.1 Implement core HTTP client
     - Create src/client.ts with JackClient class
     - Implement constructor with ClientConfig validation
@@ -85,19 +85,19 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Test configuration validation
     - _Requirements: 13.1, 13.2, 13.3, 13.5_
   
-  - [~] 3.5 Write property test for retry exhaustion
+  - [x] 3.5 Write property test for retry exhaustion
     - **Property 4: Retry Exhaustion**
     - **Validates: Requirements 6.2**
     - Generate random retryable errors, verify error includes retry count after exhaustion
     - _Requirements: 6.2_
   
-  - [~] 3.6 Write property test for cache TTL
+  - [x] 3.6 Write property test for cache TTL
     - **Property 5: Cache Invalidation**
     - **Validates: Requirements 7.3**
     - Generate random cache entries with TTL, verify fresh fetch after expiry
     - _Requirements: 7.3_
   
-  - [~] 3.7 Write property test for configuration validation
+  - [x] 3.7 Write property test for configuration validation
     - **Property 10: Configuration Validation**
     - **Validates: Requirements 13.5**
     - Generate random invalid configs, verify ValidationError thrown
