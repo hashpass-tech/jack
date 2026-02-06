@@ -1,3 +1,8 @@
+---
+title: Agent Orchestration
+sidebar_position: 1
+---
+
 # Agent Orchestration System
 
 The JACK project uses a flexible agent orchestration system that supports multiple AI coding assistants (Kiro, Claude Code, Antigravity, etc.) through a unified spec-based workflow.
@@ -77,110 +82,11 @@ Both systems can be used together:
 
 ## Spec System (Kiro-style)
 
-The spec system (`/.kiro/`) provides a Kiro-inspired workflow for feature development with structured documentation.
-
-### Directory Structure
-
-```
-.kiro/
-├── bin/
-│   └── jack-spec.js         # CLI tool for spec management
-├── specs/
-│   └── <spec_name>/
-│       ├── requirements.md  # What we're building
-│       ├── design.md        # How we're building it
-│       └── tasks.md         # Step-by-step implementation
-└── README.md                # Quick reference
-```
-
-### Spec Files
-
-#### `requirements.md`
-Contains user stories and acceptance criteria:
-
-```markdown
-## User Stories
-
-### US-1: Feature Name
-**As a** user type  
-**I want to** action  
-**So that** benefit
-
-**Acceptance Criteria:**
-- [ ] Criterion 1
-- [ ] Criterion 2
-```
-
-#### `design.md`
-Contains architecture and technical decisions:
-
-```markdown
-## Architecture Overview
-
-[ASCII/Mermaid diagrams]
-
-## Technical Decisions
-
-| Decision | Choice | Rationale |
-|----------|--------|-----------|
-```
-
-#### `tasks.md`
-Contains phased task list with machine-parseable annotations:
-
-```markdown
-<!-- @task id="FEAT-1" status="pending" priority="high" depends="SETUP-1" -->
-### Task FEAT-1: Task Title
-**Status:** 🔵 Pending | **Priority:** High | **Estimate:** 2h
-
-**Description:**
-What needs to be done...
-
-**Commands:**
-\`\`\`bash
-npm install something
-\`\`\`
-
-**Acceptance Criteria:**
-- [ ] Criterion 1
-
-**Run Task:** `[▶ Execute Task FEAT-1]`
-<!-- @endtask -->
-```
-
-### CLI Commands
-
-```bash
-# List all specs
-node .kiro/bin/jack-spec.js list
-
-# Show spec status with task breakdown
-node .kiro/bin/jack-spec.js status <spec_name>
-
-# Run a specific task
-node .kiro/bin/jack-spec.js run --task <task_id>
-
-# Run all pending tasks in a spec
-node .kiro/bin/jack-spec.js run --spec <spec_name> --all
-
-# Create a new spec with templates
-node .kiro/bin/jack-spec.js new <spec_name>
-```
-
----
+The spec system (`/.kiro/`) provides a Kiro-inspired workflow for feature development with structured documentation. For a full breakdown, see the [Spec System](../spec-system) guide.
 
 ## Task System (YAML-based)
 
 The task system (`/.agent-tasks/`) provides machine-readable task definitions for automation.
-
-### Directory Structure
-
-```
-.agent-tasks/
-├── tasks.yaml       # Manual task definitions
-├── day-1.yaml       # Auto-synced from GitHub Issues
-└── templates/       # Task templates
-```
 
 ### Task Schema
 
@@ -196,43 +102,13 @@ tasks:
     priority: "critical"     # critical | high | medium | low
     estimate: "2h"
     depends_on: ["SETUP-1"]
-    
     requirement: |
       Multi-line requirement description
-      with details about what to implement.
-    
     acceptance:
       - "Criterion 1"
-      - "Criterion 2"
-    
-    context:
-      - "path/to/relevant/file.ts"
-    
     output:
       path: "src/feature.ts"
       type: "typescript"
-    
-    agent_config:
-      kiro:
-        mode: "expert"
-      claude_code:
-        temperature: 0.1
-```
-
-### npm Scripts
-
-```bash
-# Run agent on task file
-pnpm agent:run .agent-tasks/tasks.yaml
-
-# Sync GitHub issues to YAML
-pnpm agent:sync <label>
-
-# Open agent dashboard
-pnpm agent:dashboard
-
-# Track GitHub project progress
-pnpm agent:tracker
 ```
 
 ---
@@ -248,74 +124,20 @@ ANTHROPIC_API_KEY=sk-...     # For Claude Code
 KIRO_API_KEY=kiro-...        # For Kiro API
 ```
 
-### Agent-Specific Config
-
-Each task can have agent-specific configuration:
-
-```yaml
-agent_config:
-  kiro:
-    mode: "expert"           # basic | expert
-    context_window: 100000
-  claude_code:
-    temperature: 0.1
-    max_tokens: 4000
-  antigravity:
-    workflows: ["/spec"]     # Available workflow commands
-```
-
 ---
 
 ## GitHub Integration
 
-### Syncing Issues to Tasks
+- Sync issues to tasks: `pnpm agent:sync <label>`
+- Execute tasks: `pnpm agent:run .agent-tasks/<label>.yaml`
 
-```bash
-# Sync all issues with 'auto-execute' label
-pnpm agent:sync auto-execute
-```
-
-This creates/updates `.agent-tasks/<label>.yaml` with tasks from GitHub issues.
-
-### GitHub Actions Workflow
-
-The system includes a GitHub Actions workflow (`.github/workflows/agent-automation.yml`) that:
-
-1. Triggers on workflow_dispatch
-2. Syncs issues to YAML
-3. Runs agent on tasks
-4. Commits results back to repo
-
-### Issue Template
-
-Create issues with structured data for better sync:
-
-```markdown
-## Requirement
-What needs to be done...
-
-## Acceptance Criteria
-- [ ] Criterion 1
-- [ ] Criterion 2
-
-## Output
-- Path: `src/feature.ts`
-- Type: typescript
-```
+For deeper details see:
+- [GitHub Integration Guide](./github-integration)
+- [GitHub Project Tracker](./github-tracker)
 
 ---
 
 ## Usage Guide
-
-### Choosing the Right System
-
-| Use Case | Recommended System |
-|----------|-------------------|
-| New feature with design phase | Spec System |
-| Quick bug fix | Task System |
-| Hackathon sprint tasks | Task System + GitHub sync |
-| Long-term project with phases | Spec System |
-| CI/CD automated generation | Task System |
 
 ### Workflow: Kiro-style Spec Development
 
@@ -323,84 +145,33 @@ What needs to be done...
    ```bash
    node .kiro/bin/jack-spec.js new my_feature
    ```
-
 2. **Define requirements** in `requirements.md`
-
 3. **Design the solution** in `design.md`
-
 4. **Break into tasks** in `tasks.md`
-
 5. **Execute tasks:**
    ```bash
    node .kiro/bin/jack-spec.js run --task FEAT-1
    ```
 
-6. **Track progress:**
-   ```bash
-   node .kiro/bin/jack-spec.js status my_feature
-   ```
-
 ### Workflow: GitHub-Synced Tasks
 
 1. **Create GitHub issues** with proper labels
-
 2. **Sync to local YAML:**
    ```bash
    pnpm agent:sync day-1
    ```
-
 3. **Run agent:**
    ```bash
    pnpm agent:run .agent-tasks/day-1.yaml
    ```
-
 4. **Review and commit** generated code
 
 ---
 
 ## Extending the System
 
-### Adding a New Agent
+- Add a new agent adapter in `scripts/agents/<agent-name>.ts`
+- Register it in `scripts/agent-runner.ts`
+- Update task schema as needed
 
-1. Create agent adapter in `scripts/agents/<agent-name>.ts`:
-
-```typescript
-export interface AgentAdapter {
-  name: string;
-  execute(task: Task): Promise<TaskResult>;
-  supports(taskType: string): boolean;
-}
-```
-
-2. Register in `scripts/agent-runner.ts`
-
-3. Add configuration schema to task YAML
-
-### Converting Between Formats
-
-**Spec to YAML:**
-```bash
-node .kiro/bin/jack-spec.js export --spec my_feature --format yaml
-```
-
-**YAML to Spec:**
-```bash
-node .kiro/bin/jack-spec.js import --yaml .agent-tasks/tasks.yaml
-```
-
-### VS Code Integration
-
-Tasks are available in `.vscode/tasks.json`:
-- `Ctrl+Shift+P` → "Tasks: Run Task"
-- Select `🎯 JACK:` tasks
-
-Antigravity workflow available:
-- Type `/spec` in Antigravity chat
-
----
-
-## Related Documentation
-
-- [Spec System README](../.kiro/README.md)
-- [GitHub Tracker Docs](../.sisyphus/notepads/github-tracker-docs/)
-- [Agent Automation Workflow](../.github/workflows/agent-automation.yml)
+See [Multi-Agent Configuration](../multi-agent-config) for more details.

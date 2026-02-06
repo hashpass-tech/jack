@@ -9,7 +9,7 @@
 
 ## Overview
 
-JACK is a cross-chain execution kernel that enables seamless interoperability between different blockchain networks. This project provides a robust infrastructure for executing cross-chain transactions and managing multi-chain operations.
+JACK is a cross-chain execution kernel that enables seamless interoperability between different blockchain networks. **Mission:** provide deterministic, intent-first execution by pairing a Kernel state machine with policy Hooks that enforce routing and settlement guardrails.
 
 ## Architecture
 
@@ -44,38 +44,30 @@ graph TB
 - **Developer SDK**: Comprehensive SDK for integration with existing applications
 - **Dashboard Interface**: Intuitive web dashboard for monitoring and management
 
-## Quick Start
+## 3-Step Setup Guide
 
 **Prerequisites:** Node.js, Git
 
-1. Clone the repository:
+1. **Clone + install**
    ```bash
    git clone https://github.com/hashpass-tech/jack.git
    cd jack
-   ```
-
-2. Install dependencies:
-   ```bash
    pnpm install
    ```
 
-3. Set up environment variables (if needed):
+2. **Configure environment**
    ```bash
-   cp .env.example .env.local
+   cp .env.production.example .env.local
    # Edit .env.local with your configuration
    ```
 
-4. Run the landing page (http://localhost:3000):
+3. **Run the apps**
    ```bash
-   pnpm dev:landing
+   pnpm dev:landing   # http://localhost:3000
+   pnpm dev:dashboard # http://localhost:3001
    ```
 
-5. In another terminal, run the dashboard (http://localhost:3001):
-   ```bash
-   pnpm dev:dashboard
-   ```
-
-6. Or run both concurrently:
+   Or run both concurrently:
    ```bash
    pnpm dev:all
    ```
@@ -96,10 +88,10 @@ jack/
 
 ## Documentation
 
-- [API Reference](./docs/api.md)
-- [Smart Contract Integration](./docs/contracts.md)
-- [SDK Usage Guide](./docs/sdk.md)
-- [Deployment Guide](./docs/deployment.md)
+- [Docs Platform](https://docs.jack.lukas.money)
+- [Mission & Overview](./apps/docs/docs/overview.md)
+- [Architecture](./apps/docs/docs/architecture.md)
+- [Demo Narrative](./docs/demo-script.md)
 
 ## Contributing
 
