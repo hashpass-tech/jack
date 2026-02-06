@@ -1,3 +1,24 @@
+## [0.1.27](https://github.com/hashpass-tech/JACK/compare/v0.1.22...v0.1.27) (2026-02-06)
+
+
+### Bug Fixes
+
+* **landing:** correct layer→video mapping order ([a7a5b37](https://github.com/hashpass-tech/JACK/commit/a7a5b37476111bc7da866d891fc3aa992362dca1))
+* pass NEXT_PUBLIC_IS_TESTNET as build arg to Docker for Cloud Run testnet builds ([f01478c](https://github.com/hashpass-tech/JACK/commit/f01478c4ff4e5e999dfa1593f2e9fb20028db732))
+
+
+### Features
+
+* **contracts:** finalize JACKPolicyHook policy enforcement ([8e40f5f](https://github.com/hashpass-tech/JACK/commit/8e40f5f251a851be04dbc915a80e54288d087760))
+* **contracts:** implement JACK policy hook with slippage enforcement ([d701021](https://github.com/hashpass-tech/JACK/commit/d701021645a5ca3e74168bf6185e0884631cfa59))
+* **landing:** embed layer explainer videos in modal cards ([1961bbb](https://github.com/hashpass-tech/JACK/commit/1961bbb1201e1829ba1224fc3a538f591966dc97))
+* **videos:** premium 6-scene explainer rewrite ([cdb35a5](https://github.com/hashpass-tech/JACK/commit/cdb35a5eacc6d017316ae7221b6d65df1474a3c6))
+* **videos:** scaffold Remotion + R3F video generator app ([7d71577](https://github.com/hashpass-tech/JACK/commit/7d715777029933613f2b99142b6ed3549efdbece))
+
+
+
+
+
 ## [0.1.26](https://github.com/hashpass-tech/JACK/compare/v0.1.25-testnet.1...v0.1.26) (2026-02-06)
 
 
