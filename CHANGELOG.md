@@ -1,3 +1,49 @@
+## [0.1.26](https://github.com/hashpass-tech/JACK/compare/v0.1.25-testnet.1...v0.1.26) (2026-02-06)
+
+
+
+
+
+## [0.1.25](https://github.com/hashpass-tech/JACK/compare/v0.1.24-testnet.1...v0.1.25) (2026-02-06)
+
+
+### Bug Fixes
+
+* pass NEXT_PUBLIC_IS_TESTNET as build arg to Docker for Cloud Run testnet builds ([2d6699b](https://github.com/hashpass-tech/JACK/commit/2d6699be3ea36d63b11ea93dbbfa4e55bfe23f3a))
+
+
+
+
+
+## [0.1.24](https://github.com/hashpass-tech/JACK/compare/v0.1.23-testnet.1...v0.1.24) (2026-02-06)
+
+
+
+
+
+## [0.1.23](https://github.com/hashpass-tech/JACK/compare/v0.1.22...v0.1.23) (2026-02-06)
+
+
+
+
+
+## [0.1.22](https://github.com/hashpass-tech/JACK/compare/v0.1.21...v0.1.22) (2026-02-06)
+
+
+### Features
+
+* add testnet environment alert banner for dashboard ([0f47415](https://github.com/hashpass-tech/JACK/commit/0f474158c1eb29a38860556ef7153f88d6790940))
+
+
+
+
+
+## [0.1.21](https://github.com/hashpass-tech/JACK/compare/v0.1.20-testnet.1...v0.1.21) (2026-02-05)
+
+
+
+
+
 ## [0.1.20](https://github.com/hashpass-tech/JACK/compare/v0.1.19-testnet.1...v0.1.20) (2026-02-05)
 
 

@@ -11,6 +11,16 @@ labels: agent-task
 **Requirement:**
 Detailed description of what needs to be built.
 
+**Environment Requirements:**
+- Tooling needed (e.g., `pnpm`, `forge`, `docker`)
+- Env vars or secrets (if any)
+
+**Verification Commands:**
+- `pnpm lint`
+- `pnpm test`
+- `forge build` (contracts)
+- `docker build -f Dockerfile ...` (containers)
+
 **Acceptance Criteria:**
 - [ ] Compiles successfully
 - [ ] Tests pass

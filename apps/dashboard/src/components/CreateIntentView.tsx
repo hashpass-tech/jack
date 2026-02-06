@@ -69,25 +69,25 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 	};
 
 	return (
-		<div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-500">
+		<div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 animate-in fade-in duration-500">
 			<div className="lg:col-span-2 space-y-6">
-				<div className="bg-[#0F1A2E] border border-white/5 rounded-2xl p-8 shadow-2xl relative overflow-hidden">
+				<div className="border rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden" style={{ background: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}>
 					{(status !== 'IDLE' && status !== 'ERROR') && (
-						<div className="absolute inset-0 z-20 bg-[#0B1020]/90 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center space-y-6">
+						<div className="absolute inset-0 z-20 backdrop-blur-md flex flex-col items-center justify-center p-8 text-center space-y-6" style={{ background: "var(--overlay)" }}>
 							<div className="w-16 h-16 relative">
-								<div className="absolute inset-0 border-2 border-[#F2B94B]/20 rounded-full" />
-								<div className="absolute inset-0 border-t-2 border-[#F2B94B] rounded-full animate-spin" />
+								<div className="absolute inset-0 border-2 rounded-full" style={{ borderColor: "var(--border-accent)" }} />
+								<div className="absolute inset-0 border-t-2 rounded-full animate-spin" style={{ borderColor: "var(--fg-accent)" }} />
 							</div>
 							<div className="space-y-2">
-								<h3 className="text-xl font-space font-bold text-white uppercase tracking-widest">
+								<h3 className="text-xl font-space font-bold uppercase tracking-widest" style={{ color: "var(--fg-primary)" }}>
 									{status === 'SIGNING' ? 'Awaiting Signature' : 'Kernel Broadcasting'}
 								</h3>
-								<p className="text-gray-400 text-sm font-mono">
+								<p className="text-sm font-mono" style={{ color: "var(--fg-muted)" }}>
 									{status === 'SIGNING' ? 'Verify typed data in your wallet...' : 'Transmitting Broadside Intent to Solvers...'}
 								</p>
 							</div>
-							<div className="w-64 bg-white/5 h-1 rounded-full overflow-hidden">
-								<div className={`h-full bg-[#F2B94B] transition-all duration-1000 ${status === 'BROADCASTING' ? 'w-full' : 'w-1/3'}`} />
+							<div className="w-64 h-1 rounded-full overflow-hidden" style={{ background: "var(--border-secondary)" }}>
+								<div className={`h-full transition-all duration-1000 ${status === 'BROADCASTING' ? 'w-full' : 'w-1/3'}`} style={{ background: "var(--fg-accent)" }} />
 							</div>
 						</div>
 					)}
@@ -104,15 +104,16 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 						</div>
 					)}
 
-					<h2 className="text-2xl font-space font-bold mb-6 text-[#F2B94B]">Submit Cross-Chain Intent</h2>
-					<form onSubmit={handleSubmit} className="space-y-6">
+					<h2 className="text-xl md:text-2xl font-space font-bold mb-6" style={{ color: "var(--fg-accent)" }}>Submit Cross-Chain Intent</h2>
+					<form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div className="space-y-2">
-								<label className="text-[10px] md:text-xs uppercase tracking-widest text-gray-500 font-bold">Source Chain</label>
+								<label className="text-[10px] md:text-xs uppercase tracking-widest font-bold" style={{ color: "var(--fg-muted)" }}>Source Chain</label>
 								<select
 									value={form.sourceChain}
 									onChange={e => setForm({ ...form, sourceChain: e.target.value })}
-									className="w-full bg-[#0B1020] border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#F2B94B] transition-colors text-sm font-semibold"
+									className="w-full border rounded-xl px-4 py-3 outline-none transition-colors text-sm font-semibold"
+									style={{ background: "var(--bg-input)", borderColor: "var(--border-secondary)", color: "var(--fg-primary)" }}
 								>
 									<option>Arbitrum</option>
 									<option>Optimism</option>
@@ -120,11 +121,12 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 								</select>
 							</div>
 							<div className="space-y-2">
-								<label className="text-[10px] md:text-xs uppercase tracking-widest text-gray-500 font-bold">Destination Chain</label>
+								<label className="text-[10px] md:text-xs uppercase tracking-widest font-bold" style={{ color: "var(--fg-muted)" }}>Destination Chain</label>
 								<select
 									value={form.destChain}
 									onChange={e => setForm({ ...form, destChain: e.target.value })}
-									className="w-full bg-[#0B1020] border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#F2B94B] transition-colors text-sm font-semibold"
+									className="w-full border rounded-xl px-4 py-3 outline-none transition-colors text-sm font-semibold"
+									style={{ background: "var(--bg-input)", borderColor: "var(--border-secondary)", color: "var(--fg-primary)" }}
 								>
 									<option>Base</option>
 									<option>Polygon</option>
@@ -135,15 +137,19 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 
 						<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 							<div className="space-y-2">
-								<label className="text-[10px] md:text-xs uppercase tracking-widest text-gray-500 font-bold">Input Asset</label>
+								<label className="text-[10px] md:text-xs uppercase tracking-widest font-bold" style={{ color: "var(--fg-muted)" }}>Input Asset</label>
 								<div className="flex space-x-2">
 									<input
 										type="number"
 										value={form.amountIn}
 										onChange={e => setForm({ ...form, amountIn: e.target.value })}
-										className="w-2/3 bg-[#0B1020] border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#F2B94B] text-sm font-mono"
+										className="w-2/3 border rounded-xl px-4 py-3 outline-none text-sm font-mono"
+										style={{ background: "var(--bg-input)", borderColor: "var(--border-secondary)", color: "var(--fg-primary)" }}
 									/>
-									<select className="w-1/3 bg-[#0B1020] border border-white/10 rounded-xl px-2 md:px-4 py-3 outline-none text-sm font-bold">
+									<select
+										className="w-1/3 border rounded-xl px-2 md:px-4 py-3 outline-none text-sm font-bold"
+										style={{ background: "var(--bg-input)", borderColor: "var(--border-secondary)", color: "var(--fg-primary)" }}
+									>
 										<option>USDC</option>
 										<option>ETH</option>
 										<option>LINK</option>
@@ -151,15 +157,19 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 								</div>
 							</div>
 							<div className="space-y-2">
-								<label className="text-[10px] md:text-xs uppercase tracking-widest text-gray-500 font-bold">Min Out (Slippage Cap)</label>
+								<label className="text-[10px] md:text-xs uppercase tracking-widest font-bold" style={{ color: "var(--fg-muted)" }}>Min Out (Slippage Cap)</label>
 								<div className="flex space-x-2">
 									<input
 										type="number"
 										value={form.minOut}
 										onChange={e => setForm({ ...form, minOut: e.target.value })}
-										className="w-2/3 bg-[#0B1020] border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-[#F2B94B] text-sm font-mono"
+										className="w-2/3 border rounded-xl px-4 py-3 outline-none text-sm font-mono"
+										style={{ background: "var(--bg-input)", borderColor: "var(--border-secondary)", color: "var(--fg-primary)" }}
 									/>
-									<select className="w-1/3 bg-[#0B1020] border border-white/10 rounded-xl px-2 md:px-4 py-3 outline-none text-sm font-bold">
+									<select
+										className="w-1/3 border rounded-xl px-2 md:px-4 py-3 outline-none text-sm font-bold"
+										style={{ background: "var(--bg-input)", borderColor: "var(--border-secondary)", color: "var(--fg-primary)" }}
+									>
 										<option>WETH</option>
 										<option>WBTC</option>
 										<option>USDC</option>
@@ -168,22 +178,23 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 							</div>
 						</div>
 
-						<div className="p-5 bg-gradient-to-r from-[#38BDF8]/5 to-transparent rounded-xl border border-[#38BDF8]/20 flex items-center justify-between">
+						<div className="p-4 md:p-5 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4" style={{ background: "rgba(56,189,248,0.05)", borderColor: "rgba(56,189,248,0.20)" }}>
 							<div className="flex items-center space-x-4">
-								<div className="w-12 h-12 bg-[#38BDF8]/10 rounded-xl flex items-center justify-center border border-[#38BDF8]/20 shadow-[0_0_15px_rgba(56,189,248,0.2)]">
-									<svg className="w-6 h-6 text-[#38BDF8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<div className="w-12 h-12 rounded-xl flex items-center justify-center border shrink-0" style={{ background: "rgba(56,189,248,0.10)", borderColor: "rgba(56,189,248,0.20)" }}>
+									<svg className="w-6 h-6" style={{ color: "var(--fg-info)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
 										<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
 									</svg>
 								</div>
 								<div>
-									<p className="text-sm font-bold text-white uppercase tracking-tight">Fhenix Confidential Intent</p>
-									<p className="text-[10px] text-gray-400 font-semibold tracking-wide">Encrypt constraints for agent-only visibility (CCM).</p>
+									<p className="text-sm font-bold uppercase tracking-tight" style={{ color: "var(--fg-primary)" }}>Fhenix Confidential Intent</p>
+									<p className="text-[10px] font-semibold tracking-wide" style={{ color: "var(--fg-muted)" }}>Encrypt constraints for agent-only visibility (CCM).</p>
 								</div>
 							</div>
 							<button
 								type="button"
 								onClick={() => setForm({ ...form, privacy: !form.privacy })}
-								className={`w-14 h-7 rounded-full transition-all duration-300 relative p-1 ${form.privacy ? 'bg-[#F2B94B]' : 'bg-gray-700'}`}
+								className={`w-14 h-7 rounded-full transition-all duration-300 relative p-1 shrink-0`}
+								style={{ background: form.privacy ? "var(--fg-accent)" : "var(--fg-muted)" }}
 							>
 								<div className={`w-5 h-5 bg-white rounded-full shadow-lg transition-transform duration-300 ${form.privacy ? 'translate-x-7' : 'translate-x-0'}`} />
 							</button>
@@ -192,7 +203,8 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 						<button
 							type="submit"
 							disabled={status !== 'IDLE' || !isConnected}
-							className="w-full py-5 bg-[#F2B94B] text-[#0B1020] font-black uppercase tracking-[0.2em] rounded-xl shadow-[0_10px_40px_rgba(242,185,75,0.3)] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center space-y-0 space-x-3 text-sm"
+							className="w-full py-4 md:py-5 font-black uppercase tracking-[0.2em] rounded-xl hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center space-x-3 text-sm"
+							style={{ background: "var(--fg-accent)", color: "var(--bg-primary)", boxShadow: `0 10px 40px var(--shadow-accent)` }}
 						>
 							<span>{isConnected ? 'Broadside Intent' : 'Connect to Broadside'}</span>
 							<svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -204,8 +216,8 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 			</div>
 
 			<div className="space-y-6">
-				<div className="bg-[#0F1A2E] border border-white/5 rounded-2xl p-6 shadow-xl">
-					<h3 className="text-[10px] font-space font-bold uppercase tracking-[0.3em] text-gray-500 mb-6">Route Topology</h3>
+				<div className="border rounded-2xl p-6 shadow-xl" style={{ background: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}>
+					<h3 className="text-[10px] font-space font-bold uppercase tracking-[0.3em] mb-6" style={{ color: "var(--fg-muted)" }}>Route Topology</h3>
 					<div className="space-y-5">
 						{[
 							{ step: '1', title: 'Solver Selection', desc: 'Yellow Fusion+ Bonded' },
@@ -214,29 +226,29 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 							{ step: '4', title: 'Atomic Settlement', desc: 'Uniswap v4 JACK Hook' }
 						].map((item) => (
 							<div key={item.step} className="flex items-start space-x-4">
-								<div className="w-8 h-8 bg-white/5 rounded-lg flex items-center justify-center text-[10px] font-bold border border-white/5 text-[#F2B94B]">{item.step}</div>
+								<div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold border" style={{ background: "var(--bg-tertiary)", borderColor: "var(--border-secondary)", color: "var(--fg-accent)" }}>{item.step}</div>
 								<div>
-									<p className="text-xs font-bold text-white">{item.title}</p>
-									<p className="text-[10px] text-gray-500 font-semibold">{item.desc}</p>
+									<p className="text-xs font-bold" style={{ color: "var(--fg-primary)" }}>{item.title}</p>
+									<p className="text-[10px] font-semibold" style={{ color: "var(--fg-muted)" }}>{item.desc}</p>
 								</div>
 							</div>
 						))}
-						<div className="mt-8 pt-6 border-t border-white/5">
+						<div className="mt-8 pt-6 border-t" style={{ borderColor: "var(--border-primary)" }}>
 							<div className="flex justify-between text-xs font-bold uppercase tracking-tighter">
-								<span className="text-gray-500">Estimated Gas</span>
-								<span className="text-[#38BDF8]">$12.40</span>
+								<span style={{ color: "var(--fg-muted)" }}>Estimated Gas</span>
+								<span style={{ color: "var(--fg-info)" }}>$12.40</span>
 							</div>
 							<div className="flex justify-between text-xs font-bold uppercase tracking-tighter mt-3">
-								<span className="text-gray-500">Kernel Latency</span>
-								<span className="text-[#38BDF8]">~45s</span>
+								<span style={{ color: "var(--fg-muted)" }}>Kernel Latency</span>
+								<span style={{ color: "var(--fg-info)" }}>~45s</span>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<div className="bg-gradient-to-br from-[#F2B94B]/20 to-transparent border border-[#F2B94B]/30 rounded-2xl p-6 shadow-2xl">
-					<p className="text-[10px] font-black text-[#F2B94B] uppercase tracking-[0.2em] mb-3">Kernel Guardrails</p>
-					<p className="text-xs text-gray-300 leading-relaxed font-medium">
+				<div className="border rounded-2xl p-6 shadow-2xl" style={{ background: "linear-gradient(135deg, rgba(242,185,75,0.15), transparent)", borderColor: "var(--border-accent)" }}>
+					<p className="text-[10px] font-black uppercase tracking-[0.2em] mb-3" style={{ color: "var(--fg-accent)" }}>Kernel Guardrails</p>
+					<p className="text-xs leading-relaxed font-medium" style={{ color: "var(--fg-secondary)" }}>
 						JACK employs Policy-Constrained Private Execution. Any violation of constraints triggers a fail-closed response at the settlement hook.
 					</p>
 				</div>

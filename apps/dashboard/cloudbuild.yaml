@@ -5,8 +5,12 @@ steps:
       - .
       - -f
       - apps/dashboard/Dockerfile
+      - --build-arg
+      - NEXT_PUBLIC_IS_TESTNET=${_NEXT_PUBLIC_IS_TESTNET}
       - -t
       - ${_IMAGE}
 images:
   - ${_IMAGE}
+substitutions:
+  _NEXT_PUBLIC_IS_TESTNET: 'false'
 timeout: 1800s

@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "JACK Dashboard | Autonomous Kernel",
+  title: "JACK Kernel | Autonomous Cross-chain Infrastructure",
   description: "Just-in-Time Autonomous Cross-chain Kernel",
 };
 

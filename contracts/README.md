@@ -64,3 +64,8 @@ $ forge --help
 $ anvil --help
 $ cast --help
 ```
+
+## Issue Tracking
+
+- D1-CRIT-A1 implementation is tracked in GitHub issue #1.
+- PRs for this work should include `Fixes #1` (or `Closes #1`) in the body to auto-link and close the issue on merge.
