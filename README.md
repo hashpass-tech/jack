@@ -86,20 +86,20 @@ graph TB
 jack/
 ├── apps/
 │   ├── dashboard/          # Web dashboard
-│   └── landing/           # Landing page
+│   ├── landing/           # Landing page
+│   └── docs/              # Project docs (agent/spec system)
 ├── contracts/             # Smart contracts
 ├── packages/
 │   └── sdk/               # TypeScript SDK
 ├── components/            # Shared React components
-└── docs/                  # Documentation
 ```
 
 ## Documentation
 
-- [API Reference](./docs/api.md)
-- [Smart Contract Integration](./docs/contracts.md)
-- [SDK Usage Guide](./docs/sdk.md)
-- [Deployment Guide](./docs/deployment.md)
+- [Project Docs](./apps/docs/README.md)
+- [Agent Orchestration](./apps/docs/agent-orchestration.md)
+- [Codex Per-Issue Solver](./apps/docs/codex-issue-solver.md)
+- [Contracts (Foundry)](./contracts/README.md)
 
 ## Contributing
 

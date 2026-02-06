@@ -15,11 +15,10 @@
 6. Merge only after cost and budget checks are complete.
 
 ## Agent Assignment and API Integration
-- Assign GitHub Agents Pro to triage and manage issues.
-- Use KIRO API for code analysis and suggestions.
-- Use Codex agents for code generation/refactoring.
-- Use Debrod and Google AI for diagnostics and advanced solutions.
-- Assign agents in `.agent-tasks/<issue-id>.yaml` and update as work progresses.
+- Use `PREFERRED_AGENT` (or per-task `agent_config.preferred`) to select an execution backend (`kiro | claude-code | codex | cursor`).
+- Prefer **Codex as a per-issue solver** for most workstreams (contracts, SDK, UI).
+- Keep tasks in `.agent-tasks/*.yaml` (synced via `pnpm agent:sync <label>`); run one issue/task via `pnpm agent:run ... --task <id>`.
+- Include `workspace` + `verify` in tasks to enable reproducible Docker toolchains and explicit verification (`pnpm agent:run ... --verify`).
 
 ## Cost Tracking and Budget Analysis
 - Implement a `cost-tracker.ts` module in `scripts/`.

@@ -251,6 +251,7 @@ ${issue.body}
     content += "\n\n{bold}Available Agents:{/bold}\n";
     content += "🤖 {green-fg}Kiro{/green-fg} (Autonomous)\n";
     content += "🤖 {blue-fg}Claude Code{/blue-fg} (CLI)\n";
+    content += "🤖 {cyan-fg}Codex{/cyan-fg} (Per-issue solver)\n";
     content += "🤖 {yellow-fg}Cursor{/yellow-fg} (Manual)\n";
 
     this.agentStatus.setContent(content);

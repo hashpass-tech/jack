@@ -55,8 +55,11 @@ To ensure the sync works correctly, follow the "Agent Task" template:
 - **Title**: Should contain the task ID if preferred, but not required.
 - **Body**:
     - **Output File**: `path/to/file`
+    - **Workspace** (optional): `contracts | sdk | ui | general` (otherwise inferred from output path)
     - **Requirement**: Description of work.
+    - **Context** (optional): bullet list of relevant files/paths
     - **Acceptance Criteria**: List starting with `- [ ]`.
+    - **Verify Commands** (optional): a `bash` code block or bullet list of commands
 
 ---
 

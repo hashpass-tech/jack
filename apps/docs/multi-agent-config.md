@@ -1,6 +1,6 @@
 # Multi-Agent Configuration
 
-This guide explains how to configure and switch between different AI coding agents (Kiro, Claude Code, Antigravity, etc.) in the JACK orchestration system.
+This guide explains how to configure and switch between different AI coding agents (Kiro, Claude Code, Codex, Antigravity, etc.) in the JACK orchestration system.
 
 ## Supported Agents
 
@@ -8,6 +8,7 @@ This guide explains how to configure and switch between different AI coding agen
 |-------|------|----------|
 | **Kiro** | IDE | Feature specs, visual workflows |
 | **Claude Code** | CLI | Automated tasks, CI/CD |
+| **Codex** | CLI/IDE | Per-issue solving, refactors, code review loops |
 | **Antigravity** | VS Code Extension | Interactive development |
 | **GitHub Copilot** | VS Code Extension | Code completion |
 | **Cursor** | IDE | Conversational coding |
@@ -22,7 +23,7 @@ Set the preferred agent for automated execution:
 
 ```bash
 # In .env or CI secrets
-PREFERRED_AGENT=claude-code  # Options: kiro | claude-code | antigravity
+PREFERRED_AGENT=codex  # Runner backends: kiro | claude-code | codex | cursor
 ```
 
 ### Per-Task Override
@@ -105,6 +106,28 @@ pnpm agent:run .agent-tasks/day-1.yaml --all
 ```
 
 ---
+
+## Codex Configuration
+
+### API Setup (if applicable)
+
+```bash
+# .env
+OPENAI_API_KEY=sk-...
+```
+
+### Recommended workflow
+
+Codex works best with **one task per run**:
+
+```bash
+PREFERRED_AGENT=codex pnpm agent:run .agent-tasks/day-1.yaml --task GH-1 --verify --no-commit
+```
+
+For reproducible toolchains (contracts/sdk/ui), use the Docker templates:
+
+- `docker/agent-env/README.md`
+- `apps/docs/codex-issue-solver.md`
 
 ## Antigravity Configuration
 

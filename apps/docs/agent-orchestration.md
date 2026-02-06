@@ -1,6 +1,6 @@
 # Agent Orchestration System
 
-The JACK project uses a flexible agent orchestration system that supports multiple AI coding assistants (Kiro, Claude Code, Antigravity, etc.) through a unified spec-based workflow.
+The JACK project uses a flexible agent orchestration system that supports multiple AI coding assistants (Kiro, Claude Code, Codex, Antigravity, etc.) through a unified spec-based workflow.
 
 ## Table of Contents
 
@@ -22,7 +22,7 @@ The agent orchestration system provides two complementary approaches for managin
 | System | Format | Best For | Agent Support |
 |--------|--------|----------|---------------|
 | **Spec System** | Markdown (`.kiro/specs/`) | Feature development, structured workflows | Kiro, Antigravity, any markdown-aware agent |
-| **Task System** | YAML (`.agent-tasks/`) | CI/CD automation, GitHub sync | Claude Code, automated pipelines |
+| **Task System** | YAML (`.agent-tasks/`) | CI/CD automation, GitHub sync | Codex, Claude Code, automated pipelines |
 
 Both systems can be used together:
 - **Specs** for human-readable feature documentation
@@ -53,15 +53,15 @@ Both systems can be used together:
 │             │  (PREFERRED_AGENT env var)          │                        │
 │             └──────────────────┬──────────────────┘                        │
 │                                │                                            │
-│         ┌──────────────────────┼──────────────────────┐                    │
-│         ▼                      ▼                      ▼                    │
-│   ┌───────────┐          ┌───────────┐          ┌───────────┐              │
-│   │   Kiro    │          │Claude Code│          │Antigravity│              │
-│   │  IDE/API  │          │    CLI    │          │  (VS Code)│              │
-│   └─────┬─────┘          └─────┬─────┘          └─────┬─────┘              │
-│         │                      │                      │                    │
-│         └──────────────────────┼──────────────────────┘                    │
-│                                ▼                                            │
+│         ┌──────────────────────┼──────────────────────┼──────────────────────┐            │
+│         ▼                      ▼                      ▼                      ▼            │
+│   ┌───────────┐          ┌───────────┐          ┌───────────┐          ┌───────────┐      │
+│   │   Kiro    │          │Claude Code│          │   Codex   │          │Antigravity│      │
+│   │  IDE/API  │          │    CLI    │          │  CLI/IDE  │          │  (VS Code)│      │
+│   └─────┬─────┘          └─────┬─────┘          └─────┬─────┘          └─────┬─────┘      │
+│         │                      │                      │                      │            │
+│         └──────────────────────┼──────────────────────┼──────────────────────┘            │
+│                                ▼                                                            │
 │   ┌───────────────────────────────────────────────────────────────────┐    │
 │   │                       .kiro/specs/                                │    │
 │   │   └── <spec_name>/                                                │    │
@@ -196,6 +196,7 @@ tasks:
     priority: "critical"     # critical | high | medium | low
     estimate: "2h"
     depends_on: ["SETUP-1"]
+    workspace: "contracts"   # contracts | sdk | ui | general
     
     requirement: |
       Multi-line requirement description
@@ -211,8 +212,12 @@ tasks:
     output:
       path: "src/feature.ts"
       type: "typescript"
+
+    verify:
+      - "pnpm lint"
     
     agent_config:
+      preferred: "codex"
       kiro:
         mode: "expert"
       claude_code:
@@ -224,6 +229,9 @@ tasks:
 ```bash
 # Run agent on task file
 pnpm agent:run .agent-tasks/tasks.yaml
+
+# Run a single task (per-issue solver) with optional verification
+PREFERRED_AGENT=codex pnpm agent:run .agent-tasks/day-1.yaml --task GH-1 --verify --no-commit
 
 # Sync GitHub issues to YAML
 pnpm agent:sync <label>
@@ -243,9 +251,10 @@ pnpm agent:tracker
 
 ```bash
 # .env or CI secrets
-PREFERRED_AGENT=claude-code  # kiro | claude-code | antigravity
+PREFERRED_AGENT=codex        # kiro | claude-code | codex | cursor
 ANTHROPIC_API_KEY=sk-...     # For Claude Code
 KIRO_API_KEY=kiro-...        # For Kiro API
+OPENAI_API_KEY=sk-...        # For Codex (if applicable in your setup)
 ```
 
 ### Agent-Specific Config
@@ -294,6 +303,9 @@ Create issues with structured data for better sync:
 ## Requirement
 What needs to be done...
 
+## Workspace
+contracts | sdk | ui | general
+
 ## Acceptance Criteria
 - [ ] Criterion 1
 - [ ] Criterion 2
@@ -301,6 +313,12 @@ What needs to be done...
 ## Output
 - Path: `src/feature.ts`
 - Type: typescript
+
+## Verify Commands (optional)
+```bash
+# Example
+pnpm lint
+```
 ```
 
 ---
@@ -355,6 +373,13 @@ What needs to be done...
    ```
 
 4. **Review and commit** generated code
+
+### Workflow: Codex Per-Issue Solver
+
+Codex works best as a **per-issue solver** with explicit `workspace` + `verify` commands and a reproducible toolchain (Docker).
+
+- See `apps/docs/codex-issue-solver.md`
+- Docker environments: `docker/agent-env/README.md`
 
 ---
 
