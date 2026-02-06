@@ -9,7 +9,7 @@
  *   npx tsx scripts/generate-tts-v3.ts --force   # regenerate all
  */
 
-import { execSync } from "child_process";
+import { execFileSync, execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
@@ -100,17 +100,23 @@ async function main() {
     const pitchStr =
       segment.pitch >= 0 ? `+${segment.pitch}Hz` : `${segment.pitch}Hz`;
 
-    const cmd = [
-      "edge-tts",
-      `--voice "${voice}"`,
-      `--rate="${rateStr}"`,
-      `--pitch="${pitchStr}"`,
-      `--text "${segment.text.replace(/"/g, '\\"')}"`,
-      `--write-media "${outPath}"`,
-    ].join(" ");
-
     try {
-      execSync(cmd, { stdio: "pipe" });
+      execFileSync(
+        "edge-tts",
+        [
+          "--voice",
+          voice,
+          "--rate",
+          rateStr,
+          "--pitch",
+          pitchStr,
+          "--text",
+          segment.text,
+          "--write-media",
+          outPath,
+        ],
+        { stdio: "pipe" },
+      );
       const stat = fs.statSync(outPath);
       const durationEstimate = (stat.size / 16000).toFixed(1); // rough MP3 estimate
       console.log(

@@ -1,4 +1,4 @@
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -6,6 +6,11 @@ interface GHIssue {
     number: number;
     title: string;
     body: string;
+}
+
+function escapeYamlDoubleQuoted(value: string): string {
+    // JSON escaping is compatible with YAML double-quoted scalars.
+    return JSON.stringify(value).slice(1, -1);
 }
 
 function inferWorkspace(outputPath: string) {
@@ -42,8 +47,22 @@ function defaultVerifyCommands(workspace: string, outputPath: string): string[] 
 // Fetch issues from GitHub using CLI
 function fetchIssues(label = 'day-1'): GHIssue[] {
     try {
-        const cmd = `gh issue list --repo hashpass-tech/JACK --label "${label}" --json number,title,body --state open`;
-        const output = execSync(cmd, { encoding: 'utf8' });
+        const output = execFileSync(
+            'gh',
+            [
+                'issue',
+                'list',
+                '--repo',
+                'hashpass-tech/JACK',
+                '--label',
+                label,
+                '--json',
+                'number,title,body',
+                '--state',
+                'open',
+            ],
+            { encoding: 'utf8' }
+        );
         return JSON.parse(output);
     } catch (e) {
         console.error('❌ Failed to fetch issues from GitHub. Ensure gh CLI is installed and authenticated.');
@@ -159,38 +178,38 @@ function issuesToYAML(issues: GHIssue[]) {
 
         yamlStr += `  - id: "GH-${issue.number}"\n`;
         yamlStr += `    github_issue: ${issue.number}\n`;
-        yamlStr += `    title: "${issue.title.replace(/"/g, '\\"')}"\n`;
+        yamlStr += `    title: "${escapeYamlDoubleQuoted(issue.title)}"\n`;
         yamlStr += `    requirement: |\n`;
         yamlStr += `      ${meta.requirement.split('\n').join('\n      ')}\n`;
 
         if (meta.workspace) {
-            yamlStr += `    workspace: "${meta.workspace}"\n`;
+            yamlStr += `    workspace: "${escapeYamlDoubleQuoted(meta.workspace)}"\n`;
         }
 
         if (meta.outputPath) {
             yamlStr += `    output:\n`;
-            yamlStr += `      path: "${meta.outputPath}"\n`;
-            yamlStr += `      type: "${path.extname(meta.outputPath).slice(1) || 'text'}"\n`;
+            yamlStr += `      path: "${escapeYamlDoubleQuoted(meta.outputPath)}"\n`;
+            yamlStr += `      type: "${escapeYamlDoubleQuoted(path.extname(meta.outputPath).slice(1) || 'text')}"\n`;
         }
 
         if (meta.context.length > 0) {
             yamlStr += `    context:\n`;
             meta.context.forEach(p => {
-                yamlStr += `      - "${p.replace(/"/g, '\\"')}"\n`;
+                yamlStr += `      - "${escapeYamlDoubleQuoted(p)}"\n`;
             });
         }
 
         if (meta.verify.length > 0) {
             yamlStr += `    verify:\n`;
             meta.verify.forEach(cmd => {
-                yamlStr += `      - "${cmd.replace(/"/g, '\\"')}"\n`;
+                yamlStr += `      - "${escapeYamlDoubleQuoted(cmd)}"\n`;
             });
         }
 
         if (meta.acceptance.length > 0) {
             yamlStr += `    acceptance:\n`;
             meta.acceptance.forEach(a => {
-                yamlStr += `      - "${a.replace(/"/g, '\\"')}"\n`;
+                yamlStr += `      - "${escapeYamlDoubleQuoted(a)}"\n`;
             });
         }
         yamlStr += `\n`;

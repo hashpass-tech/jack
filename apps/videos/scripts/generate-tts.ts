@@ -12,7 +12,7 @@
  *   npx tsx scripts/generate-tts.ts --engine edge # force edge-tts
  */
 
-import { execSync } from "child_process";
+import { execFileSync, execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 
@@ -220,17 +220,23 @@ async function generateWithEdge(segment: NarrationSegment, outPath: string) {
   const pitchStr =
     segment.pitch >= 0 ? `+${segment.pitch}Hz` : `${segment.pitch}Hz`;
 
-  const cmd = [
-    "edge-tts",
-    `--voice "${voice}"`,
-    `--rate="${rateStr}"`,
-    `--pitch="${pitchStr}"`,
-    `--text "${segment.text.replace(/"/g, '\\"')}"`,
-    `--write-media "${outPath}"`,
-  ].join(" ");
-
   try {
-    execSync(cmd, { stdio: "pipe" });
+    execFileSync(
+      "edge-tts",
+      [
+        "--voice",
+        voice,
+        "--rate",
+        rateStr,
+        "--pitch",
+        pitchStr,
+        "--text",
+        segment.text,
+        "--write-media",
+        outPath,
+      ],
+      { stdio: "pipe" },
+    );
     return true;
   } catch (err) {
     console.error(`  ✗ edge-tts failed for ${segment.filename}:`, err);
