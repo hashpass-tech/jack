@@ -8,26 +8,36 @@ import {
 } from "remotion";
 import { CameraRig } from "../components/CameraRig";
 import { SubtitleOverlay } from "../components/SubtitleOverlay";
-import { COLORS } from "../constants";
+import { COLORS, FOG_NEAR, FOG_FAR } from "../constants";
+
+interface CameraProps {
+  distance?: number;
+  orbitSpeed?: number;
+  dolly?: [number, number];
+  panX?: [number, number];
+  lookAtY?: number;
+}
 
 interface SceneContainerProps {
   subtitles: string[];
   accentColor: string;
   secondaryColor?: string;
-  children: React.ReactNode; // 3D content goes here
+  camera?: CameraProps;
+  children: React.ReactNode;
 }
 
 /**
  * Shared wrapper for every scene.
- *  – Dark background
- *  – ThreeCanvas with lighting + CameraRig
+ *  – Dark background (#0B1020)
+ *  – ThreeCanvas with fog + lighting + CameraRig
  *  – Scene-level fade in / out
  *  – Subtitle overlay (HTML layer on top of 3D)
  */
 export const SceneContainer: React.FC<SceneContainerProps> = ({
   subtitles,
   accentColor,
-  secondaryColor = COLORS.blue,
+  secondaryColor = COLORS.cyan,
+  camera = {},
   children,
 }) => {
   const frame = useCurrentFrame();
@@ -36,7 +46,7 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
   // Smooth fade in / out at scene boundaries
   const opacity = interpolate(
     frame,
-    [0, 18, durationInFrames - 18, durationInFrames],
+    [0, 15, durationInFrames - 15, durationInFrames],
     [0, 1, 1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
   );
@@ -46,24 +56,40 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
       {/* ─── 3D Canvas Layer ─── */}
       <AbsoluteFill>
         <ThreeCanvas linear width={width} height={height}>
-          <CameraRig />
-          <ambientLight intensity={0.35} />
+          {/* Fog */}
+          <fog attach="fog" args={[COLORS.darkBg, FOG_NEAR, FOG_FAR]} />
+
+          {/* Camera rig */}
+          <CameraRig {...camera} />
+
+          {/* Lighting — soft ambient + two-point coloured lights */}
+          <ambientLight intensity={0.3} />
           <pointLight
-            position={[10, 10, 10]}
-            intensity={1.2}
+            position={[8, 6, 8]}
+            intensity={1.0}
             color={accentColor}
           />
           <pointLight
-            position={[-8, -5, -10]}
-            intensity={0.35}
+            position={[-6, -4, -8]}
+            intensity={0.3}
             color={secondaryColor}
           />
+
           {children}
         </ThreeCanvas>
       </AbsoluteFill>
 
       {/* ─── Subtitle Overlay (HTML) ─── */}
       <SubtitleOverlay subtitles={subtitles} accentColor={accentColor} />
+
+      {/* ─── Vignette (CSS) ─── */}
+      <AbsoluteFill
+        style={{
+          background:
+            "radial-gradient(ellipse at center, transparent 45%, rgba(11,16,32,0.65) 100%)",
+          pointerEvents: "none",
+        }}
+      />
     </AbsoluteFill>
   );
 };
