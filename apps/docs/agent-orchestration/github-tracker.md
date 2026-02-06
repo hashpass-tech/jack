@@ -41,7 +41,7 @@ The tracker interface is divided into four primary panels:
 
 1.  **GitHub Issues (Left)**: A scrollable list of the most recent 50 issues. Displays issue numbers, titles, and color-coded label indicators.
 2.  **Issue Details (Top Right)**: Detailed view of the currently selected issue, including the full description, assignees, and labels.
-3.  **Agent Orchestration (Bottom Right)**: Shows the status of the agent system, listing available task files in `.agent-tasks/` and supported agent backends (Kiro, Claude Code, Cursor).
+3.  **Agent Orchestration (Bottom Right)**: Shows the status of the agent system, listing available task files in `.agent-tasks/` and supported agent backends (Kiro, Claude Code, Codex, Cursor).
 4.  **Status Bar (Bottom)**: Displays the current system status, the timestamp of the last refresh, and a quick reference for keyboard shortcuts.
 
 ---

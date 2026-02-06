@@ -16,9 +16,10 @@ graph TD
     B --> C[Agent Interface Layer (Agnostic)]
     C --> D1[Kiro Backend]
     C --> D2[Claude Code Backend]
-    C --> D3[Cursor Backend]
-    C --> D4[OpenClaw Backend]
-    D1 & D2 & D3 & D4 --> E[Output Verification Layer]
+    C --> D3[Codex Backend]
+    C --> D4[Cursor Backend]
+    C --> D5[OpenClaw Backend (future)]
+    D1 & D2 & D3 & D4 & D5 --> E[Output Verification Layer]
     E --> F[Back to GitHub (auto-close issues)]
 ```
 
@@ -48,6 +49,7 @@ Example Task (`.agent-tasks/day-1.yaml`):
 tasks:
   - id: "D1-CRIT-1"
     title: "Create JACKPolicyHook.sol skeleton"
+    workspace: "contracts"
     requirement: |
       Create a Uniswap v4 hook contract that enforces slippage policies.
     acceptance:
@@ -55,6 +57,8 @@ tasks:
       - "Inherits from BaseHook"
     output:
       path: "contracts/src/JACKPolicyHook.sol"
+    verify:
+      - "cd contracts && forge build"
 ```
 
 ### Layer 2: Universal Agent Runner (scripts/agent-runner.ts)
@@ -64,8 +68,9 @@ The runner acts as the central orchestrator. It parses tasks, selects the approp
 Supported Backends:
 - **Kiro**: Full autonomous integration via API.
 - **Claude Code**: High-performance CLI integration.
+- **Codex**: Per-issue solver (best with explicit `workspace` + `verify`).
 - **Cursor**: Directed prompts for manual Composer execution.
-- **OpenClaw**: Open-source autonomous agent execution.
+- **OpenClaw**: Placeholder for open-source autonomous execution.
 
 ---
 
@@ -79,15 +84,21 @@ Create a YAML file in `.agent-tasks/` following the schema.
 # Execute all tasks in a file
 pnpm agent:run .agent-tasks/day-1.yaml
 
+# Execute one task (per-issue solver)
+pnpm agent:run .agent-tasks/day-1.yaml --task GH-1
+
 # Target a specific agent
 PREFERRED_AGENT=kiro pnpm agent:run .agent-tasks/day-1.yaml
 ```
 
 ### 3. Verification & Commitment
-The system automatically:
-1. Runs verification scripts (e.g., `forge build`).
-2. Creates a git commit with the agent's log.
-3. References and closes relevant GitHub issues.
+The runner can optionally:
+1. Run task-level verification commands (`verify:`) when `--verify` is passed.
+2. Create a git commit per task (disable with `--no-commit`).
+
+See:
+- `apps/docs/codex-issue-solver.md`
+- `docker/agent-env/README.md`
 
 ---
 

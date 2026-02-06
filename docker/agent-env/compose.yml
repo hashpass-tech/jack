@@ -1,0 +1,47 @@
+name: jack-agent-env
+
+services:
+  base:
+    build:
+      context: ../..
+      dockerfile: docker/agent-env/Dockerfile
+      target: base
+    volumes:
+      - ../..:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+
+  ui:
+    build:
+      context: ../..
+      dockerfile: docker/agent-env/Dockerfile
+      target: ui
+    volumes:
+      - ../..:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+
+  sdk:
+    build:
+      context: ../..
+      dockerfile: docker/agent-env/Dockerfile
+      target: sdk
+    volumes:
+      - ../..:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+
+  contracts:
+    build:
+      context: ../..
+      dockerfile: docker/agent-env/Dockerfile
+      target: contracts
+    volumes:
+      - ../..:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+

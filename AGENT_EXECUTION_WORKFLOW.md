@@ -9,8 +9,15 @@ This document describes the step-by-step process for agents to pick, work on, an
 - Create a new branch from `main` using the convention: `issue/<issue-id>-<short-description>`.
 
 ## 2. Task Assignment
-- Assign agents in `.agent-tasks/<issue-id>.yaml`.
-- Specify which agent/API (GitHub Pro, KIRO, Codex, Debrod, Google AI) is responsible for each task.
+- Define tasks in `.agent-tasks/*.yaml` (GitHub-synced via `pnpm agent:sync <label>` or hand-written).
+- For Codex-first execution, keep tasks **small and per-issue** and include:
+  - `workspace`: `contracts | sdk | ui | general`
+  - `verify`: commands to validate the change (run with `pnpm agent:run ... --verify`)
+- Specify which agent/backend is preferred via `PREFERRED_AGENT` or per-task `agent_config.preferred`.
+
+## 2.1 Reproducible Environments (Docker)
+- Use `docker/agent-env/` to run tasks in consistent toolchains (contracts/sdk/ui).
+- Do not bake secrets into images; inject them at runtime.
 
 ## 3. Implementation
 - Agents work on tasks as defined in the spec and task files.

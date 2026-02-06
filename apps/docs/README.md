@@ -7,9 +7,11 @@ Welcome to the JACK project documentation.
 | Document | Description |
 |----------|-------------|
 | [Agent Orchestration](./agent-orchestration.md) | Overview of the entire agent system |
+| [Codex Per-Issue Solver](./codex-issue-solver.md) | Codex-first workflow (one issue at a time) |
 | [Spec System](./spec-system.md) | Kiro-style spec workflow details |
 | [Quick Start](./spec-quickstart.md) | 5-minute tutorial for specs |
 | [Multi-Agent Config](./multi-agent-config.md) | Configure different AI agents |
+| [Agent Environments (Docker)](../../docker/agent-env/README.md) | Reproducible toolchains for contracts/sdk/ui |
 
 ---
 
@@ -61,7 +63,8 @@ Welcome to the JACK project documentation.
 │   ┌──────────────┐     ┌──────────────┐     ┌──────────────┐   │
 │   │    GitHub    │────►│  .agent-tasks│────►│   AI Agent   │   │
 │   │    Issues    │     │    (YAML)    │     │  (Claude,    │   │
-│   └──────────────┘     └──────────────┘     │   Kiro, etc) │   │
+│   └──────────────┘     └──────────────┘     │ Codex, Kiro, │   │
+│                                              │  Claude, …) │   │
 │                                              └──────┬───────┘   │
 │                                                     │           │
 │   ┌──────────────────────────────────────────────────┘          │
@@ -109,12 +112,20 @@ JACK/
 │   └── workflows/
 │       └── agent-automation.yml
 │
-├── docs/                 # Documentation (you are here)
-│   ├── README.md
-│   ├── agent-orchestration.md
-│   ├── spec-system.md
-│   ├── spec-quickstart.md
-│   └── multi-agent-config.md
+├── apps/
+│   └── docs/             # Documentation (you are here)
+│       ├── README.md
+│       ├── agent-orchestration.md
+│       ├── codex-issue-solver.md
+│       ├── spec-system.md
+│       ├── spec-quickstart.md
+│       └── multi-agent-config.md
+│
+├── docker/
+│   └── agent-env/         # Reproducible toolchains (Docker)
+│       ├── Dockerfile
+│       ├── compose.yml
+│       └── README.md
 │
 └── scripts/              # Agent automation scripts
     ├── agent-runner.ts

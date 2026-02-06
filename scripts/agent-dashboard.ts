@@ -75,7 +75,7 @@ class AgentDashboard {
     updateAgentStatus(activeAgents: { name: string; task: string }[] = []) {
         let content = '\n  🤖 Active Agent Nodes:\n\n';
 
-        const agents = ['kiro', 'claude-code', 'cursor', 'openclaw'];
+        const agents = ['kiro', 'claude-code', 'codex', 'cursor', 'openclaw'];
         agents.forEach(a => {
             const active = activeAgents.find(aa => aa.name === a);
             const status = active ? `[ BUSY ] -> ${active.task}` : '[ IDLE ]';
