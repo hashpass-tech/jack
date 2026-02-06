@@ -7,6 +7,7 @@ Welcome to the JACK project documentation.
 | Document | Description |
 |----------|-------------|
 | [Agent Orchestration](./agent-orchestration.md) | Overview of the entire agent system |
+| [Agent Environment Readiness](./agent-orchestration/agent-environment.md) | Tooling checklist for agent task execution |
 | [Spec System](./spec-system.md) | Kiro-style spec workflow details |
 | [Quick Start](./spec-quickstart.md) | 5-minute tutorial for specs |
 | [Multi-Agent Config](./multi-agent-config.md) | Configure different AI agents |
