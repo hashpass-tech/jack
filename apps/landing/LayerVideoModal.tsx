@@ -40,6 +40,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
   const [expanded, setExpanded] = useState(false);
   const [entered, setEntered] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
 
   const accent = LAYER_ACCENT[layer] ?? "#F2B94B";
   const videoSrc = LAYER_VIDEO_MAP[layer];
@@ -52,10 +53,18 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
     });
   }, []);
 
-  /* Autoplay when modal enters */
+  /* Autoplay when modal enters, then unmute after short delay */
   useEffect(() => {
     if (entered && videoRef.current) {
-      videoRef.current.play().catch(() => {});
+      videoRef.current.play().then(() => {
+        // Auto-unmute after 300ms — the modal open was user-initiated so we can try
+        setTimeout(() => {
+          if (videoRef.current) {
+            videoRef.current.muted = false;
+            setIsMuted(false);
+          }
+        }, 300);
+      }).catch(() => {});
     }
   }, [entered, videoLoaded]);
 
@@ -83,6 +92,14 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
 
   const toggleExpand = () => {
     setExpanded((prev) => !prev);
+  };
+
+  const toggleMute = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsMuted(videoRef.current.muted);
+    }
   };
 
   return (
@@ -142,7 +159,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
             <video
               ref={videoRef}
               src={videoSrc}
-              muted
+              muted={isMuted}
               loop
               playsInline
               preload="auto"
@@ -174,6 +191,29 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               background: "linear-gradient(transparent, #0F1A2E)",
             }}
           />
+
+          {/* Sound toggle button */}
+          <button
+            onClick={toggleMute}
+            className="absolute bottom-3 left-3 z-20 flex items-center space-x-1.5 px-3 py-1.5 rounded-full transition-all hover:scale-105"
+            style={{
+              background: isMuted ? "rgba(255,255,255,0.08)" : `${accent}22`,
+              backdropFilter: "blur(8px)",
+              border: isMuted ? "1px solid rgba(255,255,255,0.06)" : `1px solid ${accent}40`,
+              color: isMuted ? "rgba(255,255,255,0.5)" : accent,
+            }}
+          >
+            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {isMuted ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15zm11.828-6.414a5 5 0 010 7.072M16.586 11.586a1 1 0 010 1.414" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+              )}
+            </svg>
+            <span className="text-[10px] font-bold uppercase tracking-wider">
+              {isMuted ? "Unmute" : "Sound On"}
+            </span>
+          </button>
 
           {/* Expand icon indicator */}
           <div
