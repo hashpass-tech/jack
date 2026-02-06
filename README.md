@@ -4,7 +4,8 @@
 
 # JACK - XChain Exec Kernel
 
-[![Docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://github.com/hashpass-tech/jack/docs)
+[![Docs Deploy](https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml)
+[![CI (Agent Tasks)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ## Overview
@@ -138,6 +139,8 @@ The script uses `gsutil -m rsync -r` to mirror the built artifacts into `gs://<b
 - GitHub Pages workflow: `.github/workflows/deploy-docs-pages.yml`
 - Docs custom domain file: `apps/docs/static/CNAME`
 - Cloud DNS helper: `scripts/gcloud/configure-docs-dns.sh`
+- Docs deploy runs: <https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml>
+- Agent CI runs: <https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml>
 
 Example DNS mapping command:
 

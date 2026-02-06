@@ -1,32 +1,42 @@
-name: Agent Tasks
+name: Agent Tasks CI
 
 on:
   push:
     paths:
       - '.agent-tasks/**'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   execute-tasks:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3
-      
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
         with:
-          node-version: 20
-      
-      - name: Install pnpm
-        run: npm install -g pnpm
+          fetch-depth: 0
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8.15.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+          cache-dependency-path: pnpm-lock.yaml
       
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       
       - name: Run agent tasks
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          KIRO_API_KEY: ${{ secrets.KIRO_API_KEY }}
-          PREFERRED_AGENT: claude-code
+          KIRO_API_KEY: ${{ secrets.KIRO_API_KEY || 'ci-mock-key' }}
+          PREFERRED_AGENT: kiro
         run: pnpm agent:run .agent-tasks/tasks.yaml
       
       - name: Commit results
