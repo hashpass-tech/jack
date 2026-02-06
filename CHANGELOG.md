@@ -1,3 +1,14 @@
+## [0.1.29](https://github.com/hashpass-tech/JACK/compare/v0.1.28...v0.1.29) (2026-02-06)
+
+
+### Features
+
+* **videos:** scene registry + unified render CLI — scalable multi-version video pipeline
+* **videos:** V3 deep dive detailed explainer videos (35s each, H.264 MP4)
+* **landing:** dual-mode modal — V2 compact clips + V3 Deep Dive on expand
+* **videos:** unified TTS generator (generate-tts-all.ts) reads from registry
+
+
 ## [0.1.28](https://github.com/hashpass-tech/JACK/compare/v0.1.27-testnet.1...v0.1.28) (2026-02-06)
 
 
