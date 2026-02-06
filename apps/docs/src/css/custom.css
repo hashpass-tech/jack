@@ -1,30 +1,43 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
-
-/* You can override the default Infima variables here. */
 :root {
-  --ifm-color-primary: #4ac9ff;
-  --ifm-color-primary-dark: #2fbfff;
-  --ifm-color-primary-darker: #1db8ff;
-  --ifm-color-primary-darkest: #0099e0;
-  --ifm-color-primary-light: #6fd6ff;
-  --ifm-color-primary-lighter: #81ddff;
-  --ifm-color-primary-lightest: #b4ecff;
-  --ifm-code-font-size: 95%;
-  --ifm-background-color: #0b1020;
-  --ifm-background-surface-color: #0f172a;
-  --ifm-navbar-background-color: #0b1020;
-  --ifm-footer-background-color: #0b1020;
-  --ifm-card-background-color: #0f172a;
-  --ifm-color-emphasis-200: #1f2a44;
-  --ifm-font-family-base: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-  --docusaurus-highlighted-code-line-bg: rgba(74, 201, 255, 0.1);
+  --ifm-color-primary: #0a7dc2;
+  --ifm-color-primary-dark: #096eab;
+  --ifm-color-primary-darker: #0869a2;
+  --ifm-color-primary-darkest: #065682;
+  --ifm-color-primary-light: #0b8cd9;
+  --ifm-color-primary-lighter: #1498e8;
+  --ifm-color-primary-lightest: #35aaef;
+  --ifm-code-font-size: 94%;
+  --ifm-font-family-base: 'Sora', 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  --ifm-background-color: #f3f7fd;
+  --ifm-background-surface-color: #ffffff;
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.9);
+  --ifm-footer-background-color: #ecf3fc;
+  --ifm-card-background-color: #ffffff;
+
+  --ifm-font-color-base: #11233f;
+  --ifm-font-color-secondary: #36527d;
+  --ifm-heading-color: #0d1d36;
+
+  --ifm-color-emphasis-100: #e5edf8;
+  --ifm-color-emphasis-200: #d4e0f0;
+  --ifm-color-emphasis-300: #c5d4e8;
+  --ifm-color-emphasis-700: #3f5a85;
+  --ifm-color-emphasis-800: #2a4369;
+
+  --jack-active-bg: rgba(10, 125, 194, 0.12);
+  --jack-table-head-bg: #eaf2fc;
+  --jack-page-gradient: radial-gradient(circle at top, rgba(53, 170, 239, 0.14), transparent 45%);
+  --jack-elev-shadow: 0 18px 38px rgba(16, 34, 61, 0.08);
+  --jack-footer-bg: linear-gradient(180deg, #f1f7ff 0%, #e4eefb 100%);
+  --jack-footer-border-color: #c4d7f0;
+  --jack-footer-title-color: #0d2343;
+  --jack-footer-link-color: #1f467a;
+  --jack-footer-link-hover: #0a7dc2;
+  --jack-footer-copyright-color: #375983;
+  --docusaurus-highlighted-code-line-bg: rgba(10, 125, 194, 0.12);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
   --ifm-color-primary: #4ac9ff;
   --ifm-color-primary-dark: #2fbfff;
@@ -33,21 +46,149 @@
   --ifm-color-primary-light: #6fd6ff;
   --ifm-color-primary-lighter: #81ddff;
   --ifm-color-primary-lightest: #b4ecff;
-  --ifm-background-color: #0b1020;
-  --ifm-background-surface-color: #0f172a;
-  --ifm-navbar-background-color: #0b1020;
-  --ifm-footer-background-color: #0b1020;
-  --ifm-card-background-color: #0f172a;
-  --ifm-color-emphasis-200: #1f2a44;
+
+  --ifm-background-color: #070d1a;
+  --ifm-background-surface-color: #0c162b;
+  --ifm-navbar-background-color: rgba(7, 13, 26, 0.9);
+  --ifm-footer-background-color: #070d1a;
+  --ifm-card-background-color: #0c162b;
+
+  --ifm-font-color-base: #dce7fa;
+  --ifm-font-color-secondary: #a6bbdb;
+  --ifm-heading-color: #eff6ff;
+
+  --ifm-color-emphasis-100: #1b2a47;
+  --ifm-color-emphasis-200: #253657;
+  --ifm-color-emphasis-300: #314971;
+  --ifm-color-emphasis-700: #a6bbdb;
+  --ifm-color-emphasis-800: #cad8ee;
+
+  --jack-active-bg: rgba(74, 201, 255, 0.2);
+  --jack-table-head-bg: #101e38;
+  --jack-page-gradient: radial-gradient(circle at top, rgba(74, 201, 255, 0.15), transparent 48%);
+  --jack-elev-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+  --jack-footer-bg: linear-gradient(180deg, #070f1f 0%, #050b16 100%);
+  --jack-footer-border-color: #24385b;
+  --jack-footer-title-color: #eaf3ff;
+  --jack-footer-link-color: #b5c8e6;
+  --jack-footer-link-hover: #4ac9ff;
+  --jack-footer-copyright-color: #90a8ca;
   --docusaurus-highlighted-code-line-bg: rgba(74, 201, 255, 0.2);
 }
 
+html,
 body {
-  background-color: var(--ifm-background-color);
+  background: var(--jack-page-gradient), var(--ifm-background-color);
+  color: var(--ifm-font-color-base);
+}
+
+.navbar {
+  background: var(--ifm-navbar-background-color);
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+  box-shadow: 0 10px 24px rgba(15, 27, 48, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+[data-theme='dark'] .navbar {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.3);
 }
 
 .navbar__title {
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  font-weight: 600;
+  font-weight: 700;
+}
+
+.navbar__title,
+.navbar__link {
+  color: var(--ifm-heading-color);
+}
+
+.menu__link {
+  color: var(--ifm-font-color-secondary);
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.menu__link:hover {
+  background: var(--jack-active-bg);
+  color: var(--ifm-heading-color);
+}
+
+.menu__link--active {
+  background: var(--jack-active-bg);
+  color: var(--ifm-color-primary);
+  font-weight: 700;
+}
+
+.table-of-contents__link {
+  color: var(--ifm-font-color-secondary);
+}
+
+.table-of-contents__link:hover,
+.table-of-contents__link--active {
+  color: var(--ifm-color-primary);
+}
+
+.theme-doc-markdown p,
+.theme-doc-markdown li {
+  color: var(--ifm-font-color-base);
+  line-height: 1.72;
+}
+
+.theme-doc-markdown h1,
+.theme-doc-markdown h2,
+.theme-doc-markdown h3,
+.theme-doc-markdown h4 {
+  color: var(--ifm-heading-color);
+}
+
+.theme-doc-markdown table {
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: var(--jack-elev-shadow);
+  background: var(--ifm-card-background-color);
+}
+
+.theme-doc-markdown table th {
+  background: var(--jack-table-head-bg);
+  color: var(--ifm-heading-color);
+}
+
+.theme-doc-markdown table th,
+.theme-doc-markdown table td {
+  border-color: var(--ifm-color-emphasis-200);
+}
+
+.pagination-nav__link,
+.card {
+  background: var(--ifm-card-background-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  box-shadow: var(--jack-elev-shadow);
+}
+
+.footer {
+  background: var(--jack-footer-bg);
+  border-top: 1px solid var(--jack-footer-border-color);
+}
+
+.footer__title {
+  color: var(--jack-footer-title-color);
+  font-weight: 700;
+}
+
+.footer a,
+.footer__link-item,
+.footer__copyright {
+  color: var(--jack-footer-link-color);
+}
+
+.footer__copyright {
+  color: var(--jack-footer-copyright-color);
+}
+
+.footer a:hover {
+  color: var(--jack-footer-link-hover);
+  text-decoration: none;
 }
