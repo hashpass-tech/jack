@@ -16,7 +16,8 @@ The JACK project uses a flexible agent orchestration system that supports multip
 5. [Agent Configuration](#agent-configuration)
 6. [GitHub Integration](#github-integration)
 7. [Usage Guide](#usage-guide)
-8. [Extending the System](#extending-the-system)
+8. [Environment Readiness](#environment-readiness)
+9. [Extending the System](#extending-the-system)
 
 ---
 
@@ -165,6 +166,14 @@ For deeper details see:
    pnpm agent:run .agent-tasks/day-1.yaml
    ```
 4. **Review and commit** generated code
+
+---
+
+## Environment Readiness
+
+Agent tasks often require additional tooling (contracts and containers). Use the environment checklist before starting work, and add required tools + verification commands to new issues.  
+
+See the full guide here: [Agent Environment Readiness](./agent-orchestration/agent-environment.md)
 
 ---
 

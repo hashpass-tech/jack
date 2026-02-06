@@ -287,7 +287,9 @@ try {
       throw new Error('GCLOUD_RUN_IMAGE or GCLOUD_PROJECT must be set to deploy to Cloud Run');
     }
 
-    run(`gcloud builds submit --region ${region} ${project} --config apps/dashboard/cloudbuild.yaml --substitutions=_IMAGE=${imageUri} .`);
+    const isTestnetBuild = getBranchName() === 'develop' ? 'true' : 'false';
+
+    run(`gcloud builds submit --region ${region} ${project} --config apps/dashboard/cloudbuild.yaml --substitutions=_IMAGE=${imageUri},_NEXT_PUBLIC_IS_TESTNET=${isTestnetBuild} .`);
     run(`gcloud run deploy ${process.env.GCLOUD_RUN_SERVICE} --image ${imageUri} --region ${region} ${project} ${allowUnauth}`);
   }
 

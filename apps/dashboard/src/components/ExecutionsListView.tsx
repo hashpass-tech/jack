@@ -50,23 +50,60 @@ export const ExecutionsListView: React.FC<ExecutionsListViewProps> = ({ onSelect
 	};
 
 	return (
-		<div className="space-y-8 animate-in slide-in-from-bottom-6 duration-700">
-			<div className="flex justify-between items-end mb-4">
+		<div className="space-y-6 md:space-y-8 animate-in slide-in-from-bottom-6 duration-700">
+			<div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-4">
 				<div className="space-y-1">
-					<h2 className="text-3xl font-space font-black uppercase tracking-tighter">Execution Registry</h2>
-					<p className="text-xs text-gray-500 font-bold uppercase tracking-[0.2em]">Real-time Cross-chain orchestration log</p>
+					<h2 className="text-2xl md:text-3xl font-space font-black uppercase tracking-tighter" style={{ color: "var(--fg-primary)" }}>Execution Registry</h2>
+					<p className="text-xs font-bold uppercase tracking-[0.2em]" style={{ color: "var(--fg-muted)" }}>Real-time Cross-chain orchestration log</p>
 				</div>
-				<div className="flex items-center space-x-2 text-[10px] font-black text-gray-600 uppercase tracking-widest bg-white/5 px-4 py-2 rounded-full border border-white/5">
+				<div className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full border" style={{ color: "var(--fg-muted)", background: "var(--bg-tertiary)", borderColor: "var(--border-secondary)" }}>
 					<div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse" />
 					<span>Syncing with Kernel</span>
 				</div>
 			</div>
 
-			<div className="bg-[#0F1A2E] border border-white/5 rounded-3xl overflow-hidden shadow-2xl relative">
-				<div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent pointer-events-none" />
+			{/* Mobile card view */}
+			<div className="block md:hidden space-y-4">
+				{isLoading && executions.length === 0 ? (
+					<div className="py-20 text-center font-mono text-sm" style={{ color: "var(--fg-muted)" }}>Initializing Registry Surface...</div>
+				) : executions.length === 0 ? (
+					<div className="py-20 text-center font-mono text-sm" style={{ color: "var(--fg-muted)" }}>No Active Intents in Kernel Store</div>
+				) : executions.map((exec) => (
+					<div
+						key={exec.id}
+						className="border rounded-2xl p-5 space-y-4 active:scale-[0.98] transition-all cursor-pointer"
+						style={{ background: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}
+						onClick={() => onSelectExecution(exec.id)}
+					>
+						<div className="flex items-center justify-between">
+							<span className="font-mono text-xs font-black tracking-tight" style={{ color: "var(--fg-accent)" }}>{exec.id}</span>
+							<span className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border ${getStatusColor(exec.status)}`}>
+								{exec.status}
+							</span>
+						</div>
+						<div className="flex items-center space-x-3">
+							<div className="px-2 py-1 rounded-md text-[9px] font-black border uppercase" style={{ background: "var(--bg-tertiary)", borderColor: "var(--border-secondary)", color: "var(--fg-primary)" }}>{exec.params.sourceChain.substring(0, 3)}</div>
+							<svg className="w-4 h-4" style={{ color: "var(--fg-muted)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+								<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7-7 7M5 12h14" />
+							</svg>
+							<div className="px-2 py-1 rounded-md text-[9px] font-black border uppercase" style={{ background: "rgba(242,185,75,0.10)", borderColor: "var(--border-accent)", color: "var(--fg-accent)" }}>{exec.params.destinationChain.substring(0, 3)}</div>
+						</div>
+						<div className="flex items-center justify-between">
+							<div>
+								<span className="text-sm font-black" style={{ color: "var(--fg-primary)" }}>{exec.params.amountIn}</span>
+								<span className="text-[10px] font-bold uppercase ml-1" style={{ color: "var(--fg-muted)" }}>{exec.params.tokenIn}</span>
+							</div>
+							<span className="text-xs font-bold uppercase" style={{ color: "var(--fg-muted)" }}>{getTimeAgo(exec.createdAt)}</span>
+						</div>
+					</div>
+				))}
+			</div>
+
+			{/* Desktop table view */}
+			<div className="hidden md:block border rounded-3xl overflow-hidden shadow-2xl relative" style={{ background: "var(--bg-secondary)", borderColor: "var(--border-primary)" }}>
 				<table className="w-full text-left relative z-10">
 					<thead>
-						<tr className="bg-white/5 text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">
+						<tr className="text-[10px] font-black uppercase tracking-[0.3em]" style={{ background: "var(--bg-tertiary)", color: "var(--fg-muted)" }}>
 							<th className="px-8 py-6">ID</th>
 							<th className="px-8 py-6">Route Topology</th>
 							<th className="px-8 py-6">Asset Manifest</th>
@@ -75,33 +112,33 @@ export const ExecutionsListView: React.FC<ExecutionsListViewProps> = ({ onSelect
 							<th className="px-8 py-6"></th>
 						</tr>
 					</thead>
-					<tbody className="divide-y divide-white/5">
+					<tbody className="divide-y" style={{ borderColor: "var(--border-primary)" }}>
 						{isLoading && executions.length === 0 ? (
-							<tr><td colSpan={6} className="px-8 py-20 text-center text-gray-500 font-mono text-sm">Initializing Registry Surface...</td></tr>
+							<tr><td colSpan={6} className="px-8 py-20 text-center font-mono text-sm" style={{ color: "var(--fg-muted)" }}>Initializing Registry Surface...</td></tr>
 						) : executions.length === 0 ? (
-							<tr><td colSpan={6} className="px-8 py-20 text-center text-gray-500 font-mono text-sm">No Active Intents in Kernel Store</td></tr>
+							<tr><td colSpan={6} className="px-8 py-20 text-center font-mono text-sm" style={{ color: "var(--fg-muted)" }}>No Active Intents in Kernel Store</td></tr>
 						) : executions.map((exec) => (
 							<tr
 								key={exec.id}
-								className="hover:bg-white/[0.03] transition-all cursor-pointer group"
+								className="hover:opacity-80 transition-all cursor-pointer group"
 								onClick={() => onSelectExecution(exec.id)}
 							>
 								<td className="px-8 py-7">
-									<span className="font-mono text-xs font-black text-[#F2B94B] tracking-tight">{exec.id}</span>
+									<span className="font-mono text-xs font-black tracking-tight" style={{ color: "var(--fg-accent)" }}>{exec.id}</span>
 								</td>
 								<td className="px-8 py-7">
 									<div className="flex items-center space-x-3">
-										<div className="px-2 py-1 bg-white/5 rounded-md text-[9px] font-black text-white border border-white/10 uppercase">{exec.params.sourceChain.substring(0, 3)}</div>
-										<svg className="w-4 h-4 text-gray-700 group-hover:text-[#F2B94B] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+										<div className="px-2 py-1 rounded-md text-[9px] font-black border uppercase" style={{ background: "var(--bg-tertiary)", borderColor: "var(--border-secondary)", color: "var(--fg-primary)" }}>{exec.params.sourceChain.substring(0, 3)}</div>
+										<svg className="w-4 h-4 transition-colors" style={{ color: "var(--fg-muted)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7-7 7M5 12h14" />
 										</svg>
-										<div className="px-2 py-1 bg-[#F2B94B]/10 rounded-md text-[9px] font-black text-[#F2B94B] border border-[#F2B94B]/20 uppercase">{exec.params.destinationChain.substring(0, 3)}</div>
+										<div className="px-2 py-1 rounded-md text-[9px] font-black border uppercase" style={{ background: "rgba(242,185,75,0.10)", borderColor: "var(--border-accent)", color: "var(--fg-accent)" }}>{exec.params.destinationChain.substring(0, 3)}</div>
 									</div>
 								</td>
 								<td className="px-8 py-7">
 									<div className="space-y-0.5">
-										<p className="text-sm font-black text-white">{exec.params.amountIn}</p>
-										<p className="text-[10px] font-bold text-gray-500 uppercase">{exec.params.tokenIn}</p>
+										<p className="text-sm font-black" style={{ color: "var(--fg-primary)" }}>{exec.params.amountIn}</p>
+										<p className="text-[10px] font-bold uppercase" style={{ color: "var(--fg-muted)" }}>{exec.params.tokenIn}</p>
 									</div>
 								</td>
 								<td className="px-8 py-7">
@@ -109,10 +146,10 @@ export const ExecutionsListView: React.FC<ExecutionsListViewProps> = ({ onSelect
 										{exec.status}
 									</span>
 								</td>
-								<td className="px-8 py-7 text-xs font-bold text-gray-500 uppercase">{getTimeAgo(exec.createdAt)}</td>
+								<td className="px-8 py-7 text-xs font-bold uppercase" style={{ color: "var(--fg-muted)" }}>{getTimeAgo(exec.createdAt)}</td>
 								<td className="px-8 py-7 text-right">
-									<div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center group-hover:bg-[#F2B94B] transition-all group-hover:scale-110 shadow-lg">
-										<svg className="w-5 h-5 text-gray-400 group-hover:text-[#0B1020] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+									<div className="w-10 h-10 rounded-xl flex items-center justify-center transition-all group-hover:scale-110 shadow-lg" style={{ background: "var(--bg-tertiary)" }}>
+										<svg className="w-5 h-5 transition-colors" style={{ color: "var(--fg-muted)" }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
 											<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
 										</svg>
 									</div>

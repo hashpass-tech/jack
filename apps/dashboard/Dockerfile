@@ -6,6 +6,9 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/dashboard ./apps/dashboard
 COPY packages ./packages
 
+ARG NEXT_PUBLIC_IS_TESTNET=false
+ENV NEXT_PUBLIC_IS_TESTNET=$NEXT_PUBLIC_IS_TESTNET
+
 RUN corepack enable && pnpm install --frozen-lockfile
 RUN pnpm --filter dashboard build
 

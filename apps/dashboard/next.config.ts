@@ -11,11 +11,14 @@ const readVersion = (filePath: string): string => {
   }
 };
 
-const landingVersion = readVersion(path.resolve(__dirname, "../../package.json"));
+const landingVersion = readVersion(
+  path.resolve(__dirname, "../../package.json"),
+);
 const dashboardVersion = readVersion(path.resolve(__dirname, "./package.json"));
 
-const dashboardBasePath = process.env.DASHBOARD_BASE_PATH
-  || (process.env.NODE_ENV === "production" ? "/dashboard" : "");
+const dashboardBasePath =
+  process.env.DASHBOARD_BASE_PATH ||
+  (process.env.NODE_ENV === "production" ? "/dashboard" : "");
 
 const nextConfig: NextConfig = {
   basePath: dashboardBasePath || undefined,
@@ -23,8 +26,9 @@ const nextConfig: NextConfig = {
   trailingSlash: false,
   env: {
     NEXT_PUBLIC_LANDING_VERSION: landingVersion,
-    NEXT_PUBLIC_DASHBOARD_VERSION: dashboardVersion
-  }
+    NEXT_PUBLIC_DASHBOARD_VERSION: dashboardVersion,
+    NEXT_PUBLIC_IS_TESTNET: process.env.NEXT_PUBLIC_IS_TESTNET || "false",
+  },
 };
 
 export default nextConfig;
