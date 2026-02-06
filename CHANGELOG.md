@@ -1,3 +1,14 @@
+## [0.1.25](https://github.com/hashpass-tech/JACK/compare/v0.1.24-testnet.1...v0.1.25) (2026-02-06)
+
+
+### Bug Fixes
+
+* pass NEXT_PUBLIC_IS_TESTNET as build arg to Docker for Cloud Run testnet builds ([2d6699b](https://github.com/hashpass-tech/JACK/commit/2d6699be3ea36d63b11ea93dbbfa4e55bfe23f3a))
+
+
+
+
+
 ## [0.1.24](https://github.com/hashpass-tech/JACK/compare/v0.1.23-testnet.1...v0.1.24) (2026-02-06)
 
 
