@@ -26,8 +26,20 @@ On every release:
    - `develop` → `vX.Y.Z-testnet.N`
    - `main`/`master` → `vX.Y.Z`
 3. Build landing and dashboard.
-4. Sync landing build to the configured GCS bucket.
-5. Deploy dashboard to Cloud Run.
+4. Optionally build docs and trigger docs Pages deployment (`--with-docs` / `--with-docs-deploy`).
+5. Sync landing build to the configured GCS bucket.
+6. Deploy dashboard to Cloud Run.
+
+### Docs Release Options
+
+```bash
+pnpm release -- --with-docs
+pnpm release -- --with-docs-deploy
+pnpm release:docs
+pnpm release:docs:deploy
+```
+
+Docs deployment and DNS details are documented in [Docs Pages Deployment](./docs-pages-deployment.md).
 
 ### Testnet vs Mainnet Version Enforcement
 - Testnet releases **require** `develop` to include the latest `main` history.
