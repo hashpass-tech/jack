@@ -1,3 +1,14 @@
+## [0.1.34](https://github.com/hashpass-tech/JACK/compare/v0.1.33-testnet.1...v0.1.34) (2026-02-06)
+
+
+### Bug Fixes
+
+* **landing:** mobile-friendly layer video modal — bottom-sheet, responsive heights ([58d1c9b](https://github.com/hashpass-tech/JACK/commit/58d1c9bd7760b87c7a8b7df5397c4a096dbd7224))
+
+
+
+
+
 ## [0.1.33](https://github.com/hashpass-tech/JACK/compare/v0.1.32-testnet.1...v0.1.33) (2026-02-06)
 
 
