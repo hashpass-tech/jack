@@ -1,3 +1,14 @@
+## [0.1.22](https://github.com/hashpass-tech/JACK/compare/v0.1.21...v0.1.22) (2026-02-06)
+
+
+### Features
+
+* add testnet environment alert banner for dashboard ([0f47415](https://github.com/hashpass-tech/JACK/commit/0f474158c1eb29a38860556ef7153f88d6790940))
+
+
+
+
+
 ## [0.1.21](https://github.com/hashpass-tech/JACK/compare/v0.1.20-testnet.1...v0.1.21) (2026-02-05)
 
 

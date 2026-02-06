@@ -1,6 +1,6 @@
 {
   "name": "jack-monorepo",
-  "version": "0.1.21",
+  "version": "0.1.22",
   "private": true,
   "scripts": {
     "build": "vite build --config apps/landing/vite.config.ts",
@@ -24,12 +24,17 @@
     "agent:tracker": "tsx scripts/github-project-tracker.ts"
   },
   "dependencies": {
+    "@metamask/sdk": "^0.34.0",
+    "@rainbow-me/rainbowkit": "^2.2.10",
     "@react-three/drei": "^9.122.0",
     "@react-three/fiber": "^8.18.0",
+    "@tanstack/react-query": "^5.90.20",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "serve": "^14.2.5",
-    "three": "^0.182.0"
+    "three": "^0.182.0",
+    "viem": "2.x",
+    "wagmi": "^3.4.2"
   },
   "devDependencies": {
     "@edcalderon/versioning": "^1.0.11",
@@ -44,6 +49,7 @@
     "@vitejs/plugin-react": "^4.3.0",
     "blessed": "^0.1.81",
     "concurrently": "^8.2.2",
+    "dotenv": "^16.4.5",
     "husky": "^9.1.7",
     "js-yaml": "^4.1.1",
     "lint-staged": "^16.2.7",
@@ -51,7 +57,6 @@
     "secretlint": "11.3.1",
     "tsx": "^4.21.0",
     "turbo": "latest",
-    "dotenv": "^16.4.5",
     "typescript": "^5.0.0",
     "vite": "^5.4.0"
   },
