@@ -1,40 +1,49 @@
-export enum ExecutionStatus {
-  CREATED = 'CREATED',
-  QUOTED = 'QUOTED',
-  EXECUTING = 'EXECUTING',
-  SETTLING = 'SETTLING',
-  SETTLED = 'SETTLED',
-  ABORTED = 'ABORTED',
-  EXPIRED = 'EXPIRED'
-}
+// Re-export all types from types.ts
+export type {
+  // Core Intent Types
+  IntentParams,
+  Intent,
+  ExecutionStep,
+  // Quote Types
+  Quote,
+  RouteStep,
+  // Cost Types
+  CostEntry,
+  IssueCost,
+  CostsResponse,
+  // Configuration Types
+  ClientConfig,
+  RequestOptions,
+  PollOptions,
+  // Result Types
+  BatchSubmitResult,
+  DryRunResult,
+  ValidationResult,
+  // EIP-712 Types
+  EIP712Domain,
+  TypedData,
+  // Subscription Types
+  Subscription,
+  ExecutionWatcher,
+  // Policy Types
+  Policy
+} from './types';
 
-export interface IntentParams {
-  sourceChain: string;
-  destinationChain: string;
-  tokenIn: string;
-  tokenOut: string;
-  amountIn: string;
-  minAmountOut: string;
-  deadline: number;
-  [key: string]: string | number;
-}
+// Re-export enums
+export { ExecutionStatus } from './types';
 
-export interface Intent {
-  id: string;
-  params: IntentParams;
-  signature?: string;
-  status: ExecutionStatus;
-  createdAt: number;
-  executionSteps: ExecutionStep[];
-  settlementTx?: string;
-}
+// Re-export all error classes
+export {
+  JackError,
+  NetworkError,
+  APIError,
+  ValidationError,
+  TimeoutError,
+  RetryError
+} from './errors';
 
-export interface ExecutionStep {
-  step: string;
-  status: 'COMPLETED' | 'IN_PROGRESS' | 'PENDING' | 'FAILED';
-  timestamp: number;
-  details?: string;
-}
+// Import types for use in this file
+import type { IntentParams, Intent } from './types';
 
 export class JACK_SDK {
   private baseUrl: string;
@@ -83,7 +92,7 @@ export class JACK_SDK {
       throw new Error('Failed to submit intent');
     }
 
-    const data = await response.json();
+    const data = await response.json() as { intentId: string };
     return data.intentId;
   }
 
@@ -97,7 +106,7 @@ export class JACK_SDK {
       throw new Error('Failed to fetch execution status');
     }
 
-    return await response.json();
+    return await response.json() as Intent;
   }
 
   /**
@@ -106,6 +115,6 @@ export class JACK_SDK {
   async listIntents(): Promise<Intent[]> {
     const response = await fetch(`${this.baseUrl}/intents`);
     if (!response.ok) return [];
-    return await response.json();
+    return await response.json() as Intent[];
   }
 }
