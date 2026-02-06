@@ -204,6 +204,10 @@ export const Scene1KeyMgmt: React.FC = () => (
     accentColor={scene.accentColor}
     secondaryColor={scene.secondaryColor}
     camera={{ distance: 4, orbitSpeed: 0.12, dolly: [5, 3.8] }}
+    narrationFile="scene1-key-management.mp3"
+    narrationDelay={12}
+    entryWhoosh
+    pulseAtFrame={60}
   >
     <KeyManagement3D />
   </SceneContainer>

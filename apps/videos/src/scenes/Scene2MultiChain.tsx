@@ -187,6 +187,9 @@ export const Scene2MultiChain: React.FC = () => (
     accentColor={scene.accentColor}
     secondaryColor={scene.secondaryColor}
     camera={{ distance: 5, orbitSpeed: 0.05, panX: [-1.5, 1.5] }}
+    narrationFile="scene2-multi-chain.mp3"
+    narrationDelay={12}
+    entryWhoosh
   >
     <MultiChain3D />
   </SceneContainer>

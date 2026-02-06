@@ -192,6 +192,10 @@ export const Scene3Clearing: React.FC = () => (
     accentColor={scene.accentColor}
     secondaryColor={scene.secondaryColor}
     camera={{ distance: 5, orbitSpeed: 0.06, dolly: [5.5, 4.2] }}
+    narrationFile="scene3-clearing.mp3"
+    narrationDelay={12}
+    entryWhoosh
+    pulseAtFrame={90}
   >
     <Clearing3D />
   </SceneContainer>

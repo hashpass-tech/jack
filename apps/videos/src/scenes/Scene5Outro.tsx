@@ -263,6 +263,10 @@ export const Scene5Outro: React.FC = () => (
     accentColor={scene.accentColor}
     secondaryColor={scene.secondaryColor}
     camera={{ distance: 5, orbitSpeed: 0.08, dolly: [4, 6.5] }}
+    narrationFile="scene5-outro.mp3"
+    narrationDelay={10}
+    narrationVolume={0.9}
+    pulseAtFrame={30}
   >
     <Outro3D />
   </SceneContainer>

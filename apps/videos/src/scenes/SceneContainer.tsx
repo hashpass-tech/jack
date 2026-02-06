@@ -2,12 +2,15 @@ import React from "react";
 import { ThreeCanvas } from "@remotion/three";
 import {
   AbsoluteFill,
+  Sequence,
   interpolate,
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
 import { CameraRig } from "../components/CameraRig";
 import { SubtitleOverlay } from "../components/SubtitleOverlay";
+import { NarrationAudio } from "../components/NarrationAudio";
+import { TransitionSFX } from "../components/TransitionSFX";
 import { COLORS, FOG_NEAR, FOG_FAR } from "../constants";
 
 interface CameraProps {
@@ -23,6 +26,16 @@ interface SceneContainerProps {
   accentColor: string;
   secondaryColor?: string;
   camera?: CameraProps;
+  /** Narration audio filename (e.g. "scene1-key-management.mp3") */
+  narrationFile?: string;
+  /** Narration volume override (0–1) */
+  narrationVolume?: number;
+  /** Delay frames before narration starts */
+  narrationDelay?: number;
+  /** Play a whoosh SFX at scene entry */
+  entryWhoosh?: boolean;
+  /** Play a pulse SFX at a specific frame */
+  pulseAtFrame?: number;
   children: React.ReactNode;
 }
 
@@ -38,6 +51,11 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
   accentColor,
   secondaryColor = COLORS.cyan,
   camera = {},
+  narrationFile,
+  narrationVolume,
+  narrationDelay,
+  entryWhoosh = false,
+  pulseAtFrame,
   children,
 }) => {
   const frame = useCurrentFrame();
@@ -81,6 +99,23 @@ export const SceneContainer: React.FC<SceneContainerProps> = ({
 
       {/* ─── Subtitle Overlay (HTML) ─── */}
       <SubtitleOverlay subtitles={subtitles} accentColor={accentColor} />
+
+      {/* ─── Audio Layers ─── */}
+      {narrationFile && (
+        <Sequence from={narrationDelay ?? 15}>
+          <NarrationAudio
+            filename={narrationFile}
+            volume={narrationVolume}
+            delayFrames={0}
+          />
+        </Sequence>
+      )}
+      {entryWhoosh && (
+        <TransitionSFX atFrame={0} type="whoosh" volume={0.3} />
+      )}
+      {pulseAtFrame !== undefined && (
+        <TransitionSFX atFrame={pulseAtFrame} type="pulse" volume={0.25} />
+      )}
 
       {/* ─── Vignette (CSS) ─── */}
       <AbsoluteFill

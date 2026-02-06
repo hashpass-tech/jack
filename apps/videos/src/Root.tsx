@@ -6,6 +6,7 @@ import { Scene2MultiChain } from "./scenes/Scene2MultiChain";
 import { Scene3Clearing } from "./scenes/Scene3Clearing";
 import { Scene4Automation } from "./scenes/Scene4Automation";
 import { Scene5Outro } from "./scenes/Scene5Outro";
+import { BackgroundAudio } from "./components/BackgroundAudio";
 import {
   VIDEO_WIDTH,
   VIDEO_HEIGHT,
@@ -18,6 +19,7 @@ import {
   OUTRO_DURATION,
   TOTAL_DURATION,
 } from "./constants";
+import { V2_DURATIONS, V2_TOTAL_DURATION } from "./data/narration";
 
 // ─── Full combined composition (6 scenes, 32 seconds) ───
 const JACKLayeredExplainer: React.FC = () => {
@@ -46,6 +48,42 @@ const JACKLayeredExplainer: React.FC = () => {
         <Scene4Automation />
       </Sequence>
       <Sequence {...seq(OUTRO_DURATION)}>
+        <Scene5Outro />
+      </Sequence>
+    </>
+  );
+};
+
+// ─── V2: Full combined composition with narration + background audio (42 s) ───
+const JACKExplainerV2: React.FC = () => {
+  let offset = 0;
+  const seq = (duration: number) => {
+    const from = offset;
+    offset += duration;
+    return { from, durationInFrames: duration };
+  };
+
+  return (
+    <>
+      {/* Background ambient drone (spans entire composition) */}
+      <BackgroundAudio />
+
+      <Sequence {...seq(V2_DURATIONS.COLD_OPEN)}>
+        <Scene0ColdOpen />
+      </Sequence>
+      <Sequence {...seq(V2_DURATIONS.SCENE1)}>
+        <Scene1KeyMgmt />
+      </Sequence>
+      <Sequence {...seq(V2_DURATIONS.SCENE2)}>
+        <Scene2MultiChain />
+      </Sequence>
+      <Sequence {...seq(V2_DURATIONS.SCENE3)}>
+        <Scene3Clearing />
+      </Sequence>
+      <Sequence {...seq(V2_DURATIONS.SCENE4)}>
+        <Scene4Automation />
+      </Sequence>
+      <Sequence {...seq(V2_DURATIONS.OUTRO)}>
         <Scene5Outro />
       </Sequence>
     </>
@@ -110,6 +148,66 @@ export const RemotionRoot: React.FC = () => (
       id="JACKLayeredExplainer"
       component={JACKLayeredExplainer}
       durationInFrames={TOTAL_DURATION}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+
+    {/* ══════════════════════════════════════════════════════════
+        V2 — With narration + background audio + extended durations
+        ══════════════════════════════════════════════════════════ */}
+    <Composition
+      id="V2Full"
+      component={JACKExplainerV2}
+      durationInFrames={V2_TOTAL_DURATION}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+    <Composition
+      id="V2Scene0"
+      component={Scene0ColdOpen}
+      durationInFrames={V2_DURATIONS.COLD_OPEN}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+    <Composition
+      id="V2Scene1"
+      component={Scene1KeyMgmt}
+      durationInFrames={V2_DURATIONS.SCENE1}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+    <Composition
+      id="V2Scene2"
+      component={Scene2MultiChain}
+      durationInFrames={V2_DURATIONS.SCENE2}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+    <Composition
+      id="V2Scene3"
+      component={Scene3Clearing}
+      durationInFrames={V2_DURATIONS.SCENE3}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+    <Composition
+      id="V2Scene4"
+      component={Scene4Automation}
+      durationInFrames={V2_DURATIONS.SCENE4}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+    <Composition
+      id="V2Scene5"
+      component={Scene5Outro}
+      durationInFrames={V2_DURATIONS.OUTRO}
       fps={FPS}
       width={VIDEO_WIDTH}
       height={VIDEO_HEIGHT}

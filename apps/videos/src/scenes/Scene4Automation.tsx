@@ -227,6 +227,9 @@ export const Scene4Automation: React.FC = () => (
     accentColor={scene.accentColor}
     secondaryColor={scene.secondaryColor}
     camera={{ distance: 4.5, orbitSpeed: 0.03 }}
+    narrationFile="scene4-automation.mp3"
+    narrationDelay={12}
+    entryWhoosh
   >
     <Automation3D />
   </SceneContainer>

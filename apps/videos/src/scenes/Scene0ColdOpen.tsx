@@ -111,6 +111,9 @@ export const Scene0ColdOpen: React.FC = () => (
     accentColor={scene.accentColor}
     secondaryColor={scene.secondaryColor}
     camera={{ distance: 4.5, orbitSpeed: 0.15 }}
+    narrationFile="scene0-cold-open.mp3"
+    narrationDelay={8}
+    narrationVolume={0.9}
   >
     <CompassCore3D />
   </SceneContainer>

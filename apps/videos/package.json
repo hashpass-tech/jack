@@ -13,7 +13,18 @@
     "render:scene3": "remotion render Scene3Clearing out/scene3-clearing.mp4",
     "render:scene4": "remotion render Scene4Automation out/scene4-automation.mp4",
     "render:scene5": "remotion render Scene5Outro out/scene5-outro.mp4",
-    "render:all": "pnpm render:scene0 && pnpm render:scene1 && pnpm render:scene2 && pnpm render:scene3 && pnpm render:scene4 && pnpm render:scene5 && pnpm render"
+    "render:all": "pnpm render:scene0 && pnpm render:scene1 && pnpm render:scene2 && pnpm render:scene3 && pnpm render:scene4 && pnpm render:scene5 && pnpm render",
+    "render:v2": "remotion render V2Full out/jack-explainer-v2.mp4",
+    "render:v2:scene0": "remotion render V2Scene0 out/v2-scene0.webm --codec=vp8",
+    "render:v2:scene1": "remotion render V2Scene1 out/v2-scene1.webm --codec=vp8",
+    "render:v2:scene2": "remotion render V2Scene2 out/v2-scene2.webm --codec=vp8",
+    "render:v2:scene3": "remotion render V2Scene3 out/v2-scene3.webm --codec=vp8",
+    "render:v2:scene4": "remotion render V2Scene4 out/v2-scene4.webm --codec=vp8",
+    "render:v2:scene5": "remotion render V2Scene5 out/v2-scene5.webm --codec=vp8",
+    "render:v2:all": "pnpm render:v2:scene0 && pnpm render:v2:scene1 && pnpm render:v2:scene2 && pnpm render:v2:scene3 && pnpm render:v2:scene4 && pnpm render:v2:scene5 && pnpm render:v2",
+    "generate:tts": "tsx scripts/generate-tts.ts",
+    "generate:sfx": "tsx scripts/generate-sfx.ts",
+    "generate:audio": "pnpm generate:tts && pnpm generate:sfx"
   },
   "dependencies": {
     "@react-three/fiber": "9.0.4",
@@ -28,6 +39,7 @@
   "devDependencies": {
     "@types/react": "^18.3.27",
     "@types/three": "^0.182.0",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.0"
   }
 }
