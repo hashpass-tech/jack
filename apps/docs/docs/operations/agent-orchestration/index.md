@@ -173,7 +173,7 @@ For deeper details see:
 
 Agent tasks often require additional tooling (contracts and containers). Use the environment checklist before starting work, and add required tools + verification commands to new issues.  
 
-See the full guide here: [Agent Environment Readiness](./agent-orchestration/agent-environment.md)
+See the full guide here: [Agent Environment Readiness](./agent-environment.md)
 
 ---
 

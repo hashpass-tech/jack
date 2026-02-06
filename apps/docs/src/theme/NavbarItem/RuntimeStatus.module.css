@@ -1,0 +1,86 @@
+.desktopItem {
+  display: flex;
+  align-items: center;
+}
+
+.mobileItem {
+  margin: 0 0 0.72rem;
+}
+
+.runtimeShell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color);
+  border-radius: 999px;
+  padding: 0.24rem 0.52rem;
+}
+
+.versionPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.28rem 0.52rem;
+  background: var(--ifm-color-primary);
+  color: var(--ifm-color-content-inverse);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.environmentText {
+  color: var(--ifm-font-color-secondary);
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+
+.networkSelect {
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  height: 1.8rem;
+  padding: 0 1.45rem 0 0.52rem;
+  background: var(--ifm-background-surface-color);
+  color: var(--ifm-heading-color);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.networkSelect:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 1px;
+}
+
+.runtimeShellMobile {
+  width: 100%;
+  border-radius: 14px;
+  background: var(--jack-mobile-nav-card-bg);
+  border-color: var(--jack-mobile-nav-card-border);
+  padding: 0.74rem 0.7rem;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.6rem 0.52rem;
+  align-items: center;
+}
+
+.runtimeShellMobile .environmentText {
+  font-size: 0.72rem;
+}
+
+.runtimeShellMobile .networkSelect {
+  grid-column: 1 / -1;
+  width: 100%;
+  border-radius: 12px;
+  height: 2.25rem;
+  font-size: 0.75rem;
+  padding-left: 0.68rem;
+}

@@ -111,6 +111,9 @@ Supported commands:
 pnpm release        # patch release
 pnpm release:minor  # minor release
 pnpm release:major  # major release
+pnpm release:all        # patch release + docs deploy (landing/dashboard/docs)
+pnpm release:all:minor  # minor release + docs deploy
+pnpm release:all:major  # major release + docs deploy
 pnpm release -- --with-docs         # include docs build
 pnpm release -- --with-docs-deploy  # include docs build + trigger Pages deploy workflow
 pnpm release:docs                   # docs-only build

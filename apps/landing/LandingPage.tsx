@@ -127,9 +127,22 @@ const deriveDashboardUrl = (): string => {
   return envUrl || "/dashboard";
 };
 
+const deriveDocsUrl = (): string => {
+  const envUrl = import.meta.env.VITE_DOCS_URL?.trim();
+  if (typeof window !== "undefined") {
+    const { hostname } = window.location;
+    if (hostname.includes("localhost") || hostname === "127.0.0.1") {
+      return "http://localhost:3002";
+    }
+    return envUrl || "https://docs.jack.lukas.money";
+  }
+  return envUrl || "https://docs.jack.lukas.money";
+};
+
 const LandingPage: React.FC = () => {
   const landingVersion = import.meta.env.VITE_LANDING_VERSION ?? "1.0.1";
   const dashboardUrl = deriveDashboardUrl();
+  const docsUrl = deriveDocsUrl();
   const [activeModalLayer, setActiveModalLayer] = useState<string | null>(null);
   const [selected3DLayer, setSelected3DLayer] = useState<number | null>(0);
   const [contentVisible, setContentVisible] = useState(false);
@@ -306,7 +319,7 @@ const LandingPage: React.FC = () => {
           {/* Desktop Nav */}
           <nav className="hidden items-center space-x-8 text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 md:flex">
             <a
-              href="https://github.com/hashpass-tech/JACK"
+              href={docsUrl}
               target="_blank"
               rel="noreferrer"
               className="hover:text-white transition-colors"
@@ -412,7 +425,9 @@ const LandingPage: React.FC = () => {
 
           <nav className="flex flex-col items-center space-y-12 text-sm font-black uppercase tracking-[0.4em]">
             <a
-              href="https://github.com/hashpass-tech/JACK"
+              href={docsUrl}
+              target="_blank"
+              rel="noreferrer"
               onClick={() => setMobileMenuOpen(false)}
               className="text-white hover:text-[#F2B94B]"
             >
@@ -585,15 +600,38 @@ const LandingPage: React.FC = () => {
                 v{landingVersion} · Built for the future of cross-chain
                 interoperability · Research by Lukas.lat
               </p>
-              <div className="flex justify-center space-x-10 text-[9px] font-black uppercase tracking-[0.4em] text-gray-600">
-                <a href="#" className="hover:text-white transition-colors">
-                  Twitter
+              <div className="flex flex-wrap items-center justify-center gap-6 text-[9px] font-black uppercase tracking-[0.35em] text-gray-500">
+                <a
+                  href={docsUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  Docs
                 </a>
-                <a href="#" className="hover:text-white transition-colors">
+                <a
+                  href={dashboardUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  Dashboard
+                </a>
+                <a
+                  href="/whitepapper/JACK-Whitepaper-v1.0.1.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  Whitepaper
+                </a>
+                <a
+                  href="https://github.com/hashpass-tech/JACK"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-white transition-colors"
+                >
                   GitHub
-                </a>
-                <a href="#" className="hover:text-white transition-colors">
-                  Discord
                 </a>
               </div>
             </div>

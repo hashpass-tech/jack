@@ -33,11 +33,16 @@ On every release:
 ### Docs Release Options
 
 ```bash
+pnpm release:all
+pnpm release:all:minor
+pnpm release:all:major
 pnpm release -- --with-docs
 pnpm release -- --with-docs-deploy
 pnpm release:docs
 pnpm release:docs:deploy
 ```
+
+`release:all*` runs the same version bump pipeline and always includes docs deployment, so landing, dashboard, and docs publish under the same semver build.
 
 Docs deployment and DNS details are documented in [Docs Pages Deployment](./docs-pages-deployment.md).
 
