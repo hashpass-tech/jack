@@ -1,167 +1,35 @@
-# JACK Documentation
+# JACK Docs Site
 
-Welcome to the JACK project documentation.
+This documentation site is built with [Docusaurus](https://docusaurus.io/) and is configured for deployment at `https://docs.jack.lukas.money`.
 
-## Quick Links
+## Installation
 
-| Document | Description |
-|----------|-------------|
-| [Agent Orchestration](./agent-orchestration.md) | Overview of the entire agent system |
-| [Agent Environment Readiness](./agent-orchestration/agent-environment.md) | Tooling checklist for agent task execution |
-| [Spec System](./spec-system.md) | Kiro-style spec workflow details |
-| [Quick Start](./spec-quickstart.md) | 5-minute tutorial for specs |
-| [Multi-Agent Config](./multi-agent-config.md) | Configure different AI agents |
-
----
-
-## Getting Started
-
-### For Feature Development (Kiro-style)
-
-1. **Create a spec:**
-   ```bash
-   node .kiro/bin/jack-spec.js new my_feature
-   ```
-
-2. **Fill in requirements, design, and tasks**
-
-3. **Execute tasks:**
-   ```bash
-   node .kiro/bin/jack-spec.js run --task FEAT-1
-   ```
-
-👉 See [Quick Start Guide](./spec-quickstart.md)
-
----
-
-### For Automated Tasks (CI/CD)
-
-1. **Create issues on GitHub**
-
-2. **Sync to local YAML:**
-   ```bash
-   pnpm agent:sync day-1
-   ```
-
-3. **Run agent:**
-   ```bash
-   pnpm agent:run .agent-tasks/day-1.yaml
-   ```
-
-👉 See [Agent Orchestration](./agent-orchestration.md)
-
----
-
-## Architecture Overview
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    JACK Agent Orchestration                      │
-├─────────────────────────────────────────────────────────────────┤
-│                                                                  │
-│   ┌──────────────┐     ┌──────────────┐     ┌──────────────┐   │
-│   │    GitHub    │────►│  .agent-tasks│────►│   AI Agent   │   │
-│   │    Issues    │     │    (YAML)    │     │  (Claude,    │   │
-│   └──────────────┘     └──────────────┘     │   Kiro, etc) │   │
-│                                              └──────┬───────┘   │
-│                                                     │           │
-│   ┌──────────────────────────────────────────────────┘          │
-│   │                                                              │
-│   ▼                                                              │
-│   ┌──────────────────────────────────────────────────────────┐  │
-│   │                    .kiro/specs/                           │  │
-│   │   ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │  │
-│   │   │requirements  │ │   design     │ │    tasks     │     │  │
-│   │   │     .md      │ │     .md      │ │     .md      │     │  │
-│   │   └──────────────┘ └──────────────┘ └──────────────┘     │  │
-│   └──────────────────────────────────────────────────────────┘  │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
+```bash
+pnpm install
 ```
 
----
+## Local Development
 
-## Directory Structure
-
-```
-JACK/
-├── .agent-tasks/         # YAML-based task automation
-│   ├── tasks.yaml        # Manual tasks
-│   └── day-1.yaml        # GitHub-synced tasks
-│
-├── .kiro/                # Kiro-style spec system
-│   ├── bin/
-│   │   └── jack-spec.js  # CLI tool
-│   ├── specs/
-│   │   └── <spec>/
-│   │       ├── requirements.md
-│   │       ├── design.md
-│   │       └── tasks.md
-│   └── README.md
-│
-├── .agent/               # Antigravity workflows
-│   └── workflows/
-│       └── spec.md
-│
-├── .vscode/              # VS Code integration
-│   └── tasks.json
-│
-├── .github/              # GitHub Actions
-│   └── workflows/
-│       └── agent-automation.yml
-│
-├── docs/                 # Documentation (you are here)
-│   ├── README.md
-│   ├── agent-orchestration.md
-│   ├── spec-system.md
-│   ├── spec-quickstart.md
-│   └── multi-agent-config.md
-│
-└── scripts/              # Agent automation scripts
-    ├── agent-runner.ts
-    ├── agent-dashboard.ts
-    └── sync-github-tasks.ts
+```bash
+pnpm start
 ```
 
----
+This command starts a local development server and opens a browser window. Most changes are reflected live without restarting.
 
-## npm Scripts
+## Build
 
-| Script | Description |
-|--------|-------------|
-| `pnpm agent:run <file>` | Run agent on task YAML |
-| `pnpm agent:sync <label>` | Sync GitHub issues to YAML |
-| `pnpm agent:dashboard` | Open agent dashboard |
-| `pnpm agent:tracker` | Track GitHub project progress |
+```bash
+pnpm build
+```
 
----
+This command generates static content into the `build` directory and can be served with any static hosting service.
 
-## CLI Commands
+## Documentation Map
 
-| Command | Description |
-|---------|-------------|
-| `jack-spec list` | List all specs |
-| `jack-spec status <spec>` | Show spec status |
-| `jack-spec run --task <id>` | Run specific task |
-| `jack-spec new <name>` | Create new spec |
-
-> **Note:** Run with `node .kiro/bin/jack-spec.js` or add as npm script.
-
----
-
-## Contributing
-
-When adding new agent integrations or spec features:
-
-1. Update the relevant documentation
-2. Add examples to the quick start guide
-3. Test with multiple agents
-4. Update the architecture diagram if needed
-
----
-
-## Related Resources
-
-- [Kiro IDE](https://kiro.dev) - Visual spec-driven development
-- [Claude Code](https://anthropic.com) - CLI-based AI coding
-- [Antigravity](https://cloud.google.com/antigravity) - VS Code AI extension
+- [Overview](./docs/overview.md)
+- [Setup](./docs/setup.md)
+- [Architecture](./docs/architecture.md)
+- [Demo Script](./docs/demo-script.md)
+- [Operations](./docs/operations/index.md)
+- [Agent Orchestration](./docs/operations/agent-orchestration/index.md)
+- [Agent Environment Readiness](./docs/operations/agent-orchestration/agent-environment.md)

@@ -1,3 +1,8 @@
+---
+title: Agent Interface Philosophy
+sidebar_position: 2
+---
+
 # Agent-Agnostic Task Orchestration System
 
 ## Kiro-Style Workflow Without Vendor Lock-in
@@ -34,38 +39,6 @@ We adopt the highly effective Kiro workflow:
 3.  **Agent execution**: Autonomous or assisted processing.
 4.  **Verification**: Automated checks (compilation, tests, linting).
 5.  **Feedback loop**: Retries or adjustments based on failure.
-
----
-
-## Architecture
-
-### Layer 1: Task Specification (.agent-tasks/)
-
-All tasks are defined in version-controlled YAML files. This ensures that the context and requirements are always synchronized with the codebase.
-
-Example Task (`.agent-tasks/day-1.yaml`):
-```yaml
-tasks:
-  - id: "D1-CRIT-1"
-    title: "Create JACKPolicyHook.sol skeleton"
-    requirement: |
-      Create a Uniswap v4 hook contract that enforces slippage policies.
-    acceptance:
-      - "Contract compiles with forge build"
-      - "Inherits from BaseHook"
-    output:
-      path: "contracts/src/JACKPolicyHook.sol"
-```
-
-### Layer 2: Universal Agent Runner (scripts/agent-runner.ts)
-
-The runner acts as the central orchestrator. It parses tasks, selects the appropriate agent backend based on availability or preference, and executes the lifecycle.
-
-Supported Backends:
-- **Kiro**: Full autonomous integration via API.
-- **Claude Code**: High-performance CLI integration.
-- **Cursor**: Directed prompts for manual Composer execution.
-- **OpenClaw**: Open-source autonomous agent execution.
 
 ---
 
