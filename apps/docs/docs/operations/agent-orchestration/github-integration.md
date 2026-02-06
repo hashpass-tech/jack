@@ -1,3 +1,8 @@
+---
+title: GitHub Issues Integration
+sidebar_position: 4
+---
+
 # GitHub Issues ↔ Agent System Integration Guide
 
 ## Two-Way Sync Between GitHub Projects and Agent Tasks
@@ -26,7 +31,7 @@ This integration ensures that GitHub Issues remain the single source of truth fo
 
 ## Daily Workflow
 
-### 1. Create/Labels Issues
+### 1. Create/Label Issues
 Ensure your issues have the appropriate labels (e.g., `day-1`, `agent-task`).
 
 ### 2. Sync to YAML

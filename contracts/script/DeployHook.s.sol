@@ -2,7 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "forge-std/Script.sol";
-import "../JACKPolicyHook.sol";
+import "../src/JACKPolicyHook.sol";
 import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 
 contract DeployHook is Script {

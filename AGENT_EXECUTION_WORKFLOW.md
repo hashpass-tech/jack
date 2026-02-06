@@ -4,6 +4,14 @@ This document describes the step-by-step process for agents to pick, work on, an
 
 ---
 
+## 0. Environment Readiness
+- Confirm the toolchain required by the issue is installed (Node.js + pnpm, Foundry/forge, Docker, etc.).
+- Run quick checks before starting work:
+  - `node -v` / `pnpm -v`
+  - `forge --version` (contracts)
+  - `docker --version` / `docker compose version` (container builds)
+- If tools are missing, document the gap in the issue and add setup steps to the task requirements.
+
 ## 1. Issue Selection
 - Agents (or maintainers) select an issue from the GitHub project board (Backlog or Ready).
 - Create a new branch from `main` using the convention: `issue/<issue-id>-<short-description>`.

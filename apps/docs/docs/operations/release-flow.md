@@ -1,3 +1,8 @@
+---
+title: Release Flow
+sidebar_position: 5
+---
+
 # Release Flow (Testnet & Mainnet)
 
 ## Summary
