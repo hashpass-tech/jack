@@ -1,0 +1,84 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.heroBanner {
+  padding: 5rem 0 4rem;
+  background: radial-gradient(circle at top, rgba(74, 201, 255, 0.18), transparent 55%);
+}
+
+.heroGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3rem;
+  align-items: center;
+}
+
+.heroTitle {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.heroSubtitle {
+  font-size: 1.25rem;
+  max-width: 520px;
+  color: var(--ifm-color-emphasis-200);
+}
+
+.heroButtons {
+  display: flex;
+  gap: 1rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+
+.heroMeta {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  color: var(--ifm-color-emphasis-200);
+}
+
+.heroMeta span {
+  display: block;
+  font-weight: 600;
+  color: var(--ifm-font-color-base);
+}
+
+.heroMeta small {
+  display: block;
+  margin-top: 0.35rem;
+}
+
+.heroCard {
+  background: var(--ifm-card-background-color);
+  border: 1px solid var(--ifm-color-emphasis-200);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
+}
+
+.heroCardTitle {
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  color: var(--ifm-color-primary);
+  margin-bottom: 1rem;
+}
+
+.heroCard ul {
+  padding-left: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+@media screen and (max-width: 996px) {
+  .heroGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .heroBanner {
+    padding: 3rem 0;
+  }
+}

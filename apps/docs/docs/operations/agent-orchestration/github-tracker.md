@@ -1,3 +1,8 @@
+---
+title: GitHub Project Tracker
+sidebar_position: 3
+---
+
 # GitHub Project Tracker
 
 ## Overview
