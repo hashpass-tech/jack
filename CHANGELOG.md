@@ -1,3 +1,15 @@
+## [0.1.28](https://github.com/hashpass-tech/JACK/compare/v0.1.27-testnet.1...v0.1.28) (2026-02-06)
+
+
+### Features
+
+* **landing:** integrate V2 narrated videos + sound toggle ([c4a28bf](https://github.com/hashpass-tech/JACK/commit/c4a28bf08578385dca0d8f9f0e9ea4b5c81b6f8d))
+* **videos:** v2 TTS narration + SFX audio system ([c7d68c2](https://github.com/hashpass-tech/JACK/commit/c7d68c2ca73a95d203f452a2d7a24b2e81494acf))
+
+
+
+
+
 ## [0.1.27](https://github.com/hashpass-tech/JACK/compare/v0.1.22...v0.1.27) (2026-02-06)
 
 
