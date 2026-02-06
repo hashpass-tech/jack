@@ -5,6 +5,8 @@ steps:
       - .
       - -f
       - apps/dashboard/Dockerfile
+      - --build-arg
+      - NEXT_PUBLIC_IS_TESTNET=true
       - -t
       - ${_IMAGE}
   - name: gcr.io/cloud-builders/docker
