@@ -7,22 +7,13 @@ import {
   Stars,
 } from "@react-three/drei";
 import Scene3D from "@/components/Scene3Dv2";
+import LayerVideoModal from "./LayerVideoModal";
 
 const whitepaperVersions = [
   { label: "Latest (v1.0.1)", filename: "JACK-Whitepaper-v1.0.1.pdf" },
   { label: "v1.0.0", filename: "JACK-Whitepaper-v1.0.0.pdf" },
 ];
 
-const layerExplanations: Record<string, string> = {
-  INTENT:
-    "Captures the user’s high-level cross-chain goal and lets the kernel strategize the best execution path.",
-  ROUTE:
-    "Deploys the solver network along optimal bridges and liquidity pools, balancing cost, speed, and risk.",
-  CONSTRAINTS:
-    "Keeps private policies and guardrails enforced through Fhenix encryption and policy hooks.",
-  SETTLEMENT:
-    "Finalizes the execution with atomic settlement adapters so every chain sees a consistent state.",
-};
 
 const highlightTiles = [
   {
@@ -574,43 +565,10 @@ const LandingPage: React.FC = () => {
       </div>
 
       {activeModalLayer && (
-        <div className="fixed inset-0 z-[110] flex items-center justify-center p-6 bg-[#0B1020]/90 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="relative w-full max-w-xl rounded-[32px] border border-[#F2B94B]/30 bg-[#0F1A2E] p-12 shadow-[0_0_100px_rgba(0,0,0,0.8)]">
-            <button
-              onClick={handleCloseModal}
-              className="absolute right-8 top-8 text-gray-500 hover:text-white transition-colors"
-            >
-              <svg
-                className="h-8 w-8"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-            <div className="space-y-8">
-              <div className="w-16 h-1 w-full bg-gradient-to-r from-[#F2B94B] via-[#38BDF8] to-transparent rounded-full" />
-              <h2 className="text-4xl font-black uppercase tracking-tighter text-white">
-                {activeModalLayer} Architecture
-              </h2>
-              <p className="text-lg text-gray-300 font-medium leading-relaxed">
-                {layerExplanations[activeModalLayer]}
-              </p>
-              <button
-                onClick={handleCloseModal}
-                className="w-full py-5 rounded-2xl bg-white/5 text-white font-black uppercase tracking-[0.4em] border border-white/10 hover:bg-white/10 transition-all"
-              >
-                Return to Scene
-              </button>
-            </div>
-          </div>
-        </div>
+        <LayerVideoModal
+          layer={activeModalLayer}
+          onClose={handleCloseModal}
+        />
       )}
     </div>
   );
