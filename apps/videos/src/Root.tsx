@@ -20,6 +20,13 @@ import {
   TOTAL_DURATION,
 } from "./constants";
 import { V2_DURATIONS, V2_TOTAL_DURATION } from "./data/narration";
+import { V3_DURATIONS } from "./data/narration-v3";
+import {
+  V3Scene1KeyMgmt,
+  V3Scene2MultiChain,
+  V3Scene3Clearing,
+  V3Scene4Automation,
+} from "./scenes/V3Scenes";
 
 // ─── Full combined composition (6 scenes, 32 seconds) ───
 const JACKLayeredExplainer: React.FC = () => {
@@ -208,6 +215,42 @@ export const RemotionRoot: React.FC = () => (
       id="V2Scene5"
       component={Scene5Outro}
       durationInFrames={V2_DURATIONS.OUTRO}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+
+    {/* ══════════════════════════════════════════════════════════
+        V3 — "Deep Dive" detailed explainers (35 s per scene)
+        ══════════════════════════════════════════════════════════ */}
+    <Composition
+      id="V3Scene1"
+      component={V3Scene1KeyMgmt}
+      durationInFrames={V3_DURATIONS.SCENE1}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+    <Composition
+      id="V3Scene2"
+      component={V3Scene2MultiChain}
+      durationInFrames={V3_DURATIONS.SCENE2}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+    <Composition
+      id="V3Scene3"
+      component={V3Scene3Clearing}
+      durationInFrames={V3_DURATIONS.SCENE3}
+      fps={FPS}
+      width={VIDEO_WIDTH}
+      height={VIDEO_HEIGHT}
+    />
+    <Composition
+      id="V3Scene4"
+      component={V3Scene4Automation}
+      durationInFrames={V3_DURATIONS.SCENE4}
       fps={FPS}
       width={VIDEO_WIDTH}
       height={VIDEO_HEIGHT}

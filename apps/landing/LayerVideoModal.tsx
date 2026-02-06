@@ -8,6 +8,14 @@ const LAYER_VIDEO_MAP: Record<string, string> = {
   SETTLEMENT: "/videos/scene4-automation.webm",
 };
 
+/* ─── V3 "Deep Dive" videos — shown in Theatre/Expanded mode ─── */
+const LAYER_VIDEO_V3_MAP: Record<string, string> = {
+  INTENT: "/videos/v3-scene1-key-management.mp4",
+  ROUTE: "/videos/v3-scene2-multi-chain.mp4",
+  CONSTRAINTS: "/videos/v3-scene3-clearing.mp4",
+  SETTLEMENT: "/videos/v3-scene4-automation.mp4",
+};
+
 const LAYER_ACCENT: Record<string, string> = {
   INTENT: "#F2B94B",
   ROUTE: "#38BDF8",
@@ -36,14 +44,17 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
   onClose,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const videoV3Ref = useRef<HTMLVideoElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [entered, setEntered] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [v3VideoLoaded, setV3VideoLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
   const accent = LAYER_ACCENT[layer] ?? "#F2B94B";
   const videoSrc = LAYER_VIDEO_MAP[layer];
+  const videoSrcV3 = LAYER_VIDEO_V3_MAP[layer];
   const description = LAYER_DESCRIPTION[layer] ?? "";
 
   /* Entrance animation */
@@ -91,15 +102,30 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
   };
 
   const toggleExpand = () => {
-    setExpanded((prev) => !prev);
+    setExpanded((prev) => {
+      const willExpand = !prev;
+      if (willExpand && videoV3Ref.current) {
+        // Switching to Theatre Mode — play V3 detailed video
+        videoV3Ref.current.currentTime = 0;
+        videoV3Ref.current.muted = isMuted;
+        videoV3Ref.current.play().catch(() => {});
+        if (videoRef.current) videoRef.current.pause();
+      } else if (!willExpand && videoRef.current) {
+        // Switching back to compact — resume V2 clip
+        videoRef.current.muted = isMuted;
+        videoRef.current.play().catch(() => {});
+        if (videoV3Ref.current) videoV3Ref.current.pause();
+      }
+      return willExpand;
+    });
   };
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
-    }
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    if (videoRef.current) videoRef.current.muted = newMuted;
+    if (videoV3Ref.current) videoV3Ref.current.muted = newMuted;
   };
 
   return (
@@ -151,7 +177,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
           className="relative cursor-pointer group"
           onClick={toggleExpand}
           style={{
-            height: expanded ? "440px" : "260px",
+            height: expanded ? "540px" : "260px",
             transition: "height 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
           }}
         >
@@ -166,7 +192,25 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               onLoadedData={() => setVideoLoaded(true)}
               className="absolute inset-0 w-full h-full object-cover"
               style={{
-                opacity: videoLoaded ? 1 : 0,
+                opacity: videoLoaded && !expanded ? 1 : 0,
+                transition: "opacity 0.6s ease",
+              }}
+            />
+          )}
+
+          {/* V3 detailed video — visible only in Theatre Mode */}
+          {videoSrcV3 && (
+            <video
+              ref={videoV3Ref}
+              src={videoSrcV3}
+              muted={isMuted}
+              loop
+              playsInline
+              preload="auto"
+              onLoadedData={() => setV3VideoLoaded(true)}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                opacity: expanded && v3VideoLoaded ? 1 : 0,
                 transition: "opacity 0.6s ease",
               }}
             />
@@ -241,7 +285,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               )}
             </svg>
             <span className="text-[10px] font-bold uppercase tracking-wider">
-              {expanded ? "Collapse" : "Expand"}
+              {expanded ? "Collapse" : "Deep Dive"}
             </span>
           </div>
         </div>
@@ -310,7 +354,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
                 color: accent,
               }}
             >
-              {expanded ? "▴ Compact" : "▾ Theatre Mode"}
+              {expanded ? "▴ Compact View" : "▾ Deep Dive"}
             </button>
           </div>
         </div>

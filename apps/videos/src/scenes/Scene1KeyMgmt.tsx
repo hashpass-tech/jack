@@ -18,7 +18,7 @@ const scene = SCENES[1]; // Layer 1
  *  - Blocked red particles hit shield and bounce (subtle)
  *  - Key orb emits one pulse ring outward (signing)
  */
-const KeyManagement3D: React.FC = () => {
+export const KeyManagement3D: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;

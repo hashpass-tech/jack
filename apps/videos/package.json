@@ -22,7 +22,13 @@
     "render:v2:scene4": "remotion render V2Scene4 out/v2-scene4.webm --codec=vp8",
     "render:v2:scene5": "remotion render V2Scene5 out/v2-scene5.webm --codec=vp8",
     "render:v2:all": "pnpm render:v2:scene0 && pnpm render:v2:scene1 && pnpm render:v2:scene2 && pnpm render:v2:scene3 && pnpm render:v2:scene4 && pnpm render:v2:scene5 && pnpm render:v2",
+    "render:v3:scene1": "remotion render V3Scene1 out/v3-scene1-key-management.mp4 --gl=angle",
+    "render:v3:scene2": "remotion render V3Scene2 out/v3-scene2-multi-chain.mp4 --gl=angle",
+    "render:v3:scene3": "remotion render V3Scene3 out/v3-scene3-clearing.mp4 --gl=angle",
+    "render:v3:scene4": "remotion render V3Scene4 out/v3-scene4-automation.mp4 --gl=angle",
+    "render:v3:all": "pnpm render:v3:scene1 && pnpm render:v3:scene2 && pnpm render:v3:scene3 && pnpm render:v3:scene4",
     "generate:tts": "tsx scripts/generate-tts.ts",
+    "generate:tts:v3": "tsx scripts/generate-tts-v3.ts",
     "generate:sfx": "tsx scripts/generate-sfx.ts",
     "generate:audio": "pnpm generate:tts && pnpm generate:sfx"
   },
