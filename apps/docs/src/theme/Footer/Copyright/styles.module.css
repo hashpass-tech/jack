@@ -17,6 +17,13 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.badge:hover {
+  border-color: var(--ifm-color-primary);
+  box-shadow: 0 0 8px rgba(10, 125, 194, 0.15);
 }
 
 .dot {
@@ -37,6 +44,15 @@
 
 .build {
   color: var(--ifm-font-color-secondary);
+}
+
+.separator {
+  opacity: 0.3;
+  color: var(--ifm-font-color-secondary);
+}
+
+.changelogLabel {
+  color: var(--ifm-color-primary);
 }
 
 @media (max-width: 640px) {

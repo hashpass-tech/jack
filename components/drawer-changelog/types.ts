@@ -49,7 +49,7 @@ export interface ChangelogDrawerProps {
   /** Raw CHANGELOG.md text */
   changelogText: string;
   /** Built-in theme preset or custom theme object */
-  theme?: "landing" | "dashboard" | ChangelogTheme;
+  theme?: "landing" | "dashboard" | "docs" | ChangelogTheme;
   /** GitHub repo URL for tag/release links */
   repoUrl?: string;
   /** Current app version (falls back to latest parsed version) */

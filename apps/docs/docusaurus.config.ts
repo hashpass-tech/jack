@@ -15,10 +15,38 @@ const readPackageVersion = (filePath: string): string => {
   }
 };
 
+const readChangelog = (): string => {
+  try {
+    return fs.readFileSync(
+      path.resolve(__dirname, '../../CHANGELOG.md'),
+      'utf-8',
+    );
+  } catch {
+    return '';
+  }
+};
+
 const docsBuildVersion = readPackageVersion(
   path.resolve(__dirname, '../../package.json'),
 );
 const protocolTrack = process.env.JACK_PROTOCOL_TRACK || 'v1';
+const changelogRaw = readChangelog();
+
+// Docusaurus plugin to add webpack alias for shared components
+function sharedComponentsPlugin() {
+  return {
+    name: 'shared-components-alias',
+    configureWebpack() {
+      return {
+        resolve: {
+          alias: {
+            '@shared': path.resolve(__dirname, '../../components'),
+          },
+        },
+      };
+    },
+  };
+}
 
 const config: Config = {
   title: 'JACK Docs',
@@ -66,12 +94,14 @@ const config: Config = {
     ],
   ],
   themes: ['@docusaurus/theme-mermaid'],
+  plugins: [sharedComponentsPlugin],
   markdown: {
     mermaid: true,
   },
   customFields: {
     docsBuildVersion,
     jackProtocolTrack: protocolTrack,
+    changelogRaw,
   },
 
   themeConfig: {
