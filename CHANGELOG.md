@@ -1,3 +1,14 @@
+## [0.1.50](https://github.com/hashpass-tech/JACK/compare/v0.1.49-testnet.1...v0.1.50) (2026-02-07)
+
+
+### Features
+
+* **dashboard:** futuristic UX rewrite — SVG icons, voice input, receipt upload, auto-route resolver ([3598e65](https://github.com/hashpass-tech/JACK/commit/3598e656e8dd3f5ee9d3b1e0dbb3cecf325bad76))
+
+
+
+
+
 ## [0.1.49](https://github.com/hashpass-tech/JACK/compare/v0.1.48...v0.1.49) (2026-02-07)
 
 
