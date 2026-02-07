@@ -272,6 +272,7 @@ export default function ChangelogDrawer({
   repoUrl = REPO_URL_DEFAULT,
   version,
   className = "",
+  renderTrigger,
 }: ChangelogDrawerProps) {
   /* ── State ───────────────────────────────────────────────── */
   const [drawerMode, setDrawerMode] = useState<"closed" | "peek" | "full">(
@@ -351,10 +352,12 @@ export default function ChangelogDrawer({
   }, [drawerMode]);
 
   /* ── Trigger badge (always visible) ────────────────────── */
-  const trigger = (
+  const handleTriggerClick = useCallback(() => open("peek"), [open]);
+
+  const defaultTrigger = (
     <button
       type="button"
-      onClick={() => open("peek")}
+      onClick={handleTriggerClick}
       className={`group inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.18em] transition-all duration-300 cursor-pointer select-none ${className}`}
       style={{
         background: theme.triggerBg,
@@ -391,8 +394,12 @@ export default function ChangelogDrawer({
     </button>
   );
 
+  const trigger = renderTrigger
+    ? renderTrigger({ onClick: handleTriggerClick, version: displayVersion })
+    : defaultTrigger;
+
   /* ── Closed → just render the trigger ─────────────────── */
-  if (drawerMode === "closed" || !mounted) return trigger;
+  if (drawerMode === "closed" || !mounted) return <>{trigger}</>;
 
   const isPeek = drawerMode === "peek";
 

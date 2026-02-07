@@ -1,5 +1,7 @@
 /* ── Changelog Drawer · Shared Types ─────────────────────────── */
 
+import type React from "react";
+
 export interface ChangelogItem {
   scope?: string;
   description: string;
@@ -54,4 +56,10 @@ export interface ChangelogDrawerProps {
   version?: string;
   /** Extra className for the trigger element */
   className?: string;
+  /**
+   * Custom trigger renderer. Receives onClick to open the peek drawer.
+   * When provided, replaces the default pulsing-dot badge entirely,
+   * letting each app embed the trigger into its own footer design.
+   */
+  renderTrigger?: (props: { onClick: () => void; version: string }) => React.ReactNode;
 }
