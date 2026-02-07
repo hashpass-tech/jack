@@ -52,6 +52,7 @@ graph TB
 - Issues `#17` and `#18` are closed as merged into `develop`.
 - Dashboard API now exposes `GET /api/quote` and enriched intent metadata for LI.FI + Yellow execution evidence.
 - Explicit fallback mode exists for LI.FI when provider calls fail or inputs are unsupported.
+- Yellow provider callbacks support ERC-7824 (Nitrolite) channel metadata/guards (`channelId`, `channelStatus`, `stateIntent`, `stateVersion`, optional adjudicator + challenge period checks).
 - Remaining hardening work is tracked in follow-up issue `#22` (lint/type cleanup and provider-state reliability tightening).
 
 ## 3-Step Setup Guide

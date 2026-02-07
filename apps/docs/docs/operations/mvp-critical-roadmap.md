@@ -41,6 +41,7 @@ Track the remaining critical work to make the demo deterministic and production-
 ## Post-Merge Status (February 7, 2026)
 
 - PR #20 merged into `develop`: Yellow notification ingestion + auth/session/channel guard checks in intents API.
+- Follow-up: Yellow callback setup now supports ERC-7824 (Nitrolite) metadata + guard checks (`channelId`, `channelStatus`, `stateIntent`, `stateVersion`, adjudicator, challenge period).
 - PR #21 merged into `develop`: LI.FI quote/route/status integration and deterministic `GET /api/quote`.
 - Issues #17 and #18 closed after merge.
 - Follow-up issue #22 created for lint/type debt and reliability hardening in merged execution pipeline.
