@@ -78,7 +78,12 @@ function inferNetwork(hostname: string, referrer: string): JackNetwork {
 }
 
 function sanitizeNetworkForHost(network: JackNetwork, hostname: string): JackNetwork {
-  if (network === 'local' && !isLocalHostname(hostname)) {
+  // On localhost, always force 'local' — never let a stale localStorage
+  // value (e.g. 'testnet' from a previous visit) override the inferred network.
+  if (isLocalHostname(hostname)) {
+    return 'local';
+  }
+  if (network === 'local') {
     return 'mainnet';
   }
   return network;

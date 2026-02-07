@@ -1,0 +1,37 @@
+name: Version Sync Check
+
+on:
+  pull_request:
+    types: [opened, reopened, synchronize, edited, ready_for_review]
+  push:
+    branches: [develop, main]
+    paths:
+      - "package.json"
+      - "apps/dashboard/package.json"
+      - "CHANGELOG.md"
+      - "scripts/check-version-sync.js"
+      - ".github/workflows/version-sync.yml"
+      - ".github/workflows/deploy-docs-pages.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-version-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch base refs
+        run: git fetch origin main develop --depth=1
+
+      - name: Validate version/changelog sync
+        env:
+          CHECK_MAIN_REF: origin/main
+          CHECK_DEVELOP_REF: origin/develop
+          CHECK_BRANCH: ${{ github.ref_name }}
+          STRICT_MAIN_DEVELOP_SYNC: "false"
+        run: node scripts/check-version-sync.js

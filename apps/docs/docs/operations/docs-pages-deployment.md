@@ -24,8 +24,11 @@ docs.jack.lukas.money
 
 - PR docs-impact gate: `.github/workflows/docs-impact.yml`
 - Merge-time docs changelog writer: `.github/workflows/docs-changelog.yml`
+- Version/changelog sync check: `.github/workflows/version-sync.yml`
+- Whitepaper artifact validation: `pnpm whitepaper:validate`
 - Check script: `scripts/check-doc-impact.js`
 - Changelog updater: `scripts/update-docs-changelog.js`
+- Version sync checker: `scripts/check-version-sync.js`
 
 If critical contract/API/SDK paths are changed, PRs must include docs updates or explicit no-impact metadata:
 
@@ -34,6 +37,7 @@ DOCS_IMPACT: none
 DOCS_IMPACT_NOTE: <why docs are not required>
 ```
 
+`deploy-docs-pages.yml` also runs version sync and whitepaper validation before docs build, so root/dashboard versions, changelog entries, and whitepaper manifest/assets stay aligned.
 ## GitHub Repository Settings
 
 1. Open repository settings: `Settings -> Pages`.

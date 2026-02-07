@@ -7,11 +7,13 @@ import {
   type JackNetwork,
   type JackRuntimeTargets,
 } from '@site/src/lib/runtimeTargets';
+import {ChangelogDrawer} from '@shared/drawer-changelog';
 import styles from './styles.module.css';
 
 type FooterCustomFields = {
   docsBuildVersion?: string;
   jackProtocolTrack?: string;
+  changelogRaw?: string;
 };
 
 const networkLabel = (network: JackNetwork): string => {
@@ -44,15 +46,30 @@ export default function FooterCopyright({copyright}: Props): ReactNode {
     customFields.jackProtocolTrack ?? runtime.protocolVersion ?? 'v1'
   ).toUpperCase();
   const buildVersion = customFields.docsBuildVersion ?? '0.0.0';
+  const changelogText = customFields.changelogRaw ?? '';
 
   return (
     <div className={styles.shell}>
-      <div className={styles.badge} aria-label="Documentation build metadata">
-        <span className={styles.dot} />
-        <span className={styles.environment}>{environment}</span>
-        <span className={styles.protocol}>{protocolTrack}</span>
-        <span className={styles.build}>BUILD {buildVersion}</span>
-      </div>
+      <ChangelogDrawer
+        changelogText={changelogText}
+        theme="docs"
+        version={buildVersion}
+        renderTrigger={({onClick, version}) => (
+          <button
+            type="button"
+            onClick={onClick}
+            className={styles.badge}
+            aria-label="View changelog"
+          >
+            <span className={styles.dot} />
+            <span className={styles.environment}>{environment}</span>
+            <span className={styles.protocol}>{protocolTrack}</span>
+            <span className={styles.build}>v{version}</span>
+            <span className={styles.separator}>·</span>
+            <span className={styles.changelogLabel}>Changelog</span>
+          </button>
+        )}
+      />
       <div
         className="footer__copyright"
         // Developer provided the HTML, so assume it's safe.

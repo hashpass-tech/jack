@@ -1,4 +1,11 @@
-import React, { Suspense, useEffect, useRef, useState, lazy, useMemo } from "react";
+import React, {
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  lazy,
+  useMemo,
+} from "react";
 import { Canvas } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -7,6 +14,8 @@ import {
   Stars,
 } from "@react-three/drei";
 import Scene3D from "@/components/Scene3Dv2";
+import { ChangelogDrawer } from "@/components/drawer-changelog";
+import changelogRaw from "../../CHANGELOG.md?raw";
 
 // Lazy load the video modal — only loaded when user clicks a layer
 const LayerVideoModal = lazy(() => import("./LayerVideoModal"));
@@ -34,7 +43,9 @@ const Scene3DLoadingFallback: React.FC = () => (
           className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-[#F2B94B] flex items-center justify-center shadow-[0_0_40px_rgba(242,185,75,0.3)]"
           style={{ animation: "fade-pulse 1.5s ease-in-out infinite" }}
         >
-          <span className="font-space text-2xl md:text-3xl font-black text-[#0B1020]">J</span>
+          <span className="font-space text-2xl md:text-3xl font-black text-[#0B1020]">
+            J
+          </span>
         </div>
       </div>
     </div>
@@ -57,11 +68,63 @@ const Scene3DLoadingFallback: React.FC = () => (
   </div>
 );
 
-const whitepaperVersions = [
-  { label: "Latest (v1.0.1)", filename: "JACK-Whitepaper-v1.0.1.pdf" },
-  { label: "v1.0.0", filename: "JACK-Whitepaper-v1.0.0.pdf" },
-];
+type WhitepaperVersionEntry = {
+  version: string;
+  releaseDate: string;
+  pdf: string;
+  sourcePdf?: string;
+};
 
+type WhitepaperManifest = {
+  latest: string;
+  featured?: string;
+  canonicalPdf: string;
+  publicPath?: string;
+  legacyPublicPath?: string;
+  versions: WhitepaperVersionEntry[];
+};
+
+const DEFAULT_WHITEPAPER_MANIFEST: WhitepaperManifest = {
+  latest: "1.0.2",
+  featured: "1.0.0",
+  canonicalPdf: "JACK-Whitepaper.pdf",
+  publicPath: "/whitepaper",
+  legacyPublicPath: "/whitepapper",
+  versions: [
+    {
+      version: "1.0.0",
+      releaseDate: "2026-02-07",
+      pdf: "JACK-Whitepaper-v1.0.0.pdf",
+    },
+    {
+      version: "1.0.2",
+      releaseDate: "2026-02-07",
+      pdf: "JACK-Whitepaper-v1.0.2.pdf",
+    },
+    {
+      version: "1.0.1",
+      releaseDate: "2026-02-06",
+      pdf: "JACK-Whitepaper-v1.0.1.pdf",
+    },
+  ],
+};
+
+const normalizeWhitepaperVersion = (value: string): string =>
+  value.replace(/^v/i, "").trim();
+
+const compareSemverDesc = (a: string, b: string): number => {
+  const left = a.split(".").map((part) => Number(part));
+  const right = b.split(".").map((part) => Number(part));
+  const max = Math.max(left.length, right.length);
+  for (let index = 0; index < max; index += 1) {
+    const l = left[index] ?? 0;
+    const r = right[index] ?? 0;
+    if (l !== r) {
+      return r - l;
+    }
+  }
+  return 0;
+};
 
 const highlightTiles = [
   {
@@ -140,7 +203,7 @@ const deriveDocsUrl = (): string => {
 };
 
 const LandingPage: React.FC = () => {
-  const landingVersion = import.meta.env.VITE_LANDING_VERSION ?? "1.0.1";
+  const landingVersion = import.meta.env.VITE_LANDING_VERSION ?? "0.0.0";
   const dashboardUrl = deriveDashboardUrl();
   const docsUrl = deriveDocsUrl();
   const [activeModalLayer, setActiveModalLayer] = useState<string | null>(null);
@@ -148,12 +211,86 @@ const LandingPage: React.FC = () => {
   const [contentVisible, setContentVisible] = useState(false);
   const [whitepaperOpen, setWhitepaperOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [whitepaperManifest, setWhitepaperManifest] =
+    useState<WhitepaperManifest>(DEFAULT_WHITEPAPER_MANIFEST);
   const whitepaperRef = useRef<HTMLDivElement | null>(null);
+  const featuredWhitepaperVersion = useMemo(
+    () =>
+      normalizeWhitepaperVersion(
+        whitepaperManifest.featured ||
+          DEFAULT_WHITEPAPER_MANIFEST.featured ||
+          whitepaperManifest.latest,
+      ),
+    [whitepaperManifest.featured, whitepaperManifest.latest],
+  );
+  const whitepaperBasePath =
+    whitepaperManifest.publicPath || DEFAULT_WHITEPAPER_MANIFEST.publicPath;
+  const whitepaperVersions = useMemo(() => {
+    const featured = normalizeWhitepaperVersion(
+      whitepaperManifest.featured ||
+        DEFAULT_WHITEPAPER_MANIFEST.featured ||
+        whitepaperManifest.latest,
+    );
+    const latest = normalizeWhitepaperVersion(
+      whitepaperManifest.latest || DEFAULT_WHITEPAPER_MANIFEST.latest,
+    );
+    const ordered = [...whitepaperManifest.versions].sort((left, right) =>
+      compareSemverDesc(
+        normalizeWhitepaperVersion(left.version),
+        normalizeWhitepaperVersion(right.version),
+      ),
+    );
+    const versionsById = new Map(
+      ordered.map((entry) => [
+        normalizeWhitepaperVersion(entry.version),
+        entry,
+      ]),
+    );
+    const selected = new Set<string>();
+    const options: Array<{
+      label: string;
+      filename: string;
+      isFeatured: boolean;
+      isLatest: boolean;
+    }> = [];
+
+    const appendOption = (version: string, label: string) => {
+      const entry = versionsById.get(version);
+      if (!entry || selected.has(version)) {
+        return;
+      }
+      selected.add(version);
+      options.push({
+        label,
+        filename: entry.pdf,
+        isFeatured: version === featured,
+        isLatest: version === latest,
+      });
+    };
+
+    appendOption(featured, `Start Here · Foundational (v${featured})`);
+    if (latest !== featured) {
+      appendOption(latest, `Latest Technical (v${latest})`);
+    }
+    for (const entry of ordered) {
+      const version = normalizeWhitepaperVersion(entry.version);
+      appendOption(version, `v${version}`);
+    }
+
+    return options;
+  }, [
+    whitepaperManifest.featured,
+    whitepaperManifest.latest,
+    whitepaperManifest.versions,
+  ]);
 
   // Detect mobile for performance tuning
   const isMobile = useMemo(() => {
     if (typeof window === "undefined") return false;
-    return window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    return (
+      window.innerWidth < 768 ||
+      /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+    );
   }, []);
   // Lower DPR on mobile for much faster GPU rendering
   const canvasDpr: [number, number] = isMobile ? [1, 1] : [1, 2];
@@ -170,6 +307,40 @@ const LandingPage: React.FC = () => {
         );
       }
     }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadWhitepaperManifest = async () => {
+      try {
+        const primary = await fetch("/whitepaper/manifest.json");
+        if (primary.ok) {
+          const manifest = (await primary.json()) as WhitepaperManifest;
+          if (active) {
+            setWhitepaperManifest(manifest);
+          }
+          return;
+        }
+
+        const legacy = await fetch("/whitepapper/manifest.json");
+        if (!legacy.ok) {
+          return;
+        }
+
+        const legacyManifest = (await legacy.json()) as WhitepaperManifest;
+        if (active) {
+          setWhitepaperManifest(legacyManifest);
+        }
+      } catch {
+        // Keep default manifest when fetch fails.
+      }
+    };
+
+    void loadWhitepaperManifest();
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -335,7 +506,7 @@ const LandingPage: React.FC = () => {
                   setWhitepaperOpen((prev) => !prev);
                 }}
               >
-                Whitepaper (v1.0.1)
+                {`Whitepaper (Start v${featuredWhitepaperVersion})`}
                 <svg
                   className="h-3 w-3 stroke-current"
                   viewBox="0 0 24 24"
@@ -350,23 +521,29 @@ const LandingPage: React.FC = () => {
                 </svg>
               </button>
               <div
-                className={`absolute right-0 mt-4 w-64 rounded-2xl border border-white/10 bg-[#0F1A2E]/95 px-6 py-5 text-left shadow-[0_30px_60px_rgba(0,0,0,0.8)] transition-all duration-300 ${
+                className={`absolute right-0 mt-4 w-80 rounded-2xl border border-white/10 bg-[#0F1A2E]/95 px-6 py-5 text-left shadow-[0_30px_60px_rgba(0,0,0,0.8)] transition-all duration-300 ${
                   whitepaperOpen
                     ? "visible opacity-100 translate-y-0"
                     : "invisible opacity-0 -translate-y-2"
                 }`}
               >
                 <p className="text-[8px] font-black uppercase tracking-[0.5em] text-[#F2B94B] mb-4">
-                  Select Specification
+                  Whitepaper Downloads
                 </p>
                 <div className="space-y-2">
                   {whitepaperVersions.map((paper) => (
                     <a
                       key={paper.filename}
-                      href={`/whitepapper/${paper.filename}`}
+                      href={`${whitepaperBasePath}/${paper.filename}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="block rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-[10px] font-bold text-white transition hover:border-[#F2B94B]/50 hover:bg-[#F2B94B]/10 uppercase tracking-widest"
+                      className={`block rounded-xl border px-4 py-3 text-[10px] font-bold text-white transition uppercase tracking-widest ${
+                        paper.isFeatured
+                          ? "border-[#F2B94B]/50 bg-[#F2B94B]/15 text-[#FFE19A]"
+                          : paper.isLatest
+                            ? "border-[#38BDF8]/40 bg-[#38BDF8]/10 text-[#AEE7FF]"
+                            : "border-white/5 bg-white/5 hover:border-[#F2B94B]/50 hover:bg-[#F2B94B]/10"
+                      }`}
                     >
                       {paper.label}
                     </a>
@@ -436,14 +613,20 @@ const LandingPage: React.FC = () => {
 
             <div className="flex flex-col items-center space-y-8">
               <p className="text-gray-500 text-[10px] tracking-[0.6em] border-b border-white/10 pb-2">
-                Whitepaper Specs
+                Whitepaper Downloads
               </p>
               <div className="flex flex-col space-y-4">
                 {whitepaperVersions.map((p) => (
                   <a
                     key={p.filename}
-                    href={`/whitepapper/${p.filename}`}
-                    className="px-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-[#F2B94B] text-[10px] text-center w-64 uppercase tracking-widest font-bold hover:bg-[#F2B94B]/10 transition-colors"
+                    href={`${whitepaperBasePath}/${p.filename}`}
+                    className={`px-10 py-4 border rounded-2xl text-[10px] text-center w-72 uppercase tracking-widest font-bold transition-colors ${
+                      p.isFeatured
+                        ? "bg-[#F2B94B]/15 border-[#F2B94B]/50 text-[#FFE19A]"
+                        : p.isLatest
+                          ? "bg-[#38BDF8]/10 border-[#38BDF8]/40 text-[#AEE7FF]"
+                          : "bg-white/5 border-white/10 text-[#F2B94B] hover:bg-[#F2B94B]/10"
+                    }`}
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setMobileMenuOpen(false)}
@@ -596,10 +779,16 @@ const LandingPage: React.FC = () => {
                   J
                 </span>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.6em] text-gray-500">
-                v{landingVersion} · Built for the future of cross-chain
-                interoperability · Research by Lukas.lat
-              </p>
+              <div className="flex flex-col items-center gap-3">
+                <ChangelogDrawer
+                  changelogText={changelogRaw}
+                  theme="landing"
+                  version={landingVersion}
+                />
+                <p className="text-[10px] font-black uppercase tracking-[0.6em] text-gray-500">
+                  Built for the future of cross-chain interoperability · Research by Lukas.lat
+                </p>
+              </div>
               <div className="flex flex-wrap items-center justify-center gap-6 text-[9px] font-black uppercase tracking-[0.35em] text-gray-500">
                 <a
                   href={docsUrl}
@@ -618,7 +807,7 @@ const LandingPage: React.FC = () => {
                   Dashboard
                 </a>
                 <a
-                  href="/whitepapper/JACK-Whitepaper-v1.0.1.pdf"
+                  href={`${whitepaperBasePath}/${whitepaperManifest.canonicalPdf}`}
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-white transition-colors"

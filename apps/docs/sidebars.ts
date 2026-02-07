@@ -20,6 +20,17 @@ const sidebars: SidebarsConfig = {
     "demo-script",
     {
       type: "category",
+      label: "Whitepaper",
+      link: { type: "doc", id: "whitepaper/index" },
+      items: [
+        "whitepaper/summary",
+        "whitepaper/whitepaper-v1.0.2",
+        "whitepaper/whitepaper-v1.0.0",
+        "whitepaper/changelog",
+      ],
+    },
+    {
+      type: "category",
       label: "Runbooks & Operations",
       link: { type: "doc", id: "operations/index" },
       items: [

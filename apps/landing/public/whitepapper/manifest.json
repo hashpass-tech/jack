@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "project": "JACK",
+  "latest": "1.0.2",
+  "featured": "1.0.0",
+  "canonicalPdf": "JACK-Whitepaper.pdf",
+  "publicPath": "/whitepaper",
+  "legacyPublicPath": "/whitepapper",
+  "versions": [
+    {
+      "version": "1.0.2",
+      "releaseDate": "2026-02-07",
+      "pdf": "JACK-Whitepaper-v1.0.2.pdf",
+      "tex": "whitepaper/tex/JACK-Whitepaper-v1.0.2.tex",
+      "markdown": "whitepaper/markdown/JACK-Whitepaper-v1.0.2.md",
+      "changelog": [
+        "Added deterministic /api/quote mode contract with explicit fallback semantics.",
+        "Documented LI.FI quote/route/status integration boundaries and failure model.",
+        "Added Yellow provider notification, auth, and persistence integration details.",
+        "Expanded whitepaper with implementation mapping tables and process diagrams."
+      ]
+    },
+    {
+      "version": "1.0.1",
+      "releaseDate": "2026-02-06",
+      "pdf": "JACK-Whitepaper-v1.0.1.pdf",
+      "tex": "whitepaper/tex/JACK-Whitepaper-v1.0.1.tex",
+      "changelog": [
+        "Clarified v1 scope and explicit non-goals.",
+        "Replaced hard FHE claims with CCM pluggable interface.",
+        "Added minimal solver economic model and expanded hook security notes."
+      ]
+    },
+    {
+      "version": "1.0.0",
+      "releaseDate": "2026-02-07",
+      "pdf": "JACK-Whitepaper-v1.0.0.pdf",
+      "sourcePdf": "whitepaper/source-pdf/JACK-whitepaper-v1.0.0.pdf",
+      "markdown": "whitepaper/markdown/JACK-Whitepaper-v1.0.0.md",
+      "changelog": [
+        "Foundational whitepaper edition, optimized as the primary onboarding read.",
+        "Preferred starting point for non-technical and early-stage technical readers."
+      ]
+    }
+  ]
+}

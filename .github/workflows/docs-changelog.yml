@@ -1,0 +1,49 @@
+name: Docs Changelog Automation
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: write
+  pull-requests: read
+
+jobs:
+  update-docs-changelog:
+    if: >
+      github.event.pull_request.merged == true &&
+      (github.event.pull_request.base.ref == 'develop' ||
+       github.event.pull_request.base.ref == 'main' ||
+       github.event.pull_request.base.ref == 'master')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout base branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+
+      - name: Update docs changelog file
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_MERGED_AT: ${{ github.event.pull_request.merged_at }}
+          PR_LABELS_JSON: ${{ toJson(github.event.pull_request.labels.*.name) }}
+        run: node scripts/update-docs-changelog.js
+
+      - name: Commit changelog update
+        run: |
+          if git diff --quiet -- apps/docs/docs/operations/documentation-changelog.md; then
+            echo "No changelog updates required."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/docs/docs/operations/documentation-changelog.md
+          git commit -m "docs: update documentation changelog for PR #${{ github.event.pull_request.number }}"
+          git push origin HEAD:${{ github.event.pull_request.base.ref }}

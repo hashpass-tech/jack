@@ -6,6 +6,7 @@ import { CreateIntentView } from "./CreateIntentView";
 import { ExecutionsListView } from "./ExecutionsListView";
 import { ExecutionDetailView } from "./ExecutionDetailView";
 import AgentCostDashboard from "./AgentCostDashboard";
+import { ChangelogDrawer } from "@shared/drawer-changelog";
 
 const ThemeToggle: FC = () => {
   const [theme, setTheme] = useState<"dark" | "light">("dark");
@@ -43,7 +44,7 @@ const ThemeToggle: FC = () => {
   );
 };
 
-const Dashboard: FC = () => {
+const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
   const [activeTab, setActiveTab] = useState<
     "create" | "executions" | "cost-dashboard"
   >("create");
@@ -383,18 +384,29 @@ const Dashboard: FC = () => {
         style={{ background: "var(--bg-secondary)", borderColor: "var(--border-primary)", color: "var(--fg-secondary)" }}
       >
         <div className="mx-auto flex max-w-6xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div
-            className="inline-flex w-full items-center justify-center gap-2 rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] md:w-auto md:justify-start"
-            style={{ borderColor: "var(--border-secondary)", background: "var(--bg-primary)", color: "var(--fg-secondary)" }}
-          >
-            <span
-              className="h-2.5 w-2.5 rounded-full"
-              style={{ background: "var(--fg-accent)", boxShadow: `0 0 12px var(--shadow-accent)` }}
-            />
-            <span style={{ color: "var(--fg-primary)" }}>{environmentLabel}</span>
-            <span style={{ color: "var(--fg-info)" }}>{protocolTrack.toUpperCase()}</span>
-            <span style={{ color: "var(--fg-muted)" }}>BUILD {dashboardVersion}</span>
-          </div>
+          <ChangelogDrawer
+            changelogText={changelog}
+            theme="dashboard"
+            version={dashboardVersion}
+            renderTrigger={({ onClick, version: v }) => (
+              <button
+                type="button"
+                onClick={onClick}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] transition-all duration-300 cursor-pointer select-none md:w-auto md:justify-start hover:border-[var(--fg-accent)]"
+                style={{ borderColor: "var(--border-secondary)", background: "var(--bg-primary)", color: "var(--fg-secondary)" }}
+              >
+                <span
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{ background: "var(--fg-accent)", boxShadow: `0 0 12px var(--shadow-accent)` }}
+                />
+                <span style={{ color: "var(--fg-primary)" }}>{environmentLabel}</span>
+                <span style={{ color: "var(--fg-info)" }}>{protocolTrack.toUpperCase()}</span>
+                <span style={{ color: "var(--fg-muted)" }}>v{v}</span>
+                <span style={{ opacity: 0.3 }}>·</span>
+                <span style={{ color: "var(--fg-accent)" }}>Changelog</span>
+              </button>
+            )}
+          />
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10px] font-bold uppercase tracking-[0.16em] md:justify-end">
             <a href={docsUrl} target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" style={{ color: "var(--fg-primary)" }}>
               Documentation
