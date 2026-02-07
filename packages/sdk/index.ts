@@ -27,6 +27,19 @@ export interface Intent {
   createdAt: number;
   executionSteps: ExecutionStep[];
   settlementTx?: string;
+  fallbackMode?: {
+    enabled: boolean;
+    reasons: Array<{
+      stage: 'QUOTE' | 'ROUTE' | 'STATUS';
+      reasonCode: string;
+      message: string;
+    }>;
+  };
+  lifi?: {
+    quote?: unknown;
+    route?: unknown;
+    status?: unknown;
+  };
 }
 
 export interface ExecutionStep {
