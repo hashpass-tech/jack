@@ -1,3 +1,31 @@
+## [0.1.39](https://github.com/hashpass-tech/JACK/compare/v0.1.37-testnet.1...v0.1.39) (2026-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** fix SDK imports and constructor calls for build ([5f7d612](https://github.com/hashpass-tech/JACK/commit/5f7d61273e597ba839c9549e47c80821e9d9c086))
+* **ui:** changelog drawer inline styles + docs local link detection ([7233487](https://github.com/hashpass-tech/JACK/commit/7233487d9b01863ecf72d18dc244e58168d75784))
+* **ui:** merge changelog trigger into dashboard status pill — remove duplicate info ([22c2b23](https://github.com/hashpass-tech/JACK/commit/22c2b23fadd3886872036d59b61978fa9118146b))
+* **workflow:** add --no-git-checks flag to handle detached HEAD state during publish ([9a7368a](https://github.com/hashpass-tech/JACK/commit/9a7368a687e6100686d8825f0e409fc4317aac94))
+* **workflow:** simplify publish workflow and remove SBOM generation ([9805ec1](https://github.com/hashpass-tech/JACK/commit/9805ec1606733aa50698d1deb71c5b5b5b0d130c))
+
+
+### Features
+
+* create dashboard SDK integration spec with requirements, design, and tasks ([43c3844](https://github.com/hashpass-tech/JACK/commit/43c3844b046dac8888bd231104f17977844f9623))
+* **dashboard:** add @jack-kernel/sdk dependency ([4878682](https://github.com/hashpass-tech/JACK/commit/4878682f646c7238a4be2db6a795da250281a891))
+* **docs:** integrate shared changelog drawer + fix version sync across all apps ([18b0949](https://github.com/hashpass-tech/JACK/commit/18b094973d8eab98ec05a0038c36cb5dc1526524))
+* **sdk:** add property-based tests for HTTP client ([b4e4117](https://github.com/hashpass-tech/JACK/commit/b4e4117343399f87146bae6a502e70e49d2d5336))
+* **sdk:** implement core SDK with agent execution and intent management ([a366bab](https://github.com/hashpass-tech/JACK/commit/a366bab90812b5f760e5e97620784b2ae4166e14))
+* **sdk:** implement HTTP client with retry, caching, and comprehensive tests ([4473b89](https://github.com/hashpass-tech/JACK/commit/4473b89802f9927d34a91d47e74b0a746bf82fe9))
+* **ui:** shared changelog drawer component with theming support ([d648b29](https://github.com/hashpass-tech/JACK/commit/d648b296728425b1dfa4aa25812157c417775f49)), closes [#F2B94](https://github.com/hashpass-tech/JACK/issues/F2B94)
+* **whitepaper:** add v1.0.2 pipeline, manifest, docs, and landing wiring ([c1e6165](https://github.com/hashpass-tech/JACK/commit/c1e6165ebc7ce6503dc5890c37a17802de73d47e))
+* **whitepaper:** prioritize foundational v1.0.0 across landing and docs ([e774cbc](https://github.com/hashpass-tech/JACK/commit/e774cbc05f340424e67b215ce19f6e302ebd14ce))
+
+
+
+
+
 ## [0.1.38](https://github.com/hashpass-tech/JACK/compare/v0.1.37-testnet.1...v0.1.38) (2026-02-07)
 
 
