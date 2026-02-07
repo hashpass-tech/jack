@@ -10,11 +10,14 @@ interface Scene3DProps {
     onViewDetails?: (layerName: string) => void;
     selectedLayer: number | null;
     onSelect: (index: number | null) => void;
+    cinematicSpin?: boolean;
 }
 
-const Scene3Dv2: React.FC<Scene3DProps> = ({ onViewDetails, selectedLayer, onSelect }) => {
+const Scene3Dv2: React.FC<Scene3DProps> = ({ onViewDetails, selectedLayer, onSelect, cinematicSpin = false }) => {
     const { viewport } = useThree();
     const groupRef = useRef<THREE.Group>(null);
+    const spinStartRef = useRef<number | null>(null);
+    const spinBaseY = useRef(0);
 
     // Scale factor for mobile
     const isMobile = viewport.width < 5;
@@ -33,10 +36,41 @@ const Scene3Dv2: React.FC<Scene3DProps> = ({ onViewDetails, selectedLayer, onSel
     ], []);
 
     useFrame((state) => {
-        const { x, y } = state.mouse;
-        if (groupRef.current) {
-            groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, x * 0.15, 0.1);
-            groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -y * 0.1, 0.1);
+        if (!groupRef.current) return;
+
+        if (cinematicSpin) {
+            // Capture start state once
+            if (spinStartRef.current === null) {
+                spinStartRef.current = state.clock.getElapsedTime();
+                spinBaseY.current = groupRef.current.rotation.y;
+            }
+            const elapsed = state.clock.getElapsedTime() - spinStartRef.current;
+            const duration = 4.5; // slow, cinematic sweep
+            const t = Math.min(elapsed / duration, 1);
+
+            // Ease-in-out quintic — very smooth acceleration/deceleration
+            const ease = t < 0.5
+                ? 16 * t * t * t * t * t
+                : 1 - Math.pow(-2 * t + 2, 5) / 2;
+
+            // Exact 360° sweep (no overshoot — cleaner look)
+            const sweep = Math.PI * 2;
+            groupRef.current.rotation.y = spinBaseY.current + ease * sweep;
+
+            // Very gentle tilt for subtle parallax depth
+            const targetX = Math.sin(elapsed * 0.8) * 0.06;
+            groupRef.current.rotation.x = THREE.MathUtils.lerp(
+                groupRef.current.rotation.x,
+                targetX,
+                0.03
+            );
+        } else {
+            // Reset cinematic tracking
+            spinStartRef.current = null;
+            // Smooth return to mouse parallax via lerp (avoids snap)
+            const { x, y } = state.mouse;
+            groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, x * 0.15, 0.04);
+            groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, -y * 0.1, 0.04);
         }
     });
 
