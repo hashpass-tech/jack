@@ -1,3 +1,14 @@
+## [0.1.49](https://github.com/hashpass-tech/JACK/compare/v0.1.48...v0.1.49) (2026-02-07)
+
+
+### Features
+
+* **dashboard:** refresh favicon assets ([82bb671](https://github.com/hashpass-tech/JACK/commit/82bb6715e916cbf6c7bfd71a75c38d42fc26d46c))
+
+
+
+
+
 ## [0.1.48](https://github.com/hashpass-tech/JACK/compare/v0.1.47...v0.1.48) (2026-02-07)
 
 
