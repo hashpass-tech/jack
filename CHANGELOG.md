@@ -1,3 +1,9 @@
+## [0.1.40](https://github.com/hashpass-tech/JACK/compare/v0.1.39-testnet.2...v0.1.40) (2026-02-07)
+
+
+
+
+
 ## [0.1.39](https://github.com/hashpass-tech/JACK/compare/v0.1.37-testnet.1...v0.1.39) (2026-02-07)
 
 
