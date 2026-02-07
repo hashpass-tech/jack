@@ -14,6 +14,8 @@ import {
   Stars,
 } from "@react-three/drei";
 import Scene3D from "@/components/Scene3Dv2";
+import { ChangelogDrawer } from "@/components/drawer-changelog";
+import changelogRaw from "../../CHANGELOG.md?raw";
 
 // Lazy load the video modal — only loaded when user clicks a layer
 const LayerVideoModal = lazy(() => import("./LayerVideoModal"));
@@ -695,10 +697,16 @@ const LandingPage: React.FC = () => {
                   J
                 </span>
               </div>
-              <p className="text-[10px] font-black uppercase tracking-[0.6em] text-gray-500">
-                v{landingVersion} · Built for the future of cross-chain
-                interoperability · Research by Lukas.lat
-              </p>
+              <div className="flex flex-col items-center gap-3">
+                <ChangelogDrawer
+                  changelogText={changelogRaw}
+                  theme="landing"
+                  version={landingVersion}
+                />
+                <p className="text-[10px] font-black uppercase tracking-[0.6em] text-gray-500">
+                  Built for the future of cross-chain interoperability · Research by Lukas.lat
+                </p>
+              </div>
               <div className="flex flex-wrap items-center justify-center gap-6 text-[9px] font-black uppercase tracking-[0.35em] text-gray-500">
                 <a
                   href={docsUrl}
