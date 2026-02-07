@@ -131,7 +131,7 @@ const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
   };
 
   const tabs: { key: "create" | "executions" | "cost-dashboard"; label: string; shortLabel: string }[] = [
-    { key: "create", label: "Build Intent", shortLabel: "Intent" },
+    { key: "create", label: "Create Intent", shortLabel: "Intent" },
     { key: "executions", label: "Executions", shortLabel: "Exec" },
     { key: "cost-dashboard", label: "Agent & Costs", shortLabel: "Costs" },
   ];
