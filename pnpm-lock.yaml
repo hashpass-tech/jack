@@ -111,6 +111,9 @@ importers:
 
   apps/dashboard:
     dependencies:
+      '@jack-kernel/sdk':
+        specifier: workspace:^
+        version: link:../../packages/sdk
       '@rainbow-me/rainbowkit':
         specifier: ^2.2.10
         version: 2.2.10(@tanstack/react-query@5.90.20)(@types/react@19.2.11)(react-dom@19.2.3)(react@19.2.3)(typescript@5.9.3)(viem@2.45.1)(wagmi@3.4.2)
@@ -7709,7 +7712,7 @@ packages:
         optional: true
     dependencies:
       '@metamask/sdk': 0.34.0
-      '@wagmi/core': 3.3.2(@types/react@18.3.27)(react@18.3.1)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.45.1)
+      '@wagmi/core': 3.3.2(@types/react@19.2.11)(react@19.2.3)(typescript@5.9.3)(use-sync-external-store@1.4.0)(viem@2.45.1)
       typescript: 5.9.3
       viem: 2.45.1(typescript@5.9.3)(zod@4.3.6)
     dev: false
