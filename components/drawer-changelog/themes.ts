@@ -2,8 +2,9 @@
  *
  *  Each app has its own visual identity:
  *
- *  • Landing  → dark space (#0B1020) with JACK gold (#F2B94B)
+ *  • Landing   → dark space (#0B1020) with JACK gold (#F2B94B)
  *  • Dashboard → adaptive via CSS custom properties (dark/light toggle)
+ *  • Docs      → Docusaurus Infima vars (light/dark auto-switch)
  *
  *  The drawer maps every colour to a theme token so it blends
  *  seamlessly into whichever host it lives in.
@@ -61,11 +62,37 @@ export const dashboardTheme: ChangelogTheme = {
   divider: "var(--border-primary, rgba(255,255,255,0.06))",
 };
 
+/* ── Docs · Docusaurus Infima variables (auto light/dark) ── */
+export const docsTheme: ChangelogTheme = {
+  overlay: "rgba(0, 0, 0, 0.50)",
+  drawerBg: "var(--ifm-background-surface-color, #ffffff)",
+  drawerBorder: "var(--ifm-color-emphasis-300, rgba(0,0,0,0.12))",
+  headerBg: "var(--ifm-background-color, #f8f9fa)",
+  textPrimary: "var(--ifm-heading-color, #1c1e21)",
+  textSecondary: "var(--ifm-font-color-base, #333)",
+  textMuted: "var(--ifm-font-color-secondary, #666)",
+  accent: "var(--ifm-color-primary, #0a7dc2)",
+  accentHover: "var(--ifm-color-primary-dark, #0870ae)",
+  badgeBg: "var(--ifm-color-primary-lightest, rgba(10,125,194,0.08))",
+  badgeText: "var(--ifm-color-primary, #0a7dc2)",
+  badgeBorder: "var(--ifm-color-primary-light, rgba(10,125,194,0.25))",
+  sectionBg: "var(--ifm-background-color, rgba(0,0,0,0.02))",
+  sectionBorder: "var(--ifm-color-emphasis-200, rgba(0,0,0,0.08))",
+  triggerBg: "var(--ifm-background-surface-color, rgba(0,0,0,0.03))",
+  triggerBorder: "var(--ifm-color-emphasis-300, rgba(0,0,0,0.12))",
+  triggerText: "var(--ifm-font-color-secondary, #666)",
+  triggerHover: "var(--ifm-heading-color, #1c1e21)",
+  scrollbarTrack: "rgba(0, 0, 0, 0.02)",
+  scrollbarThumb: "rgba(0, 0, 0, 0.12)",
+  divider: "var(--ifm-color-emphasis-200, rgba(0,0,0,0.08))",
+};
+
 /* ── Resolver ─────────────────────────────────────────────── */
 export function resolveTheme(
-  theme?: "landing" | "dashboard" | ChangelogTheme,
+  theme?: "landing" | "dashboard" | "docs" | ChangelogTheme,
 ): ChangelogTheme {
   if (!theme || theme === "landing") return landingTheme;
   if (theme === "dashboard") return dashboardTheme;
+  if (theme === "docs") return docsTheme;
   return theme;
 }

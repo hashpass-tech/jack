@@ -2,7 +2,7 @@
 
 export { default as ChangelogDrawer } from "./ChangelogDrawer";
 export { parseChangelog } from "./parse-changelog";
-export { resolveTheme, landingTheme, dashboardTheme } from "./themes";
+export { resolveTheme, landingTheme, dashboardTheme, docsTheme } from "./themes";
 export type {
   ChangelogDrawerProps,
   ChangelogEntry,
