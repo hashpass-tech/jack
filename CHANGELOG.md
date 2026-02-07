@@ -1,6 +1,11 @@
 ## [0.1.46](https://github.com/hashpass-tech/JACK/compare/v0.1.45...v0.1.46) (2026-02-07)
 
 
+### Features
+
+* **landing:** add interactive video controls to Deep Dive overlay ([cb0802a](https://github.com/hashpass-tech/JACK/commit/cb0802a3bd5c9921f8e8f1bf219b484263388243))
+
+
 ### Documentation
 
 * **api:** add ERC-7824 Yellow setup details ([90a1207](https://github.com/hashpass-tech/JACK/commit/90a12075f1cf809cfa4dd592b458984b44df07fb))
