@@ -69,6 +69,12 @@ export interface LifiStatusPayload {
   fallback?: LifiFallback;
 }
 
+type LifiRouteStep = {
+  estimate?: {
+    duration?: number;
+  };
+};
+
 const CHAIN_NAME_TO_ID: Record<string, number> = {
   arbitrum: 42161,
   optimism: 10,
@@ -176,7 +182,13 @@ const mapHttpError = (status: number): LifiReasonCode => {
 };
 
 export const buildQuoteRequest = (params: IntentParams) => {
-  if (!params?.sourceChain || !params?.destinationChain || !params?.tokenIn || !params?.tokenOut || !params?.amountIn) {
+  if (
+    !params?.sourceChain ||
+    !params?.destinationChain ||
+    !params?.tokenIn ||
+    !params?.tokenOut ||
+    !params?.amountIn
+  ) {
     return { ok: false as const, reason: 'MISSING_PARAMS' as LifiReasonCode, message: 'Missing quote parameters.' };
   }
 
@@ -310,7 +322,7 @@ export const fetchLifiRoute = async (params: IntentParams): Promise<LifiRoutePay
       };
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { routes?: Array<Record<string, unknown>> };
     const route = data?.routes?.[0];
     if (!route) {
       return {
@@ -325,6 +337,8 @@ export const fetchLifiRoute = async (params: IntentParams): Promise<LifiRoutePay
       };
     }
 
+    const steps = Array.isArray(route.steps) ? (route.steps as LifiRouteStep[]) : undefined;
+
     return {
       provider: 'lifi',
       routeId: route.id ?? deterministicId(JSON.stringify(route)),
@@ -334,9 +348,9 @@ export const fetchLifiRoute = async (params: IntentParams): Promise<LifiRoutePay
         toChainId: request.toChainId,
         fromToken: request.fromToken.address,
         toToken: request.toToken.address,
-        steps: route.steps,
-        tags: route.tags,
-        estimatedDuration: route?.steps?.reduce((sum: number, step: any) => sum + (step.estimate?.duration ?? 0), 0)
+        steps,
+        tags: Array.isArray(route.tags) ? (route.tags as string[]) : undefined,
+        estimatedDuration: steps?.reduce((sum, step) => sum + (step.estimate?.duration ?? 0), 0)
       },
       raw: route
     };
@@ -386,7 +400,7 @@ export const fetchLifiStatus = async (txHash: string | undefined): Promise<LifiS
       };
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as { status?: string; substatus?: string };
     return {
       provider: 'lifi',
       timestamp: Date.now(),

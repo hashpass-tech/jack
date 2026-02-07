@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIntents, saveIntent } from '@/lib/store';
-import { fetchLifiQuote, fetchLifiRoute, fetchLifiStatus, type LifiFallback } from '@/lib/lifi';
+import {
+    fetchLifiQuote,
+    fetchLifiRoute,
+    fetchLifiStatus,
+    type LifiFallback,
+    type LifiStatusPayload
+} from '@/lib/lifi';
 import type { IntentParams } from '../../../../../../packages/sdk';
 
 type FallbackReason = LifiFallback & { stage: 'QUOTE' | 'ROUTE' | 'STATUS' };
@@ -20,9 +26,58 @@ type ProviderNotification = {
     metadata?: Record<string, unknown>;
 };
 
+type ExecutionStepStatus = 'COMPLETED' | 'IN_PROGRESS' | 'PENDING' | 'FAILED';
+
+type IntentStatus = 'CREATED' | 'QUOTED' | 'EXECUTING' | 'SETTLING' | 'SETTLED' | 'ABORTED' | 'EXPIRED';
+
+type ExecutionStep = {
+    step: string;
+    status: ExecutionStepStatus;
+    timestamp: number;
+    details?: string;
+};
+
+type IntentReasonCode = {
+    code: string;
+    timestamp: number;
+    source?: string;
+};
+
+type IntentOperatorLog = {
+    message: string;
+    timestamp: number;
+    source?: string;
+};
+
+type IntentRecord = {
+    id: string;
+    params: IntentParams;
+    status: IntentStatus;
+    createdAt: number;
+    updatedAt?: number;
+    executionSteps: ExecutionStep[];
+    reasonCodes?: IntentReasonCode[];
+    operatorLogs?: IntentOperatorLog[];
+    fallbackMode?: {
+        enabled: boolean;
+        reasons: FallbackReason[];
+    };
+    lifi?: {
+        quote?: unknown;
+        route?: unknown;
+        status?: unknown;
+    };
+    provider?: string;
+    sessionId?: string;
+    channel?: string;
+    settlementTx?: string;
+    providerMetadata?: Record<string, unknown>;
+    [key: string]: unknown;
+};
+
 const EVENT_STATUS_MAP: Record<
     string,
-    { status: string; step: string; stepStatus?: 'COMPLETED' | 'IN_PROGRESS' | 'PENDING' | 'FAILED' }
+    { status: IntentStatus; step: string; stepStatus?: ExecutionStepStatus }
 > = {
     quote_accepted: {
         status: 'QUOTED',
@@ -85,8 +140,13 @@ const EVENT_STATUS_MAP: Record<
 const normalizeEvent = (value?: string) =>
     value ? value.trim().toLowerCase().replace(/[\s-]+/g, '_') : '';
 
-const isProviderNotification = (body: any): body is ProviderNotification =>
-    Boolean(body?.intentId && (body?.event || body?.status || body?.provider));
+const isProviderNotification = (body: unknown): body is ProviderNotification =>
+    Boolean(
+        body &&
+            typeof body === 'object' &&
+            'intentId' in body &&
+            (('event' in body && body.event) || ('status' in body && body.status) || ('provider' in body && body.provider))
+    );
 
 const requireProviderAuth = (request: NextRequest, notification: ProviderNotification) => {
     const authToken = process.env.YELLOW_NETWORK_AUTH_TOKEN;
@@ -122,7 +182,7 @@ const requireProviderAuth = (request: NextRequest, notification: ProviderNotific
 
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
+        const body = (await request.json()) as Record<string, unknown>;
 
         if (isProviderNotification(body)) {
             const authCheck = requireProviderAuth(request, body);
@@ -130,7 +190,7 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: authCheck.message }, { status: authCheck.status });
             }
 
-            const intents = getIntents();
+            const intents = getIntents() as Record<string, IntentRecord>;
             const intent = intents[body.intentId];
             if (!intent) {
                 return NextResponse.json({ error: 'Intent not found' }, { status: 404 });
@@ -143,6 +203,7 @@ export async function POST(request: NextRequest) {
             const stepStatus = mapping?.stepStatus || 'COMPLETED';
             const timestamp = body.timestamp ?? Date.now();
 
+            intent.executionSteps = intent.executionSteps ?? [];
             intent.status = status;
             intent.updatedAt = timestamp;
             intent.provider = body.provider || intent.provider || 'Yellow Network';
@@ -190,21 +251,21 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ intentId: body.intentId, status: intent.status });
         }
 
-        const intentId = `JK-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        const intentId = `JK-${Math.random().toString(36).slice(2, 11).toUpperCase()}`;
         const timestamp = Date.now();
 
         const params: IntentParams = {
-            sourceChain: body.sourceChain,
-            destinationChain: body.destinationChain,
-            tokenIn: body.tokenIn,
-            tokenOut: body.tokenOut,
-            amountIn: body.amountIn,
-            minAmountOut: body.minAmountOut,
-            deadline: body.deadline,
-            signature: body.signature
+            sourceChain: body.sourceChain as string,
+            destinationChain: body.destinationChain as string,
+            tokenIn: body.tokenIn as string,
+            tokenOut: body.tokenOut as string,
+            amountIn: body.amountIn as string,
+            minAmountOut: body.minAmountOut as string,
+            deadline: body.deadline as number,
+            signature: body.signature as string
         } as IntentParams;
 
-        const intent = {
+        const intent: IntentRecord = {
             id: intentId,
             ...body,
             params,
@@ -232,16 +293,16 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-    const intents = getIntents();
-    const list = Object.values(intents).sort((a: any, b: any) => b.createdAt - a.createdAt);
+    const intents = getIntents() as Record<string, IntentRecord>;
+    const list = Object.values(intents).sort((a, b) => b.createdAt - a.createdAt);
     return NextResponse.json(list);
 }
 
 async function executeIntent(intentId: string, params: IntentParams) {
     const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-    const updateIntent = (updates: Record<string, any>) => {
-        const intents = getIntents();
+    const updateIntent = (updates: Partial<IntentRecord>) => {
+        const intents = getIntents() as Record<string, IntentRecord>;
         const intent = intents[intentId];
         if (intent) {
             Object.assign(intent, updates);
@@ -251,7 +312,7 @@ async function executeIntent(intentId: string, params: IntentParams) {
 
     const addFallback = (fallback: LifiFallback | undefined, stage: FallbackReason['stage']) => {
         if (!fallback) return;
-        const intents = getIntents();
+        const intents = getIntents() as Record<string, IntentRecord>;
         const intent = intents[intentId];
         if (!intent) return;
         const fallbackMode = intent.fallbackMode ?? { enabled: false, reasons: [] };
@@ -261,14 +322,15 @@ async function executeIntent(intentId: string, params: IntentParams) {
         saveIntent(intentId, intent);
     };
 
-    const appendStep = (status: string, step: string, details: string) => {
-        const intents = getIntents();
+    const appendStep = (status: IntentStatus, step: string, details: string, stepStatus: ExecutionStepStatus = 'COMPLETED') => {
+        const intents = getIntents() as Record<string, IntentRecord>;
         const intent = intents[intentId];
         if (intent) {
             intent.status = status;
+            intent.executionSteps = intent.executionSteps ?? [];
             intent.executionSteps.push({
                 step,
-                status: 'COMPLETED',
+                status: stepStatus,
                 timestamp: Date.now(),
                 details
             });
@@ -302,9 +364,12 @@ async function executeIntent(intentId: string, params: IntentParams) {
             : `Route ${route.routeId} with ${route.route?.steps?.length ?? 0} step(s)`
     );
 
-    const statusTxHash = typeof route.raw === 'object' && route.raw && 'transactionHash' in (route.raw as Record<string, unknown>)
-        ? String((route.raw as Record<string, unknown>).transactionHash)
-        : undefined;
+    const statusTxHash =
+        typeof route.raw === 'object' &&
+        route.raw &&
+        'transactionHash' in (route.raw as Record<string, unknown>)
+            ? String((route.raw as Record<string, unknown>).transactionHash)
+            : undefined;
 
     // 3. LI.FI Status (SETTLING)
     await sleep(2500);
@@ -321,10 +386,13 @@ async function executeIntent(intentId: string, params: IntentParams) {
 
     // 4. Finality (provider status-derived)
     await sleep(2000);
-    const intents = getIntents();
+    const intents = getIntents() as Record<string, IntentRecord>;
     const intent = intents[intentId];
     if (intent) {
-        intent.status = status.provider === 'lifi' ? 'SETTLED' : 'ABORTED';
+        const finalOutcome = deriveFinalOutcome(status);
+        if (intent.status !== 'SETTLED' && intent.status !== 'ABORTED') {
+            intent.status = finalOutcome.status;
+        }
         intent.reasonCodes = intent.reasonCodes ?? [];
         if (status.fallback?.reasonCode) {
             intent.reasonCodes.push({
@@ -336,9 +404,10 @@ async function executeIntent(intentId: string, params: IntentParams) {
         if (status.status.txHash) {
             intent.settlementTx = status.status.txHash;
         }
+        intent.executionSteps = intent.executionSteps ?? [];
         intent.executionSteps.push({
-            step: status.provider === 'lifi' ? 'Settlement Complete' : 'Settlement Unavailable',
-            status: status.provider === 'lifi' ? 'COMPLETED' : 'FAILED',
+            step: finalOutcome.step,
+            status: finalOutcome.stepStatus,
             timestamp: Date.now(),
             details: intent.fallbackMode?.enabled
                 ? 'Finalized with fallback routing mode.'
@@ -347,3 +416,37 @@ async function executeIntent(intentId: string, params: IntentParams) {
         saveIntent(intentId, intent);
     }
 }
+
+const normalizeLifiState = (state?: string) =>
+    state ? state.trim().toUpperCase().replace(/[\s-]+/g, '_') : 'UNKNOWN';
+
+const deriveFinalOutcome = (status: LifiStatusPayload) => {
+    if (status.provider !== 'lifi') {
+        return {
+            status: 'ABORTED' as const,
+            step: 'Settlement Unavailable',
+            stepStatus: 'FAILED' as const
+        };
+    }
+
+    const normalized = normalizeLifiState(status.status.state);
+    if (['DONE', 'COMPLETED', 'SUCCESS', 'SUCCEEDED'].includes(normalized)) {
+        return {
+            status: 'SETTLED' as const,
+            step: 'Settlement Complete',
+            stepStatus: 'COMPLETED' as const
+        };
+    }
+    if (['FAILED', 'CANCELLED', 'CANCELED', 'REVERTED', 'EXPIRED'].includes(normalized)) {
+        return {
+            status: 'ABORTED' as const,
+            step: 'Settlement Failed',
+            stepStatus: 'FAILED' as const
+        };
+    }
+    return {
+        status: 'SETTLING' as const,
+        step: 'Settlement Pending',
+        stepStatus: 'IN_PROGRESS' as const
+    };
+};
