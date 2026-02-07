@@ -14,16 +14,53 @@ flowchart LR
   UI[Intent Authoring UI] --> Kernel[Execution Kernel]
   Kernel -->|invokes| PolicyHook[Policy Hook]
   Kernel -->|invokes| RoutingHook[Routing Hook]
-  Kernel -->|invokes| SettlementHook[Settlement Hook]
+  Kernel -->|invokes| SettlementAdapter[Settlement Adapter]
   PolicyHook --> Risk[Risk & Permission Rules]
   RoutingHook --> Adapters[Chain Adapters]
-  SettlementHook --> Bridge[Settlement / Bridge]
+  SettlementAdapter --> Uniswap[Uniswap v4]
   Adapters --> ChainA[Chain A]
   Adapters --> ChainB[Chain B]
-  Bridge --> FinalChain[Destination Chain]
+  Uniswap --> FinalChain[Destination Chain]
 ```
 
 **Key idea:** Hooks never bypass the Kernel. The Kernel owns the execution state machine, while Hooks provide opinionated decisions at each stage.
+
+## Settlement Layer Architecture
+
+The **JACKSettlementAdapter** provides production-ready on-chain settlement through Uniswap v4:
+
+```mermaid
+sequenceDiagram
+  participant User
+  participant Solver
+  participant SettlementAdapter
+  participant PolicyHook
+  participant PoolManager as Uniswap v4 PoolManager
+  
+  User->>User: Sign Intent (EIP-712)
+  User->>Solver: Submit Intent
+  Solver->>SettlementAdapter: settleIntent()
+  SettlementAdapter->>SettlementAdapter: Verify Signature
+  SettlementAdapter->>PolicyHook: checkPolicy()
+  PolicyHook-->>SettlementAdapter: Approved
+  SettlementAdapter->>PoolManager: unlock()
+  PoolManager->>SettlementAdapter: unlockCallback()
+  SettlementAdapter->>PoolManager: swap()
+  PoolManager-->>SettlementAdapter: BalanceDelta
+  SettlementAdapter->>SettlementAdapter: settleDeltas()
+  SettlementAdapter-->>Solver: IntentSettled Event
+```
+
+### Settlement Features
+
+- **EIP-712 Signatures**: Users sign intents with cryptographic guarantees
+- **Solver Authorization**: Permissioned solver network with owner control
+- **Policy Enforcement**: Integration with JACKPolicyHook for intent validation
+- **Atomic Execution**: Leverages Uniswap v4 unlock/callback pattern
+- **Reentrancy Protection**: Guards against reentrancy attacks
+- **Delta Settlement**: Handles token transfers for swap completion
+
+See [Settlement Adapter Documentation](./contracts/settlement-adapter.md) for detailed information.
 
 ## Critical Execution Flow
 

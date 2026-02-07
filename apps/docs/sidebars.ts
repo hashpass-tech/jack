@@ -20,6 +20,14 @@ const sidebars: SidebarsConfig = {
     "demo-script",
     {
       type: "category",
+      label: "Smart Contracts",
+      link: { type: "doc", id: "contracts/index" },
+      items: [
+        "contracts/settlement-adapter",
+      ],
+    },
+    {
+      type: "category",
       label: "Whitepaper",
       link: { type: "doc", id: "whitepaper/index" },
       items: [
