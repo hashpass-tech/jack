@@ -51,28 +51,7 @@ jobs:
       - name: Run tests
         run: pnpm --filter @jack-kernel/sdk run test
 
-      - name: Generate SBOM
-        run: |
-          npm install -g @cyclonedx/npm
-          cyclonedx-npm --output-file packages/sdk/sbom.json --output-format json
-
-      - name: Create build attestation
-        run: |
-          cat > packages/sdk/build-attestation.json << 'EOF'
-          {
-            "version": "1.0.0",
-            "buildDate": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
-            "gitCommit": "${{ github.sha }}",
-            "gitRef": "${{ github.ref }}",
-            "gitRepository": "${{ github.repository }}",
-            "buildTool": "pnpm",
-            "buildCommand": "pnpm run build",
-            "testCommand": "pnpm run test",
-            "testsPassed": true
-          }
-          EOF
-
       - name: Publish to npm
-        run: pnpm --filter @jack-kernel/sdk publish --access public --provenance
+        run: pnpm --filter @jack-kernel/sdk publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_KEY }}
