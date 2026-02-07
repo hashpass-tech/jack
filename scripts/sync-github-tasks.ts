@@ -166,7 +166,10 @@ function parseIssue(issue: GHIssue) {
               ? defaultVerifyCommands(workspace, outputPath)
               : [];
 
-    return { outputPath, acceptance, requirement, workspace, verify, context };
+    const preferredAgentMatch = body.match(/PREFERRED_AGENT\s*=\s*([a-z0-9_-]+)/i);
+    const preferredAgent = preferredAgentMatch?.[1]?.toLowerCase();
+
+    return { outputPath, acceptance, requirement, workspace, verify, context, preferredAgent };
 }
 
 // Convert to YAML-style string for the agent system
@@ -204,6 +207,11 @@ function issuesToYAML(issues: GHIssue[]) {
             meta.verify.forEach(cmd => {
                 yamlStr += `      - "${escapeYamlDoubleQuoted(cmd)}"\n`;
             });
+        }
+
+        if (meta.preferredAgent) {
+            yamlStr += `    agent_config:\n`;
+            yamlStr += `      preferred: "${escapeYamlDoubleQuoted(meta.preferredAgent)}"\n`;
         }
 
         if (meta.acceptance.length > 0) {
