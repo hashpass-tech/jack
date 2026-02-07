@@ -1,23 +1,120 @@
 # Auto-generated from GitHub Issues
-# Generated: 2026-02-04T04:40:09.480Z
+# Generated: 2026-02-07T00:58:39.166Z
 
 version: "1.0"
 tasks:
-  - id: "GH-6"
-    github_issue: 6
-    title: "[D1-CRIT-F1] Documentation & Demo Script: Hackathon Submission"
+  - id: "GH-18"
+    github_issue: 18
+    title: "[D1-CRIT-B3] Live LI.FI integration for JACK quote/route/status path"
     requirement: |
-      Prepare materials for hackathon submission and final demo.
-      - Write README with clear mission and installation guide.
-      - Create architecture.md with Mermaid diagrams.
-      - Draft the 2-minute demo script for final recording.
+      s (LI.FI Docs)
+      
+      Implement against LI.FI’s current docs + API contracts:
+      
+      - API overview + fundamentals:  
+        https://docs.li.fi/api-reference/introduction
+      - Rate limits and API key expectations:  
+        https://docs.li.fi/api-reference/rate-limits
+      - Error code taxonomy:  
+        https://docs.li.fi/api-reference/error-codes
+      - Single-step quote endpoint:  
+        https://docs.li.fi/api-reference/get-a-quote-for-a-token-transfer
+      - Advanced routes endpoint:  
+        https://docs.li.fi/api-reference/advanced/get-a-set-of-routes-for-a-request-that-describes-a-transfer-of-tokens
+      - Populate step with transaction data:  
+        https://docs.li.fi/api-reference/advanced/populate-a-step-with-transaction-data
+      - Cross-chain transfer status endpoint:  
+        https://docs.li.fi/api-reference/check-the-status-of-a-cross-chain-transfer
+      - Available tools endpoint (bridge/DEX inventory):  
+        https://docs.li.fi/api-reference/get-available-bridges-and-exchanges
+      - Chain-connection discovery endpoint:  
+        https://docs.li.fi/api-reference/returns-all-possible-connections-based-on-a-from-or-tochain
+      - SDK route request/execute references:  
+        https://docs.li.fi/sdk/request-routes  
+        https://docs.li.fi/sdk/execute-routes
+      
+      ## Requirement
+      
+      Implement a deterministic LI.FI integration
+    workspace: "ui"
     output:
-      path: "docs/demo-script.md"
-      type: "md"
+      path: "apps/dashboard/src/app/api/intents/route.ts (primary), plus /api/quote and LI.FI provider modules under apps/dashboard/src/lib/."
+      type: "text"
+    verify:
+      - "pnpm --filter dashboard lint"
+      - "pnpm --filter dashboard build"
+    agent_config:
+      preferred: "codex"
     acceptance:
-      - "README provides a 3-step setup guide"
-      - "Architecture diagram clearly explains the Hook/Kernel relationship"
-      - "Demo script covers all critical path features"
+      - "`/api/quote` is LI.FI-backed and deterministic (no placeholder payloads)."
+      - "LI.FI route/step metadata is persisted and surfaced in execution status APIs."
+      - "Lifecycle transitions are provider-driven (no timer-only LI.FI simulation path)."
+      - "LI.FI error codes are mapped to explicit JACK failure reason codes."
+      - "Fallback mode is explicit and operator-visible (never silent)."
+      - "Execution detail timeline reflects real LI.FI quote/route/status events."
+      - "Scope can be validated without requiring Yellow integration completion."
+
+  - id: "GH-17"
+    github_issue: 17
+    title: "[D1-CRIT-B2] Live Yellow Network integration for JACK execution + settlement path"
+    requirement: |
+      s (Yellow Docs)
+      
+      Implement to Yellow’s current protocol guidance (official docs):
+      
+      - Off-chain RPC method families and required integration flow:  
+        https://docs.yellow.org/docs/protocol/off-chain/overview/
+      - Authentication/session-key flow (`auth_request`, `auth_
+    workspace: "ui"
+    output:
+      path: "apps/dashboard/src/app/api/intents/route.ts (primary), plus supporting modules under apps/dashboard/src/lib/ and API routes for execution telemetry."
+      type: "text"
+    verify:
+      - "Channel lifecycle methods (create_channel, resize_channel, close_channel):"
+      - "App sessions (create_app_session, submit_app_state, close_app_session):"
+      - "Query methods (get_config, get_assets, get_channels, get_ledger_balances, etc.):"
+      - "Transfer lifecycle and confirmations:"
+      - "Real-time notification envelope (bu, cu, tr, asu) over signed WS messages:"
+      - "Implementation checklist (required methods + notification handling):"
+    agent_config:
+      preferred: "codex"
+    acceptance:
+      - "No timer-driven solver simulation remains in `apps/dashboard/src/app/api/intents/route.ts`."
+      - "Yellow auth/session flow is implemented with expiry/error handling."
+      - "Yellow channel/app-session prerequisites are validated before execution transitions."
+      - "Real-time Yellow notifications are consumed and mapped to JACK execution statuses."
+      - "Settlement transaction references are real (no random/hash placeholders)."
+      - "Failure states include explicit reason codes and reproducible operator logs."
+      - "Dashboard execution timeline reflects actual backend/provider events."
+      - "Docs updated with runbook for Yellow session/channel failures and recovery."
+      - "Scope can be validated without requiring LI.FI integration completion."
+
+  - id: "GH-11"
+    github_issue: 11
+    title: "[D1-CRIT-A2] Contracts MVP Demo Readiness: JACKPolicyHook Deployment + Validation"
+    requirement: |
+      Finalize contracts stream readiness for the critical MVP demo using the current JACKPolicyHook implementation and verified behavior.
+      
+      ## Current State (Verified on February 6, 2026)
+      - [x] `JACKPolicyHook` is implemented with `BaseHook` inheritance and `beforeSwap` enforcement.
+      - [x] `PolicyChecked(bytes32 intentId, bool allowed, bytes32 reason)` is emitted in policy checks.
+      - [x] Access control for policy updates is implemented (`owner` + delegated updater
+    workspace: "general"
+    acceptance:
+      - "`JACKPolicyHook` is implemented with `BaseHook` inheritance and `beforeSwap` enforcement."
+      - "`PolicyChecked(bytes32 intentId, bool allowed, bytes32 reason)` is emitted in policy checks."
+      - "Access control for policy updates is implemented (`owner` + delegated updater path)."
+      - "Foundry tests pass locally: `11 passed, 0 failed` via `forge test -vv`."
+      - "Deployment tooling exists (`DeployJACKPolicyHook.s.sol` + `deploy-hook.sh` + `smoke-hook.sh`)."
+      - "`JACKSettlementAdapter` compiles when explicitly targeted (`forge build --contracts JACKSettlementAdapter.sol`), but it remains mock-level and has no dedicated tests."
+      - "Testnet deployment executed and canonical hook address recorded for demo."
+      - "End-to-end demo evidence captured for both allow and reject policy paths."
+      - "Settlement adapter demo status finalized (either integrated + tested, or explicitly declared out-of-scope for MVP recording)."
+      - "Dashboard/API wiring to real contract-demo path validated with stable env settings."
+      - "Deployed hook address and network details are documented in the issue."
+      - "Contract smoke checks (allow/reject) are executed and evidence is attached."
+      - "Demo flow explicitly states what is live contract path vs mock/stub."
+      - "Contract-related demo blockers are reduced to zero for MVP recording."
 
   - id: "GH-5"
     github_issue: 5
@@ -27,9 +124,12 @@ tasks:
       - Refine 3D orbits and core glow animation.
       - Optimize performance for mobile devices.
       - Ensure CTA leads directly to Dashboard intent creation.
+    workspace: "ui"
     output:
       path: "apps/landing/LandingPage.tsx"
       type: "tsx"
+    verify:
+      - "pnpm build"
     acceptance:
       - "3D scene scores high on visual polish (no clipping/glitches)"
       - "Mobile Lighthouse score for Performance > 70"
@@ -43,9 +143,12 @@ tasks:
       - Export typed Intent and Constraint interfaces.
       - Implement createIntent() and hashIntent() logic.
       - Implement getQuote() consumer.
+    workspace: "sdk"
     output:
       path: "packages/sdk/index.ts"
       type: "ts"
+    verify:
+      - "pnpm -w exec tsc -p tsconfig.json"
     acceptance:
       - "SDK exports are usable in the Dashboard app"
       - "Types are correctly exported and consistent with API"
@@ -59,9 +162,13 @@ tasks:
       - Intent Creation Form (Token selection, Amount, Constraints).
       - Route selection view showing quotes.
       - Execution tracking timeline.
+    workspace: "ui"
     output:
       path: "apps/dashboard/LandingPage.tsx"
       type: "tsx"
+    verify:
+      - "pnpm --filter dashboard lint"
+      - "pnpm --filter dashboard build"
     acceptance:
       - "User can complete full flow (Intent -> Quote -> Execute)"
       - "UI displays real-time execution status transitions"
@@ -69,34 +176,21 @@ tasks:
 
   - id: "GH-2"
     github_issue: 2
-    title: "[D1-CRIT-B1] API Orchestrator: Intent & Quote API"
+    title: "[D1-CRIT-B1] Execution Orchestrator: Yellow Network + LI.FI Live Path"
     requirement: |
-      Build the backend orchestrator for intent management.
-      - POST /api/intents: Create and persist intent.
-      - GET /api/quote: Fetch normalized route quotes (integrate LI.FI mock).
-      - POST /api/execute: Trigger execution pipeline.
-    output:
-      path: "apps/dashboard/api/intents/route.ts"
-      type: "ts"
+      Deliver a deterministic execution orchestrator for MVP demo that uses explicit provider-backed
+    workspace: "general"
     acceptance:
-      - "API successfully persists intents in store"
-      - "/api/quote returns valid JSON route summary"
-      - "Execution state machine transitions correctly"
-
-  - id: "GH-1"
-    github_issue: 1
-    title: "[D1-CRIT-A1] Contracts MVP: Uniswap v4 Hook + Adapter"
-    requirement: |
-      Implement the core Uniswap v4 hook for JACK.
-      - Inherit from BaseHook.
-      - Implement beforeSwap to enforce constraints.
-      - Emit PolicyChecked(bytes32 intentId, bool allowed, bytes32 reason) events.
-      - Implement access control for policy updates.
-    output:
-      path: "contracts/src/JACKPolicyHook.sol"
-      type: "sol"
-    acceptance:
-      - "forge test passes"
-      - "Hook correctly rejects swaps exceeding slippage logic"
-      - "PolicyChecked events are emitted correctly"
+      - "Intent persistence exists via local store."
+      - "Execution status transitions are surfaced in API responses."
+      - "UI messaging references Yellow Fusion and LI.FI stages."
+      - "Route execution stage is still simulated (`sleep` + mock transition strings)."
+      - "No dedicated `/api/quote` live integration response contract for LI.FI production-like routing."
+      - "No explicit provider-proof fields (provider name, route id, quote timestamp, request id) in orchestration outputs."
+      - "No explicit error/fallback policy for Yellow/LI.FI provider failures."
+      - "LI.FI integration path exists and returns normalized quote details."
+      - "Yellow integration path exists for solver lifecycle transitions."
+      - "Execution transitions are provider-driven, not timer-only."
+      - "API responses contain provider evidence metadata and explicit failure reason codes."
+      - "Demo mode clearly distinguishes live provider path from fallback/mock path."
 

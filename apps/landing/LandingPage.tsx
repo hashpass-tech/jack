@@ -1,4 +1,11 @@
-import React, { Suspense, useEffect, useRef, useState, lazy, useMemo } from "react";
+import React, {
+  Suspense,
+  useEffect,
+  useRef,
+  useState,
+  lazy,
+  useMemo,
+} from "react";
 import { Canvas } from "@react-three/fiber";
 import {
   OrbitControls,
@@ -34,7 +41,9 @@ const Scene3DLoadingFallback: React.FC = () => (
           className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-[#F2B94B] flex items-center justify-center shadow-[0_0_40px_rgba(242,185,75,0.3)]"
           style={{ animation: "fade-pulse 1.5s ease-in-out infinite" }}
         >
-          <span className="font-space text-2xl md:text-3xl font-black text-[#0B1020]">J</span>
+          <span className="font-space text-2xl md:text-3xl font-black text-[#0B1020]">
+            J
+          </span>
         </div>
       </div>
     </div>
@@ -61,7 +70,6 @@ const whitepaperVersions = [
   { label: "Latest (v1.0.1)", filename: "JACK-Whitepaper-v1.0.1.pdf" },
   { label: "v1.0.0", filename: "JACK-Whitepaper-v1.0.0.pdf" },
 ];
-
 
 const highlightTiles = [
   {
@@ -140,7 +148,7 @@ const deriveDocsUrl = (): string => {
 };
 
 const LandingPage: React.FC = () => {
-  const landingVersion = import.meta.env.VITE_LANDING_VERSION ?? "1.0.1";
+  const landingVersion = import.meta.env.VITE_LANDING_VERSION ?? "0.0.0";
   const dashboardUrl = deriveDashboardUrl();
   const docsUrl = deriveDocsUrl();
   const [activeModalLayer, setActiveModalLayer] = useState<string | null>(null);
@@ -153,7 +161,10 @@ const LandingPage: React.FC = () => {
   // Detect mobile for performance tuning
   const isMobile = useMemo(() => {
     if (typeof window === "undefined") return false;
-    return window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    return (
+      window.innerWidth < 768 ||
+      /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+    );
   }, []);
   // Lower DPR on mobile for much faster GPU rendering
   const canvasDpr: [number, number] = isMobile ? [1, 1] : [1, 2];

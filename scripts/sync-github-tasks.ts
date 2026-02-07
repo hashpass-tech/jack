@@ -8,6 +8,17 @@ interface GHIssue {
     body: string;
 }
 
+interface CliOptions {
+    label: string;
+    repo: string;
+    assign?: string;
+    start: boolean;
+    taskId?: string;
+    preferredAgent?: string;
+    verify: boolean;
+    noCommit: boolean;
+}
+
 function escapeYamlDoubleQuoted(value: string): string {
     // JSON escaping is compatible with YAML double-quoted scalars.
     return JSON.stringify(value).slice(1, -1);
@@ -45,7 +56,7 @@ function defaultVerifyCommands(workspace: string, outputPath: string): string[] 
 }
 
 // Fetch issues from GitHub using CLI
-function fetchIssues(label = 'day-1'): GHIssue[] {
+function fetchIssues(label = 'day-1', repo = 'hashpass-tech/JACK'): GHIssue[] {
     try {
         const output = execFileSync(
             'gh',
@@ -53,7 +64,7 @@ function fetchIssues(label = 'day-1'): GHIssue[] {
                 'issue',
                 'list',
                 '--repo',
-                'hashpass-tech/JACK',
+                repo,
                 '--label',
                 label,
                 '--json',
@@ -166,7 +177,10 @@ function parseIssue(issue: GHIssue) {
               ? defaultVerifyCommands(workspace, outputPath)
               : [];
 
-    return { outputPath, acceptance, requirement, workspace, verify, context };
+    const preferredAgentMatch = body.match(/PREFERRED_AGENT\s*=\s*([a-z0-9_-]+)/i);
+    const preferredAgent = preferredAgentMatch?.[1]?.toLowerCase();
+
+    return { outputPath, acceptance, requirement, workspace, verify, context, preferredAgent };
 }
 
 // Convert to YAML-style string for the agent system
@@ -206,6 +220,11 @@ function issuesToYAML(issues: GHIssue[]) {
             });
         }
 
+        if (meta.preferredAgent) {
+            yamlStr += `    agent_config:\n`;
+            yamlStr += `      preferred: "${escapeYamlDoubleQuoted(meta.preferredAgent)}"\n`;
+        }
+
         if (meta.acceptance.length > 0) {
             yamlStr += `    acceptance:\n`;
             meta.acceptance.forEach(a => {
@@ -218,16 +237,169 @@ function issuesToYAML(issues: GHIssue[]) {
     return yamlStr;
 }
 
-// Main execution
-const label = process.argv[2] || 'day-1';
-console.log(`🔄 Syncing issues from GitHub with label: ${label}...`);
+function parseArgs(argv: string[]): CliOptions {
+    const args = [...argv];
+    let label = 'day-1';
+    if (args[0] && !args[0].startsWith('-')) {
+        label = args.shift()!;
+    }
 
-const issues = fetchIssues(label);
+    const options: CliOptions = {
+        label,
+        repo: 'hashpass-tech/JACK',
+        start: false,
+        verify: false,
+        noCommit: false,
+    };
+
+    for (let i = 0; i < args.length; i++) {
+        const arg = args[i];
+        if (arg === '--assign') {
+            const value = args[i + 1];
+            if (!value) {
+                throw new Error('Missing value for --assign');
+            }
+            options.assign = value;
+            i++;
+            continue;
+        }
+        if (arg === '--repo') {
+            const value = args[i + 1];
+            if (!value) {
+                throw new Error('Missing value for --repo');
+            }
+            options.repo = value;
+            i++;
+            continue;
+        }
+        if (arg === '--start') {
+            options.start = true;
+            continue;
+        }
+        if (arg === '--task' || arg === '-t') {
+            const value = args[i + 1];
+            if (!value) {
+                throw new Error('Missing value for --task');
+            }
+            options.taskId = value;
+            i++;
+            continue;
+        }
+        if (arg === '--agent' || arg === '--preferred-agent') {
+            const value = args[i + 1];
+            if (!value) {
+                throw new Error('Missing value for --agent');
+            }
+            options.preferredAgent = value.toLowerCase();
+            i++;
+            continue;
+        }
+        if (arg === '--verify') {
+            options.verify = true;
+            continue;
+        }
+        if (arg === '--no-commit') {
+            options.noCommit = true;
+            continue;
+        }
+        if (arg === '--help' || arg === '-h') {
+            console.log(`Usage:
+  pnpm agent:sync [label]
+  pnpm agent:sync [label] --assign @me
+  pnpm agent:sync [label] --assign @me --start --agent codex --verify
+
+Options:
+  --assign <login>      Assign synced issues to a GitHub user (supports @me).
+  --start               Run agent execution immediately after sync.
+  --task <id>           Execute only one task id (for example GH-17).
+  --agent <name>        Force preferred agent for this run (codex, kiro, claude-code, cursor).
+  --verify              Run task verification commands in agent-runner.
+  --no-commit           Do not auto-commit task outputs in agent-runner.
+  --repo <owner/name>   Override repository for sync/assign actions.
+`);
+            process.exit(0);
+        }
+
+        console.warn(`⚠️ Unknown argument: ${arg}`);
+    }
+
+    return options;
+}
+
+function resolveAssignee(value: string): string {
+    const normalized = value.trim();
+    if (normalized === '@me' || normalized.toLowerCase() === 'me' || normalized.toLowerCase() === 'self') {
+        const login = execFileSync('gh', ['api', 'user', '--jq', '.login'], { encoding: 'utf8' }).trim();
+        if (!login) {
+            throw new Error('Unable to resolve current GitHub user for --assign @me');
+        }
+        return login;
+    }
+    return normalized.replace(/^@/, '');
+}
+
+function selectIssuesForTask(issues: GHIssue[], taskId?: string): GHIssue[] {
+    if (!taskId) return issues;
+
+    const match = taskId.match(/\d+/);
+    if (!match) {
+        throw new Error(`Unable to infer issue number from task id: ${taskId}`);
+    }
+
+    const issueNumber = Number(match[0]);
+    return issues.filter(issue => issue.number === issueNumber);
+}
+
+function assignIssues(issues: GHIssue[], repo: string, assignee: string, preferredAgent?: string) {
+    for (const issue of issues) {
+        const args = ['issue', 'edit', String(issue.number), '--repo', repo, '--add-assignee', assignee];
+        if (preferredAgent === 'codex') {
+            args.push('--add-label', 'codex');
+        }
+        execFileSync('gh', args, { stdio: 'inherit' });
+    }
+}
+
+function startAgentRun(taskFile: string, options: CliOptions) {
+    const args = ['--import', 'tsx', 'scripts/agent-runner.ts', taskFile];
+    if (options.taskId) {
+        args.push('--task', options.taskId);
+    }
+    if (options.preferredAgent) {
+        args.push('--agent', options.preferredAgent);
+    }
+    if (options.verify) {
+        args.push('--verify');
+    }
+    if (options.noCommit) {
+        args.push('--no-commit');
+    }
+
+    const env = { ...process.env };
+    if (options.preferredAgent === 'codex' && !env.CODEX_AUTO_EXEC) {
+        env.CODEX_AUTO_EXEC = '1';
+    }
+
+    execFileSync('node', args, { stdio: 'inherit', env });
+}
+
+// Main execution
+const options = parseArgs(process.argv.slice(2));
+console.log(`🔄 Syncing issues from GitHub with label: ${options.label}...`);
+
+const issues = fetchIssues(options.label, options.repo);
 console.log(`✅ Found ${issues.length} open issues.`);
 
 if (issues.length === 0) {
     console.log('No tasks to sync.');
     process.exit(0);
+}
+
+if (options.assign) {
+    const assignee = resolveAssignee(options.assign);
+    const targetIssues = selectIssuesForTask(issues, options.taskId);
+    console.log(`👤 Assigning ${targetIssues.length} issue(s) to @${assignee}...`);
+    assignIssues(targetIssues, options.repo, assignee, options.preferredAgent);
 }
 
 const yamlOutput = issuesToYAML(issues);
@@ -237,8 +409,14 @@ if (!fs.existsSync(taskDir)) {
     fs.mkdirSync(taskDir, { recursive: true });
 }
 
-const filePath = path.join(taskDir, `${label}.yaml`);
+const filePath = path.join(taskDir, `${options.label}.yaml`);
 fs.writeFileSync(filePath, yamlOutput);
 
-console.log(`🚀 Generated task file: .agent-tasks/${label}.yaml`);
-console.log(`You can now run: pnpm agent:run .agent-tasks/${label}.yaml`);
+console.log(`🚀 Generated task file: .agent-tasks/${options.label}.yaml`);
+
+if (options.start) {
+    console.log('▶️ Starting agent execution...');
+    startAgentRun(filePath, options);
+} else {
+    console.log(`You can now run: pnpm agent:run .agent-tasks/${options.label}.yaml`);
+}

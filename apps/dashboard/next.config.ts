@@ -11,10 +11,7 @@ const readVersion = (filePath: string): string => {
   }
 };
 
-const landingVersion = readVersion(
-  path.resolve(__dirname, "../../package.json"),
-);
-const dashboardVersion = readVersion(path.resolve(__dirname, "./package.json"));
+const appVersion = readVersion(path.resolve(__dirname, "../../package.json"));
 
 const dashboardBasePath =
   process.env.DASHBOARD_BASE_PATH ||
@@ -25,8 +22,8 @@ const nextConfig: NextConfig = {
   assetPrefix: dashboardBasePath || undefined,
   trailingSlash: false,
   env: {
-    NEXT_PUBLIC_LANDING_VERSION: landingVersion,
-    NEXT_PUBLIC_DASHBOARD_VERSION: dashboardVersion,
+    NEXT_PUBLIC_LANDING_VERSION: appVersion,
+    NEXT_PUBLIC_DASHBOARD_VERSION: appVersion,
     NEXT_PUBLIC_IS_TESTNET: process.env.NEXT_PUBLIC_IS_TESTNET || "false",
   },
 };

@@ -1,3 +1,32 @@
+## [0.1.37](https://github.com/hashpass-tech/JACK/compare/v0.1.36-testnet.1...v0.1.37) (2026-02-07)
+
+
+
+
+
+## [0.1.36](https://github.com/hashpass-tech/JACK/compare/v0.1.35-testnet.1...v0.1.36) (2026-02-07)
+
+
+
+
+
+## [0.1.35](https://github.com/hashpass-tech/JACK/compare/v0.1.34-testnet.1...v0.1.35) (2026-02-07)
+
+
+### Bug Fixes
+
+* **security:** harden escaping in tts and task sync scripts ([5a20d90](https://github.com/hashpass-tech/JACK/commit/5a20d90601bd53b49f8757cc396468ebb441647c))
+
+
+### Features
+
+* **agent:** add assign+start sync flow and codex auto-exec mode ([30de02d](https://github.com/hashpass-tech/JACK/commit/30de02d53f7ce0b80588f6f7233cf50d55f829f4))
+* integrate LI.FI quote/route/status ([42bd05d](https://github.com/hashpass-tech/JACK/commit/42bd05dc701d17d91cf8b298a3fa8f7946259228))
+
+
+
+
+
 ## [0.1.34](https://github.com/hashpass-tech/JACK/compare/v0.1.33-testnet.1...v0.1.34) (2026-02-06)
 
 
