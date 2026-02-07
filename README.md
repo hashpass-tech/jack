@@ -45,6 +45,14 @@ graph TB
 - **Developer SDK**: Comprehensive SDK for integration with existing applications
 - **Dashboard Interface**: Intuitive web dashboard for monitoring and management
 
+## Current System State (February 7, 2026)
+
+- `develop` includes merged execution/API work from PR `#20` (Yellow notification/auth/persistence flow) and PR `#21` (LI.FI quote/route/status integration + `/api/quote` endpoint).
+- Issues `#17` and `#18` are closed as merged into `develop`.
+- Dashboard API now exposes `GET /api/quote` and enriched intent metadata for LI.FI + Yellow execution evidence.
+- Explicit fallback mode exists for LI.FI when provider calls fail or inputs are unsupported.
+- Remaining hardening work is tracked in follow-up issue `#22` (lint/type cleanup and provider-state reliability tightening).
+
 ## 3-Step Setup Guide
 
 **Prerequisites:** Node.js, Git
@@ -139,6 +147,7 @@ The script uses `gsutil -m rsync -r` to mirror the built artifacts into `gs://<b
 - GitHub Pages workflow: `.github/workflows/deploy-docs-pages.yml`
 - Docs custom domain file: `apps/docs/static/CNAME`
 - Cloud DNS helper: `scripts/gcloud/configure-docs-dns.sh`
+- PR merge automation workflow: `.github/workflows/pr-merge-automation.yml` (auto-close linked issues + optional follow-up issue creation)
 - Docs deploy runs: <https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml>
 - Agent CI runs: <https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml>
 

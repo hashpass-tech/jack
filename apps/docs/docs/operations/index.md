@@ -16,5 +16,6 @@ JACK ships with an operations toolkit for releasing, monitoring, and coordinatin
 - **Contracts Deployment**: Environment-aware deploy and smoke-check workflow.
 - **MVP Critical Roadmap**: Cross-stream checklist for demo readiness.
 - **GitHub Tracker**: Terminal-based mission control for issues and tasks.
+- **PR Merge Automation**: Auto-close linked issues on merge and optionally generate follow-up issues.
 
 These runbooks keep execution deterministic beyond the kernel itself—ensuring operators have a predictable, repeatable playbook.
