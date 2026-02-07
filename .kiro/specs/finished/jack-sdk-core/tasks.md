@@ -103,7 +103,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Generate random invalid configs, verify ValidationError thrown
     - _Requirements: 13.5_
 
-- [ ] 4. Intent management
+- [~] 4. Intent management
   - [x] 4.1 Implement EIP-712 serialization
     - Create src/serialization.ts with getTypedData() function
     - Define EIP-712 domain (name: 'JACK', version: '1', chainId, verifyingContract)
@@ -154,7 +154,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Generate random invalid params, verify ValidationError thrown before network call
     - _Requirements: 5.4_
 
-- [ ] 5. Execution tracking
+- [~] 5. Execution tracking
   - [x] 5.1 Implement ExecutionTracker class
     - Create src/execution.ts with ExecutionTracker class
     - Implement getStatus() method (delegates to IntentManager.get())
@@ -184,7 +184,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Generate random intents, verify waitForStatus() either succeeds or throws timeout (never hangs)
     - _Requirements: 2.5_
 
-- [ ] 6. Cost tracking
+- [~] 6. Cost tracking
   - [x] 6.1 Implement CostTracker class
     - Create src/costs.ts with CostTracker class
     - Implement getCosts() method (GET from /api/costs)
@@ -199,7 +199,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Test getOverBudgetIssues() filters correctly
     - _Requirements: 4.1, 4.2_
 
-- [ ] 7. Agent utilities
+- [~] 7. Agent utilities
   - [x] 7.1 Implement batch submission
     - Create src/agent.ts with AgentUtils class
     - Implement batchSubmit() method using Promise.allSettled()
@@ -232,7 +232,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Generate random batch inputs, verify result array length matches input length
     - _Requirements: 8.2_
 
-- [ ] 8. Main SDK class and exports
+- [~] 8. Main SDK class and exports
   - [x] 8.1 Implement JACK_SDK main class
     - Create src/index.ts with JACK_SDK class
     - Initialize all managers (intents, execution, costs, agent) in constructor
@@ -258,7 +258,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
 - [x] 9. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Property-based tests for error handling and types
+- [~] 10. Property-based tests for error handling and types
   - [x] 10.1 Write property test for error type discrimination
     - **Property 8: Error Type Discrimination**
     - **Validates: Requirements 5.3**
@@ -271,7 +271,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Generate random Intent objects, verify all fields match TypeScript interface
     - _Requirements: 5.1, 14.5_
 
-- [ ] 11. Documentation
+- [~] 11. Documentation
   - [x] 11.1 Write comprehensive README
     - Add installation instructions (npm/pnpm)
     - Add quick start example (create and track intent)
@@ -295,7 +295,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Provide code examples for both use cases
     - _Requirements: 12.4_
 
-- [ ] 12. NPM package finalization
+- [~] 12. NPM package finalization
   - [x] 12.1 Verify package.json configuration
     - Verify name, version, description are correct
     - Verify main, module, types, exports fields point to correct paths
@@ -345,7 +345,7 @@ This plan implements the JACK TypeScript SDK as a production-ready npm package w
     - Workflow will publish to npm under @jack-kernel organization
     - _Requirements: 11.1, 11.2, 11.3_
 
-- [ ] 14. Final checkpoint and validation
+- [~] 14. Final checkpoint and validation
   - [x] 14.1 Run full test suite with coverage
     - Run `pnpm test:coverage` and verify >80% coverage
     - Fix any failing tests
