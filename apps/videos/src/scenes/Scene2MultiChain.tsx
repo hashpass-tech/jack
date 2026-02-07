@@ -63,7 +63,7 @@ const ArcTube: React.FC<{
   );
 };
 
-const MultiChain3D: React.FC = () => {
+export const MultiChain3D: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps, durationInFrames } = useVideoConfig();
 

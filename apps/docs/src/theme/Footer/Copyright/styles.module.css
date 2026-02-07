@@ -1,0 +1,50 @@
+.shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  border-radius: 999px;
+  padding: 0.42rem 0.72rem;
+  background: var(--ifm-background-surface-color);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--ifm-color-primary);
+  box-shadow: 0 0 12px rgba(10, 125, 194, 0.45);
+}
+
+.environment {
+  color: var(--ifm-heading-color);
+}
+
+.protocol {
+  color: var(--ifm-color-primary);
+}
+
+.build {
+  color: var(--ifm-font-color-secondary);
+}
+
+@media (max-width: 640px) {
+  .badge {
+    width: 100%;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 0.58rem;
+    letter-spacing: 0.06em;
+  }
+}

@@ -4,7 +4,8 @@
 
 # JACK - XChain Exec Kernel
 
-[![Docs](https://img.shields.io/badge/docs-latest-blue.svg)](https://github.com/hashpass-tech/jack/docs)
+[![Docs Deploy](https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml)
+[![CI (Agent Tasks)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
 ## Overview
@@ -65,9 +66,10 @@ graph TB
    ```bash
    pnpm dev:landing   # http://localhost:3000
    pnpm dev:dashboard # http://localhost:3001
+   pnpm dev:docs      # http://localhost:3002
    ```
 
-   Or run both concurrently:
+   Or run all apps concurrently:
    ```bash
    pnpm dev:all
    ```
@@ -78,8 +80,8 @@ graph TB
 jack/
 ├── apps/
 │   ├── dashboard/          # Web dashboard
-│   ├── landing/           # Landing page
-│   └── docs/              # Project docs (agent/spec system)
+│   ├── docs/              # Docusaurus documentation app
+│   └── landing/           # Landing page
 ├── contracts/             # Smart contracts
 ├── packages/
 │   └── sdk/               # TypeScript SDK
@@ -93,6 +95,8 @@ jack/
 - [Architecture](./apps/docs/docs/architecture.md)
 - [Demo Narrative](./docs/demo-script.md)
 - [Contracts (Foundry)](./contracts/README.md)
+- [Contracts Deployment Runbook](./apps/docs/docs/operations/contracts-deployment.md)
+- [MVP Critical Roadmap](./apps/docs/docs/operations/mvp-critical-roadmap.md)
 
 ## Contributing
 
@@ -100,7 +104,7 @@ We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) 
 
 ## Releases
 
-Releases are driven by `@edcalderon/versioning` and the `pnpm release*` scripts in the root package. After you commit every change set, run the release helper to bump the version, regenerate the changelog, build `landing` + `dashboard`, and (optionally) sync the artifacts to your configured GCloud buckets.
+Releases are driven by `@edcalderon/versioning` and the `pnpm release*` scripts in the root package. After you commit every change set, run the release helper to bump the version, regenerate the changelog, build `landing` + `dashboard`, and (optionally) run the docs release step and sync artifacts to your configured GCloud buckets.
 
 Supported commands:
 
@@ -108,6 +112,13 @@ Supported commands:
 pnpm release        # patch release
 pnpm release:minor  # minor release
 pnpm release:major  # major release
+pnpm release:all        # patch release + docs deploy (landing/dashboard/docs)
+pnpm release:all:minor  # minor release + docs deploy
+pnpm release:all:major  # major release + docs deploy
+pnpm release -- --with-docs         # include docs build
+pnpm release -- --with-docs-deploy  # include docs build + trigger Pages deploy workflow
+pnpm release:docs                   # docs-only build
+pnpm release:docs:deploy            # docs-only build + workflow dispatch
 ```
 
 The helper respects these environment variables to upload every release to GCloud:
@@ -122,6 +133,24 @@ The helper respects these environment variables to upload every release to GClou
 - `GOOGLE_APPLICATION_CREDENTIALS`: path to a service account JSON key used for `gcloud`/`gsutil` auth.
 
 The script uses `gsutil -m rsync -r` to mirror the built artifacts into `gs://<bucket>/` and `gs://<bucket>/releases/v<version>/…`, then deploys the dashboard to Cloud Run if `GCLOUD_RUN_SERVICE` is defined. Make sure `gcloud` + `gsutil` are installed and authenticated before running the release command.
+
+### Docs deployment + DNS
+
+- GitHub Pages workflow: `.github/workflows/deploy-docs-pages.yml`
+- Docs custom domain file: `apps/docs/static/CNAME`
+- Cloud DNS helper: `scripts/gcloud/configure-docs-dns.sh`
+- Docs deploy runs: <https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml>
+- Agent CI runs: <https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml>
+
+Example DNS mapping command:
+
+```bash
+GCLOUD_PROJECT=your-project \
+GCLOUD_DNS_ZONE=lukas-money \
+DOCS_DOMAIN=docs.jack.lukas.money \
+DOCS_GITHUB_PAGES_TARGET=hashpass-tech.github.io \
+./scripts/gcloud/configure-docs-dns.sh
+```
 
 ### Testnet setup
 

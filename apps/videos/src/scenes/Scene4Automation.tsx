@@ -22,7 +22,7 @@ const scene = SCENES[4]; // Layer 4
  *  - 3 stage dots fill sequentially (cyan → gold → green)
  *  - Capsule (pill) moves along the track toward compass core
  */
-const Automation3D: React.FC = () => {
+export const Automation3D: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;

@@ -8,6 +8,14 @@ const LAYER_VIDEO_MAP: Record<string, string> = {
   SETTLEMENT: "/videos/scene4-automation.webm",
 };
 
+/* ─── V3 "Deep Dive" videos — shown in Theatre/Expanded mode ─── */
+const LAYER_VIDEO_V3_MAP: Record<string, string> = {
+  INTENT: "/videos/v3-scene1-key-management.mp4",
+  ROUTE: "/videos/v3-scene2-multi-chain.mp4",
+  CONSTRAINTS: "/videos/v3-scene3-clearing.mp4",
+  SETTLEMENT: "/videos/v3-scene4-automation.mp4",
+};
+
 const LAYER_ACCENT: Record<string, string> = {
   INTENT: "#F2B94B",
   ROUTE: "#38BDF8",
@@ -36,14 +44,17 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
   onClose,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const videoV3Ref = useRef<HTMLVideoElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [entered, setEntered] = useState(false);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [v3VideoLoaded, setV3VideoLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
   const accent = LAYER_ACCENT[layer] ?? "#F2B94B";
   const videoSrc = LAYER_VIDEO_MAP[layer];
+  const videoSrcV3 = LAYER_VIDEO_V3_MAP[layer];
   const description = LAYER_DESCRIPTION[layer] ?? "";
 
   /* Entrance animation */
@@ -68,6 +79,15 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
     }
   }, [entered, videoLoaded]);
 
+  /* Autoplay V3 when expanded and loaded */
+  useEffect(() => {
+    if (expanded && v3VideoLoaded && videoV3Ref.current) {
+      videoV3Ref.current.currentTime = 0;
+      videoV3Ref.current.muted = isMuted;
+      videoV3Ref.current.play().catch(() => {});
+    }
+  }, [expanded, v3VideoLoaded]);
+
   /* Close on ESC */
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -91,22 +111,34 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
   };
 
   const toggleExpand = () => {
-    setExpanded((prev) => !prev);
+    setExpanded((prev) => {
+      const willExpand = !prev;
+      if (willExpand) {
+        // Switching to Theatre Mode — pause V2, V3 will autoplay once mounted
+        if (videoRef.current) videoRef.current.pause();
+        setV3VideoLoaded(false); // reset so we show shimmer while loading
+      } else if (!willExpand && videoRef.current) {
+        // Switching back to compact — resume V2 clip
+        videoRef.current.muted = isMuted;
+        videoRef.current.play().catch(() => {});
+      }
+      return willExpand;
+    });
   };
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
-    }
+    const newMuted = !isMuted;
+    setIsMuted(newMuted);
+    if (videoRef.current) videoRef.current.muted = newMuted;
+    if (videoV3Ref.current) videoV3Ref.current.muted = newMuted;
   };
 
   return (
     <div
       ref={modalRef}
       onClick={handleBackdropClick}
-      className="fixed inset-0 z-[110] flex items-center justify-center p-4 md:p-6"
+      className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center p-0 sm:p-4 md:p-6"
       style={{
         background: entered ? "rgba(11,16,32,0.92)" : "rgba(11,16,32,0)",
         backdropFilter: entered ? "blur(20px)" : "blur(0px)",
@@ -115,9 +147,10 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
     >
       {/* ── Card ── */}
       <div
-        className="relative w-full rounded-[28px] border overflow-hidden"
+        className="relative w-full rounded-t-[28px] sm:rounded-[28px] border border-b-0 sm:border-b overflow-hidden overflow-y-auto"
         style={{
           maxWidth: expanded ? "960px" : "540px",
+          maxHeight: "calc(100dvh - env(safe-area-inset-bottom, 0px))",
           background: "#0F1A2E",
           borderColor: `${accent}33`,
           boxShadow: entered
@@ -148,11 +181,12 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
 
         {/* ── Video area ── */}
         <div
-          className="relative cursor-pointer group"
+          className="relative cursor-pointer group flex-shrink-0"
           onClick={toggleExpand}
           style={{
-            height: expanded ? "440px" : "260px",
-            transition: "height 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
+            height: expanded ? "min(56vw, 540px)" : "min(52vw, 260px)",
+            minHeight: expanded ? "220px" : "160px",
+            transition: "height 0.5s cubic-bezier(0.16, 1, 0.3, 1), min-height 0.5s cubic-bezier(0.16, 1, 0.3, 1)",
           }}
         >
           {videoSrc && (
@@ -162,11 +196,29 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               muted={isMuted}
               loop
               playsInline
-              preload="auto"
+              preload="metadata"
               onLoadedData={() => setVideoLoaded(true)}
               className="absolute inset-0 w-full h-full object-cover"
               style={{
-                opacity: videoLoaded ? 1 : 0,
+                opacity: videoLoaded && !expanded ? 1 : 0,
+                transition: "opacity 0.6s ease",
+              }}
+            />
+          )}
+
+          {/* V3 detailed video — only mount when expanded (saves ~4MB download per video) */}
+          {expanded && videoSrcV3 && (
+            <video
+              ref={videoV3Ref}
+              src={videoSrcV3}
+              muted={isMuted}
+              loop
+              playsInline
+              preload="auto"
+              onLoadedData={() => setV3VideoLoaded(true)}
+              className="absolute inset-0 w-full h-full object-cover"
+              style={{
+                opacity: v3VideoLoaded ? 1 : 0,
                 transition: "opacity 0.6s ease",
               }}
             />
@@ -241,14 +293,14 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               )}
             </svg>
             <span className="text-[10px] font-bold uppercase tracking-wider">
-              {expanded ? "Collapse" : "Expand"}
+              {expanded ? "Collapse" : "Deep Dive"}
             </span>
           </div>
         </div>
 
         {/* ── Content area ── */}
         <div
-          className="px-8 pt-4 pb-8"
+          className="px-5 sm:px-8 pt-3 sm:pt-4 pb-6 sm:pb-8"
           style={{
             opacity: entered ? 1 : 0,
             transform: entered ? "translateY(0)" : "translateY(12px)",
@@ -257,7 +309,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
         >
           {/* Accent line */}
           <div
-            className="w-full h-[2px] rounded-full mb-6"
+            className="w-full h-[2px] rounded-full mb-4 sm:mb-6"
             style={{
               background: `linear-gradient(to right, ${accent}, ${accent}40, transparent)`,
             }}
@@ -270,12 +322,12 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               style={{ background: accent, boxShadow: `0 0 8px ${accent}` }}
             />
             <h2
-              className="text-2xl md:text-3xl font-black uppercase tracking-tight"
+              className="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight"
               style={{ color: "#fff" }}
             >
               {layer}
               <span
-                className="ml-2 text-sm font-bold tracking-widest opacity-60"
+                className="ml-2 text-xs sm:text-sm font-bold tracking-widest opacity-60"
                 style={{ color: accent }}
               >
                 Layer
@@ -284,7 +336,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
           </div>
 
           {/* Description */}
-          <p className="text-[15px] text-gray-300 font-medium leading-relaxed mb-6 max-w-lg">
+          <p className="text-[13px] sm:text-[15px] text-gray-300 font-medium leading-relaxed mb-4 sm:mb-6 max-w-lg">
             {description}
           </p>
 
@@ -292,7 +344,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <button
               onClick={handleClose}
-              className="flex-1 py-3.5 rounded-2xl font-black uppercase tracking-[0.3em] text-xs border transition-all hover:scale-[1.01] active:scale-[0.99]"
+              className="flex-1 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[10px] sm:text-xs border transition-all hover:scale-[1.01] active:scale-[0.99]"
               style={{
                 background: "rgba(255,255,255,0.04)",
                 borderColor: "rgba(255,255,255,0.08)",
@@ -303,14 +355,14 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
             </button>
             <button
               onClick={toggleExpand}
-              className="flex-1 py-3.5 rounded-2xl font-black uppercase tracking-[0.3em] text-xs transition-all hover:scale-[1.01] active:scale-[0.99]"
+              className="flex-1 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[10px] sm:text-xs transition-all hover:scale-[1.01] active:scale-[0.99]"
               style={{
                 background: `${accent}18`,
                 border: `1px solid ${accent}40`,
                 color: accent,
               }}
             >
-              {expanded ? "▴ Compact" : "▾ Theatre Mode"}
+              {expanded ? "▴ Compact View" : "▾ Deep Dive"}
             </button>
           </div>
         </div>

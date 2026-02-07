@@ -23,7 +23,7 @@ const scene = SCENES[3]; // Layer 3
  *  - Policy gate (thin plane) flashes green on allow (optional red reject first)
  *  - Outbound stream (gold/white) exits cleanly
  */
-const Clearing3D: React.FC = () => {
+export const Clearing3D: React.FC = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const t = frame / fps;

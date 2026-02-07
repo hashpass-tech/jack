@@ -24,6 +24,18 @@ pnpm build
 
 This command generates static content into the `build` directory and can be served with any static hosting service.
 
+## Deployment
+
+- GitHub Pages workflow: `.github/workflows/deploy-docs-pages.yml`
+- Custom domain source: `static/CNAME` (`docs.jack.lukas.money`)
+
+From repo root:
+
+```bash
+pnpm release:docs
+pnpm release:docs:deploy
+```
+
 ## Documentation Map
 
 - [Overview](./docs/overview.md)

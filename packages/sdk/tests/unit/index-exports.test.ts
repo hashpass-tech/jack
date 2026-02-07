@@ -45,6 +45,15 @@ import {
   RetryError
 } from '../../src/index';
 
+// Test importing validation functions
+import { validateIntentParams } from '../../src/index';
+
+// Test importing manager classes
+import { IntentManager, ExecutionTracker, CostTracker } from '../../src/index';
+
+// Test importing client
+import { JackClient } from '../../src/index';
+
 describe('Index Exports', () => {
   it('should export ExecutionStatus enum', () => {
     expect(ExecutionStatusEnum.CREATED).toBe('CREATED');
@@ -52,7 +61,7 @@ describe('Index Exports', () => {
   });
 
   it('should export JACK_SDK class', () => {
-    const sdk = new JACK_SDK('https://api.jack.example');
+    const sdk = new JACK_SDK({ baseUrl: 'https://api.jack.example' });
     expect(sdk).toBeInstanceOf(JACK_SDK);
   });
 
@@ -94,7 +103,7 @@ describe('Index Exports', () => {
   });
 
   it('should allow using JACK_SDK methods with exported types', () => {
-    const sdk = new JACK_SDK('https://api.jack.example');
+    const sdk = new JACK_SDK({ baseUrl: 'https://api.jack.example' });
     
     const params: IntentParams = {
       sourceChain: 'arbitrum',
@@ -151,6 +160,51 @@ describe('Index Exports', () => {
     
     expect(handleError(networkError)).toContain('ECONNREFUSED');
     expect(handleError(apiError)).toContain('404');
+  });
+
+  it('should export validateIntentParams function', () => {
+    // Test that validation function is exported and works correctly
+    const validParams: IntentParams = {
+      sourceChain: 'arbitrum',
+      destinationChain: 'base',
+      tokenIn: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
+      tokenOut: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      amountIn: '1000000',
+      minAmountOut: '950000',
+      deadline: Date.now() + 3600000
+    };
+
+    const result = validateIntentParams(validParams);
+    expect(result.valid).toBe(true);
+    expect(result.errors).toEqual([]);
+
+    // Test with invalid params
+    const invalidParams: IntentParams = {
+      sourceChain: '',
+      destinationChain: 'base',
+      tokenIn: 'invalid',
+      tokenOut: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+      amountIn: '0',
+      minAmountOut: '950000',
+      deadline: Date.now() - 1000
+    };
+
+    const invalidResult = validateIntentParams(invalidParams);
+    expect(invalidResult.valid).toBe(false);
+    expect(invalidResult.errors.length).toBeGreaterThan(0);
+  });
+
+  it('should export manager classes', () => {
+    // Test that manager classes are exported and can be instantiated
+    const client = new JackClient({ baseUrl: 'https://api.jack.test' });
+    
+    const intentManager = new IntentManager(client);
+    const executionTracker = new ExecutionTracker(client);
+    const costTracker = new CostTracker(client);
+
+    expect(intentManager).toBeInstanceOf(IntentManager);
+    expect(executionTracker).toBeInstanceOf(ExecutionTracker);
+    expect(costTracker).toBeInstanceOf(CostTracker);
   });
 });
 

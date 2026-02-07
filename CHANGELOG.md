@@ -1,3 +1,59 @@
+## [0.1.34](https://github.com/hashpass-tech/JACK/compare/v0.1.33-testnet.1...v0.1.34) (2026-02-06)
+
+
+### Bug Fixes
+
+* **landing:** mobile-friendly layer video modal — bottom-sheet, responsive heights ([58d1c9b](https://github.com/hashpass-tech/JACK/commit/58d1c9bd7760b87c7a8b7df5397c4a096dbd7224))
+
+
+
+
+
+## [0.1.33](https://github.com/hashpass-tech/JACK/compare/v0.1.32-testnet.1...v0.1.33) (2026-02-06)
+
+
+
+
+
+## [0.1.32](https://github.com/hashpass-tech/JACK/compare/v0.1.31-testnet.1...v0.1.32) (2026-02-06)
+
+
+### Bug Fixes
+
+* **landing:** reduce hero CTA buttons size and push below JACK icon on desktop ([d2e3cd0](https://github.com/hashpass-tech/JACK/commit/d2e3cd065791976d2c7c880841176f950690bd7e))
+
+
+
+
+
+## [0.1.31](https://github.com/hashpass-tech/JACK/compare/v0.1.30-testnet.1...v0.1.31) (2026-02-06)
+
+
+### Performance Improvements
+
+* **landing:** mobile-first optimizations — lazy load, SW cache, video defer, 3D tuning ([1aef2f1](https://github.com/hashpass-tech/JACK/commit/1aef2f1f354ad54b4bef7e11748823aac2973935))
+
+
+
+
+
+## [0.1.30](https://github.com/hashpass-tech/JACK/compare/v0.1.29...v0.1.30) (2026-02-06)
+
+
+
+
+
+## [0.1.29](https://github.com/hashpass-tech/JACK/compare/v0.1.28...v0.1.29) (2026-02-06)
+
+
+### Features
+
+* **videos:** scene registry + unified render CLI — scalable multi-version video pipeline
+* **videos:** V3 deep dive detailed explainer videos (35s each, H.264 MP4)
+* **landing:** dual-mode modal — V2 compact clips + V3 Deep Dive on expand
+* **videos:** unified TTS generator (generate-tts-all.ts) reads from registry
+
+
 ## [0.1.28](https://github.com/hashpass-tech/JACK/compare/v0.1.27-testnet.1...v0.1.28) (2026-02-06)
 
 

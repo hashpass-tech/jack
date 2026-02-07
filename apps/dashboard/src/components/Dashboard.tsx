@@ -52,8 +52,26 @@ const Dashboard: FC = () => {
   );
   const [showTestnetModal, setShowTestnetModal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [docsUrl, setDocsUrl] = useState(
+    process.env.NEXT_PUBLIC_DOCS_URL ?? "https://docs.jack.lukas.money",
+  );
   const dashboardVersion = process.env.NEXT_PUBLIC_DASHBOARD_VERSION ?? "0.0.0";
+  const protocolTrack = process.env.NEXT_PUBLIC_JACK_PROTOCOL_TRACK ?? "v1";
   const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === "true";
+  const landingUrl = isTestnet
+    ? "https://testnet.jack.lukas.money"
+    : "https://jack.lukas.money";
+  const environmentLabel = isTestnet ? "TESTNET" : "MAINNET";
+
+  useEffect(() => {
+    if (
+      typeof window !== "undefined" &&
+      (window.location.hostname.includes("localhost") ||
+        window.location.hostname === "127.0.0.1")
+    ) {
+      setDocsUrl("http://localhost:3002");
+    }
+  }, []);
 
   useEffect(() => {
     if (isTestnet && typeof window !== "undefined") {
@@ -173,6 +191,15 @@ const Dashboard: FC = () => {
                 </button>
               ))}
             </div>
+            <a
+              href={docsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border transition-all hover:opacity-90"
+              style={{ borderColor: "var(--border-secondary)", color: "var(--fg-secondary)" }}
+            >
+              Docs
+            </a>
             <ThemeToggle />
             <ConnectButton.Custom>
               {({ account, chain, openAccountModal, openChainModal, openConnectModal, mounted }) => {
@@ -258,6 +285,16 @@ const Dashboard: FC = () => {
               {tab.label}
             </button>
           ))}
+          <a
+            href={docsUrl}
+            target="_blank"
+            rel="noreferrer"
+            onClick={() => setMobileMenuOpen(false)}
+            className="w-full py-4 rounded-2xl text-sm font-black uppercase tracking-[0.2em] transition-all border text-center"
+            style={{ background: "transparent", color: "var(--fg-primary)", borderColor: "var(--border-secondary)" }}
+          >
+            Documentation
+          </a>
           <div className="pt-6 w-full flex justify-center">
             <ConnectButton />
           </div>
@@ -342,10 +379,34 @@ const Dashboard: FC = () => {
 
       {/* ── Footer ────────────────────────────────────── */}
       <footer
-        className="border-t px-6 py-3 text-center text-[10px] uppercase tracking-[0.4em]"
-        style={{ background: "var(--bg-secondary)", borderColor: "var(--border-primary)", color: "var(--fg-muted)" }}
+        className="border-t px-4 py-5 md:px-8 md:py-6"
+        style={{ background: "var(--bg-secondary)", borderColor: "var(--border-primary)", color: "var(--fg-secondary)" }}
       >
-        v{dashboardVersion}
+        <div className="mx-auto flex max-w-6xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div
+            className="inline-flex w-full items-center justify-center gap-2 rounded-full border px-3 py-2 text-[10px] font-bold uppercase tracking-[0.18em] md:w-auto md:justify-start"
+            style={{ borderColor: "var(--border-secondary)", background: "var(--bg-primary)", color: "var(--fg-secondary)" }}
+          >
+            <span
+              className="h-2.5 w-2.5 rounded-full"
+              style={{ background: "var(--fg-accent)", boxShadow: `0 0 12px var(--shadow-accent)` }}
+            />
+            <span style={{ color: "var(--fg-primary)" }}>{environmentLabel}</span>
+            <span style={{ color: "var(--fg-info)" }}>{protocolTrack.toUpperCase()}</span>
+            <span style={{ color: "var(--fg-muted)" }}>BUILD {dashboardVersion}</span>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[10px] font-bold uppercase tracking-[0.16em] md:justify-end">
+            <a href={docsUrl} target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" style={{ color: "var(--fg-primary)" }}>
+              Documentation
+            </a>
+            <a href={landingUrl} target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" style={{ color: "var(--fg-primary)" }}>
+              Landing
+            </a>
+            <a href="https://github.com/hashpass-tech/JACK" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" style={{ color: "var(--fg-primary)" }}>
+              GitHub
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );

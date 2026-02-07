@@ -1,8 +1,24 @@
 import {themes as prismThemes} from 'prism-react-renderer';
+import fs from 'fs';
+import path from 'path';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
+
+const readPackageVersion = (filePath: string): string => {
+  try {
+    const raw = fs.readFileSync(filePath, 'utf-8');
+    return JSON.parse(raw).version ?? '0.0.0';
+  } catch {
+    return '0.0.0';
+  }
+};
+
+const docsBuildVersion = readPackageVersion(
+  path.resolve(__dirname, '../../package.json'),
+);
+const protocolTrack = process.env.JACK_PROTOCOL_TRACK || 'v1';
 
 const config: Config = {
   title: 'JACK Docs',
@@ -53,6 +69,10 @@ const config: Config = {
   markdown: {
     mermaid: true,
   },
+  customFields: {
+    docsBuildVersion,
+    jackProtocolTrack: protocolTrack,
+  },
 
   themeConfig: {
     // Replace with your project's social card
@@ -76,6 +96,21 @@ const config: Config = {
         },
         {to: '/docs/demo-script', label: 'Demo', position: 'left'},
         {
+          type: 'custom-jackRuntime' as any,
+          position: 'right',
+        },
+        {
+          to: '/go/dashboard',
+          label: 'Dashboard',
+          position: 'right',
+          className: 'jack-navbar__cta',
+        },
+        {
+          to: '/go/landing',
+          label: 'Landing',
+          position: 'right',
+        },
+        {
           href: 'https://github.com/hashpass-tech/JACK',
           label: 'GitHub',
           position: 'right',
@@ -83,7 +118,7 @@ const config: Config = {
       ],
     },
     footer: {
-      style: 'dark',
+      style: 'light',
       links: [
         {
           title: 'Docs',
@@ -103,6 +138,23 @@ const config: Config = {
           ],
         },
         {
+          title: 'Product',
+          items: [
+            {
+              label: 'Landing',
+              to: '/go/landing',
+            },
+            {
+              label: 'Dashboard',
+              to: '/go/dashboard',
+            },
+            {
+              label: 'Demo Narrative',
+              to: '/docs/demo-script',
+            },
+          ],
+        },
+        {
           title: 'Operations',
           items: [
             {
@@ -112,15 +164,6 @@ const config: Config = {
             {
               label: 'Release Flow',
               to: '/docs/operations/release-flow',
-            },
-          ],
-        },
-        {
-          title: 'More',
-          items: [
-            {
-              label: 'Demo Narrative',
-              to: '/docs/demo-script',
             },
             {
               label: 'GitHub',

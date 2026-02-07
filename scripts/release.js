@@ -6,8 +6,103 @@ const path = require('path');
 const dotenv = require('dotenv');
 
 const RELEASE_LEVELS = new Set(['major', 'minor', 'patch']);
-const releaseLevel = process.argv[2] || 'patch';
-const releaseMessage = process.argv[3] || `Release ${releaseLevel}`;
+const usage = () => {
+  console.log([
+    'Usage: node scripts/release.js [major|minor|patch] [message] [options]',
+    '',
+    'Options:',
+    '  --message "<text>"      Explicit release commit message.',
+    '  --with-docs             Run docs release build as part of this release.',
+    '  --with-docs-deploy      Run docs build and trigger GitHub Pages workflow.',
+    '  -h, --help              Show this help output.'
+  ].join('\n'));
+};
+
+const parseReleaseArgs = (args) => {
+  const parsed = {
+    releaseLevel: 'patch',
+    releaseMessage: '',
+    withDocs: false,
+    withDocsDeploy: false,
+    help: false
+  };
+
+  let index = 0;
+  if (args[index] && RELEASE_LEVELS.has(args[index])) {
+    parsed.releaseLevel = args[index];
+    index += 1;
+  }
+
+  const messageParts = [];
+  while (index < args.length) {
+    const arg = args[index];
+
+    if (arg === '--message') {
+      const value = args[index + 1];
+      if (!value) {
+        throw new Error('--message requires a value');
+      }
+      parsed.releaseMessage = value;
+      index += 2;
+      continue;
+    }
+
+    if (arg === '--with-docs') {
+      parsed.withDocs = true;
+      index += 1;
+      continue;
+    }
+
+    if (arg === '--with-docs-deploy') {
+      parsed.withDocs = true;
+      parsed.withDocsDeploy = true;
+      index += 1;
+      continue;
+    }
+
+    if (arg === '--help' || arg === '-h') {
+      parsed.help = true;
+      index += 1;
+      continue;
+    }
+
+    if (arg.startsWith('-')) {
+      throw new Error(`Unknown option: ${arg}`);
+    }
+
+    messageParts.push(arg);
+    index += 1;
+  }
+
+  if (!parsed.releaseMessage) {
+    parsed.releaseMessage = messageParts.length
+      ? messageParts.join(' ')
+      : `Release ${parsed.releaseLevel}`;
+  }
+
+  return parsed;
+};
+
+let cli;
+try {
+  cli = parseReleaseArgs(process.argv.slice(2));
+} catch (error) {
+  console.error(error.message || error);
+  usage();
+  process.exit(1);
+}
+const {
+  releaseLevel,
+  releaseMessage,
+  withDocs,
+  withDocsDeploy,
+  help
+} = cli;
+
+if (help) {
+  usage();
+  process.exit(0);
+}
 
 const loadEnvFile = (file) => {
   const envPath = path.join(__dirname, '..', file);
@@ -201,6 +296,21 @@ const syncDevelopToPrimary = () => {
   }
 };
 
+const runDocsRelease = ({ triggerDeploy }) => {
+  const currentBranch = getBranchName();
+  const command = ['node scripts/release-docs.js'];
+
+  if (triggerDeploy) {
+    command.push('--trigger-deploy');
+    if (currentBranch) {
+      command.push('--ref');
+      command.push(currentBranch);
+    }
+  }
+
+  run(command.join(' '));
+};
+
 try {
   enforceTestnetNotBehind();
   console.log('Starting versioning + release pipeline');
@@ -223,6 +333,14 @@ try {
   console.log('Building landing and dashboard for release');
   run('pnpm build');
   run('cd apps/dashboard && pnpm build');
+
+  if (withDocs) {
+    const currentBranch = getBranchName();
+    const autoDeployDocs = currentBranch === 'main' || currentBranch === 'master';
+    const triggerDocsDeploy = withDocsDeploy || process.env.RELEASE_WITH_DOCS_DEPLOY === 'true' || autoDeployDocs;
+    console.log(`Running docs release step (${triggerDocsDeploy ? 'build + deploy trigger' : 'build only'})`);
+    runDocsRelease({ triggerDeploy: triggerDocsDeploy });
+  }
 
   const releaseToken = `releases/v${version}`;
   const transferBucket = ({ bucket, source, target }) => {

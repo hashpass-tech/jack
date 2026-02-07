@@ -6,6 +6,12 @@
     "outDir": "./dist/esm",
     "declaration": false,
     "declarationMap": false,
-    "sourceMap": true
+    "sourceMap": true,
+    "noEmit": false
+  },
+  "ts-node": {
+    "compilerOptions": {
+      "module": "ESNext"
+    }
   }
 }

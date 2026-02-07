@@ -198,6 +198,10 @@ export interface RequestOptions {
   noRetry?: boolean;
   /** Disable caching for this request */
   noCache?: boolean;
+  /** Skip cache for this request (alias for noCache) */
+  skipCache?: boolean;
+  /** Query parameters for the request */
+  params?: Record<string, unknown>;
   /** Additional headers for this request */
   headers?: Record<string, string>;
 }

@@ -42,5 +42,22 @@ export default defineConfig(({ mode }) => {
       },
     },
     root: path.resolve(__dirname),
+    build: {
+      // Chunk splitting for better caching & smaller initial load
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            // Split heavy three.js into its own chunk (~800KB)
+            'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
+            // React in its own chunk
+            'react-vendor': ['react', 'react-dom'],
+          },
+        },
+      },
+      // Target modern browsers for smaller bundles
+      target: 'es2020',
+      // Increase chunk size warning limit (three.js is inherently large)
+      chunkSizeWarningLimit: 1000,
+    },
   };
 });

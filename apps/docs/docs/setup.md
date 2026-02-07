@@ -29,6 +29,7 @@ cp .env.production.example .env.local
 ```bash
 pnpm dev:landing   # http://localhost:3000
 pnpm dev:dashboard # http://localhost:3001
+pnpm dev:docs      # http://localhost:3002
 ```
 
 For a single terminal, use:
