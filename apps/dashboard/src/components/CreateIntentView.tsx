@@ -187,7 +187,12 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 								</div>
 								<div>
 									<p className="text-sm font-bold uppercase tracking-tight" style={{ color: "var(--fg-primary)" }}>Fhenix Confidential Intent</p>
-									<p className="text-[10px] font-semibold tracking-wide" style={{ color: "var(--fg-muted)" }}>Encrypt constraints for agent-only visibility (CCM).</p>
+									<p className="text-[10px] font-semibold tracking-wide" style={{ color: "var(--fg-muted)" }}>
+										Deep-critical, well-structured CCM constraints.
+									</p>
+									<p className="text-[10px] font-semibold tracking-wide" style={{ color: "var(--fg-muted)" }}>
+										Encrypted for agent-only visibility (CCM).
+									</p>
 								</div>
 							</div>
 							<button
@@ -221,7 +226,7 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 					<div className="space-y-5">
 						{[
 							{ step: '1', title: 'Solver Selection', desc: 'Yellow Fusion+ Bonded' },
-							{ step: '2', title: 'Confidentiality', desc: 'Fhenix Encrypted CCM' },
+							{ step: '2', title: 'Confidentiality', desc: 'Fhenix Encrypted CCM (agent-only)' },
 							{ step: '3', title: 'Cross-chain Hop', desc: 'LI.FI Stargate Abstraction' },
 							{ step: '4', title: 'Atomic Settlement', desc: 'Uniswap v4 JACK Hook' }
 						].map((item) => (
