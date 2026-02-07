@@ -20,10 +20,10 @@ Track the remaining critical work to make the demo deterministic and production-
 
 ## B. Execution/API (Issue #2)
 
-- [ ] Replace simulated route stage with real LI.FI operation path (or hard gate + explicit fallback mode).
-- [ ] Add explicit Yellow Network solver operation integration points (quote + execution lifecycle events).
-- [ ] Expose deterministic `/api/quote` output structure with provenance fields (provider, route id, timestamp).
-- [ ] Ensure execution status transitions reflect actual backend outcomes, not only timers/mocks.
+- [x] Replace simulated route stage with real LI.FI operation path (or hard gate + explicit fallback mode).
+- [x] Add explicit Yellow Network solver operation integration points (quote + execution lifecycle events).
+- [x] Expose deterministic `/api/quote` output structure with provenance fields (provider, route id, timestamp).
+- [ ] Ensure execution status transitions reflect actual backend outcomes, not only timers/mocks. (Residual hardening tracked in #22.)
 
 ## C. Demo Reliability
 
@@ -35,5 +35,12 @@ Track the remaining critical work to make the demo deterministic and production-
 ## Exit Criteria (Critical Path)
 
 - [ ] Contract deployment + smoke evidence is attached to the contracts critical issue.
-- [ ] API execution flow includes LI.FI + Yellow integration path or documented fallback gate.
+- [x] API execution flow includes LI.FI + Yellow integration path or documented fallback gate.
 - [ ] Demo script reflects real live path vs any mock behavior with no ambiguity.
+
+## Post-Merge Status (February 7, 2026)
+
+- PR #20 merged into `develop`: Yellow notification ingestion + auth/session/channel guard checks in intents API.
+- PR #21 merged into `develop`: LI.FI quote/route/status integration and deterministic `GET /api/quote`.
+- Issues #17 and #18 closed after merge.
+- Follow-up issue #22 created for lint/type debt and reliability hardening in merged execution pipeline.
