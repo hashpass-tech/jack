@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { JACK_SDK, Intent } from '../../../../packages/sdk';
+import { JACK_SDK, Intent } from '@jack-kernel/sdk';
 
 interface ExecutionsListViewProps {
 	onSelectExecution: (id: string) => void;
@@ -14,7 +14,7 @@ export const ExecutionsListView: React.FC<ExecutionsListViewProps> = ({ onSelect
 	useEffect(() => {
 		const fetchExecutions = async () => {
 			try {
-				const sdk = new JACK_SDK();
+				const sdk = new JACK_SDK({ baseUrl: '/api' });
 				const list = await sdk.listIntents();
 				setExecutions(list);
 			} catch (error) {

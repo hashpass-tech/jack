@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { JACK_SDK, ExecutionStatus, Intent } from '../../../../packages/sdk';
+import { JACK_SDK, ExecutionStatus, Intent } from '@jack-kernel/sdk';
 
 interface ExecutionDetailViewProps {
 	id: string;
@@ -15,7 +15,7 @@ export const ExecutionDetailView: React.FC<ExecutionDetailViewProps> = ({ id, on
 	useEffect(() => {
 		const fetchStatus = async () => {
 			try {
-				const sdk = new JACK_SDK();
+				const sdk = new JACK_SDK({ baseUrl: '/api' });
 				const data = await sdk.getExecutionStatus(id);
 				setIntent(data);
 			} catch (error) {

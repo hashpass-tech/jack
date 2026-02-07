@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent, type FC } from 'react';
 import { useSignTypedData, useAccount } from 'wagmi';
-import { JACK_SDK, IntentParams } from '../../../../packages/sdk';
+import { JACK_SDK, IntentParams } from '@jack-kernel/sdk';
 
 interface CreateIntentViewProps {
 	onIntentSubmitted: (id: string) => void;
@@ -33,7 +33,7 @@ export const CreateIntentView: FC<CreateIntentViewProps> = ({ onIntentSubmitted 
 
 		try {
 			setStatus('SIGNING');
-			const sdk = new JACK_SDK();
+			const sdk = new JACK_SDK({ baseUrl: '/api' });
 
 			const intentParams: IntentParams = {
 				sourceChain: form.sourceChain,
