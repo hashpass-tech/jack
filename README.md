@@ -5,6 +5,7 @@
 # JACK - XChain Exec Kernel
 
 [![Docs Deploy](https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml)
+[![Docs Impact Check](https://github.com/hashpass-tech/jack/actions/workflows/docs-impact.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/docs-impact.yml)
 [![CI (Agent Tasks)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
@@ -23,13 +24,13 @@ graph TB
     C --> F[Chain B]
     D --> G[Cross-Chain Bridge]
     G --> H[Destination Chain]
-    
+
     subgraph "JACK Components"
         B
         C
         D
     end
-    
+
     subgraph "Blockchain Networks"
         E
         F
@@ -58,6 +59,7 @@ graph TB
 **Prerequisites:** Node.js, Git
 
 1. **Clone + install**
+
    ```bash
    git clone https://github.com/hashpass-tech/jack.git
    cd jack
@@ -65,12 +67,14 @@ graph TB
    ```
 
 2. **Configure environment**
+
    ```bash
    cp .env.production.example .env.local
    # Edit .env.local with your configuration
    ```
 
 3. **Run the apps**
+
    ```bash
    pnpm dev:landing   # http://localhost:3000
    pnpm dev:dashboard # http://localhost:3001
@@ -78,6 +82,7 @@ graph TB
    ```
 
    Or run all apps concurrently:
+
    ```bash
    pnpm dev:all
    ```
@@ -104,6 +109,8 @@ jack/
 - [Demo Narrative](./docs/demo-script.md)
 - [Contracts (Foundry)](./contracts/README.md)
 - [Contracts Deployment Runbook](./apps/docs/docs/operations/contracts-deployment.md)
+- [Documentation Governance Runbook](./apps/docs/docs/operations/documentation-governance.md)
+- [Documentation Changelog](./apps/docs/docs/operations/documentation-changelog.md)
 - [MVP Critical Roadmap](./apps/docs/docs/operations/mvp-critical-roadmap.md)
 
 ## Contributing
@@ -127,6 +134,7 @@ pnpm release -- --with-docs         # include docs build
 pnpm release -- --with-docs-deploy  # include docs build + trigger Pages deploy workflow
 pnpm release:docs                   # docs-only build
 pnpm release:docs:deploy            # docs-only build + workflow dispatch
+pnpm docs:impact:check              # validate docs impact for critical paths
 ```
 
 The helper respects these environment variables to upload every release to GCloud:
@@ -147,6 +155,8 @@ The script uses `gsutil -m rsync -r` to mirror the built artifacts into `gs://<b
 - GitHub Pages workflow: `.github/workflows/deploy-docs-pages.yml`
 - Docs custom domain file: `apps/docs/static/CNAME`
 - Cloud DNS helper: `scripts/gcloud/configure-docs-dns.sh`
+- Docs impact gate workflow: `.github/workflows/docs-impact.yml`
+- Docs changelog automation workflow: `.github/workflows/docs-changelog.yml`
 - PR merge automation workflow: `.github/workflows/pr-merge-automation.yml` (auto-close linked issues + optional follow-up issue creation)
 - Docs deploy runs: <https://github.com/hashpass-tech/jack/actions/workflows/deploy-docs-pages.yml>
 - Agent CI runs: <https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml>

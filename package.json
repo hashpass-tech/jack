@@ -20,6 +20,7 @@
     "release:all:major": "node scripts/release.js major --with-docs-deploy",
     "release:docs": "node scripts/release-docs.js",
     "release:docs:deploy": "node scripts/release-docs.js --trigger-deploy --ref main",
+    "docs:impact:check": "node scripts/check-doc-impact.js",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "test": "turbo run test",
     "start": "serve -s apps/landing/dist -l 8080",

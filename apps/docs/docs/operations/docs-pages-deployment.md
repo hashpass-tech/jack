@@ -20,6 +20,20 @@ The docs app includes `apps/docs/static/CNAME`, so every deploy keeps the custom
 docs.jack.lukas.money
 ```
 
+## Docs Governance Automation
+
+- PR docs-impact gate: `.github/workflows/docs-impact.yml`
+- Merge-time docs changelog writer: `.github/workflows/docs-changelog.yml`
+- Check script: `scripts/check-doc-impact.js`
+- Changelog updater: `scripts/update-docs-changelog.js`
+
+If critical contract/API/SDK paths are changed, PRs must include docs updates or explicit no-impact metadata:
+
+```txt
+DOCS_IMPACT: none
+DOCS_IMPACT_NOTE: <why docs are not required>
+```
+
 ## GitHub Repository Settings
 
 1. Open repository settings: `Settings -> Pages`.
