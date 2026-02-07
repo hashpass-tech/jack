@@ -26,6 +26,11 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_DASHBOARD_VERSION: appVersion,
     NEXT_PUBLIC_IS_TESTNET: process.env.NEXT_PUBLIC_IS_TESTNET || "false",
   },
+  turbopack: {
+    resolveAlias: {
+      "@shared": path.resolve(__dirname, "../../components"),
+    },
+  },
 };
 
 export default nextConfig;
