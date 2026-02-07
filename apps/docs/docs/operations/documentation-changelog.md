@@ -9,6 +9,7 @@ Auto-updated on merged PRs to `develop` and `main`.
 
 ## 2026-02-07
 
+- PR [#25](https://github.com/hashpass-tech/JACK/pull/25) into `main` by @edcalderon: chore: release v0.1.41 to main | docs-impact: unspecified | areas: unlabeled | summary: chore: release v0.1.41 to main
 - PR [#24](https://github.com/hashpass-tech/JACK/pull/24) into `develop` by @edcalderon: Codex-generated pull request | docs-impact: unspecified | areas: unlabeled | summary: Codex-generated pull request
 - PR [#23](https://github.com/hashpass-tech/JACK/pull/23) into `develop` by @edcalderon: feat: JACK TypeScript SDK v1.0.0 - Complete implementation with tests and npm publishing | docs-impact: unspecified | areas: unlabeled | summary: feat: JACK TypeScript SDK v1.0.0 - Complete implementation with tests and npm publishing
 - PR [#20](https://github.com/hashpass-tech/JACK/pull/20) into `develop` by @edcalderon: Intents API: integrate Yellow Network provider notifications, auth, and persistence codex | docs-impact: required | areas: unlabeled | summary: Yellow Network notification ingestion, auth, and persistence added in intents API.
