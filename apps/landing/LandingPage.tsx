@@ -16,6 +16,7 @@ import {
 import Scene3D from "@/components/Scene3Dv2";
 import { ChangelogDrawer } from "@/components/drawer-changelog";
 import changelogRaw from "../../CHANGELOG.md?raw";
+import DeepDiveOverlay from "./DeepDiveOverlay";
 
 // Lazy load the video modal — only loaded when user clicks a layer
 const LayerVideoModal = lazy(() => import("./LayerVideoModal"));
@@ -211,6 +212,9 @@ const LandingPage: React.FC = () => {
   const [contentVisible, setContentVisible] = useState(false);
   const [whitepaperOpen, setWhitepaperOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [deepDiveActive, setDeepDiveActive] = useState(false);
+  const [deepDiveStartLayer, setDeepDiveStartLayer] = useState(0);
+  const [cinematicSpin, setCinematicSpin] = useState(false);
   const [whitepaperManifest, setWhitepaperManifest] =
     useState<WhitepaperManifest>(DEFAULT_WHITEPAPER_MANIFEST);
   const whitepaperRef = useRef<HTMLDivElement | null>(null);
@@ -406,6 +410,15 @@ const LandingPage: React.FC = () => {
     setSelected3DLayer(null);
   };
 
+  const LAYER_NAMES = ["INTENT", "ROUTE", "CONSTRAINTS", "SETTLEMENT"];
+  const handleStartDeepDive = (layerName: string) => {
+    setActiveModalLayer(null);
+    const idx = LAYER_NAMES.indexOf(layerName);
+    setDeepDiveStartLayer(idx >= 0 ? idx : 0);
+    window.scrollTo({ top: 0 });
+    setDeepDiveActive(true);
+  };
+
   return (
     <div className="relative w-full min-h-screen bg-[#0B1020] text-white font-space overflow-x-hidden">
       {/* 3D Core Layer */}
@@ -430,6 +443,7 @@ const LandingPage: React.FC = () => {
                 selectedLayer={selected3DLayer}
                 onSelect={setSelected3DLayer}
                 onViewDetails={(name) => setActiveModalLayer(name)}
+                cinematicSpin={cinematicSpin}
               />
               <Stars
                 radius={100}
@@ -652,18 +666,33 @@ const LandingPage: React.FC = () => {
             id="hero"
             className="relative flex flex-1 min-h-screen items-center justify-center pt-32 md:pt-20 pointer-events-none"
           >
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4 z-20 mt-64 md:mt-[22rem] pointer-events-auto">
-              <a
-                href={dashboardUrl}
-                className="w-full sm:w-auto px-8 md:px-8 py-3 md:py-3 bg-[#F2B94B] text-[#0B1020] font-black uppercase tracking-[0.1em] md:tracking-[0.15em] rounded-xl shadow-[0_12px_30px_rgba(242,185,75,0.25)] hover:scale-105 transition-all text-[10px] md:text-xs text-center"
-              >
-                Enter the Kernel
-              </a>
+            <div className="flex flex-col items-center z-20 mt-64 md:mt-[22rem] pointer-events-auto gap-5">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 md:gap-4">
+                <a
+                  href={dashboardUrl}
+                  className="w-full sm:w-auto px-8 md:px-8 py-3 md:py-3 bg-[#F2B94B] text-[#0B1020] font-black uppercase tracking-[0.1em] md:tracking-[0.15em] rounded-xl shadow-[0_12px_30px_rgba(242,185,75,0.25)] hover:scale-105 transition-all text-[10px] md:text-xs text-center"
+                >
+                  Enter the Kernel
+                </a>
+                <button
+                  onClick={scrollToContent}
+                  className="w-full sm:w-auto px-6 md:px-7 py-3 md:py-3 bg-white/5 text-white font-black uppercase tracking-[0.1em] md:tracking-[0.15em] rounded-xl border border-white/10 hover:bg-white/10 transition-all text-[10px] md:text-xs"
+                >
+                  Read Thesis
+                </button>
+              </div>
               <button
-                onClick={scrollToContent}
-                className="w-full sm:w-auto px-6 md:px-7 py-3 md:py-3 bg-white/5 text-white font-black uppercase tracking-[0.1em] md:tracking-[0.15em] rounded-xl border border-white/10 hover:bg-white/10 transition-all text-[10px] md:text-xs"
+                onClick={() => {
+                  window.scrollTo({ top: 0 });
+                  setDeepDiveStartLayer(0);
+                  setDeepDiveActive(true);
+                }}
+                className="px-5 py-2 rounded-full border border-[#F2B94B]/30 text-[#F2B94B]/80 text-[10px] font-black uppercase tracking-[0.2em] hover:bg-[#F2B94B]/10 hover:border-[#F2B94B]/50 hover:text-[#F2B94B] transition-all flex items-center gap-2"
               >
-                Read Thesis
+                <svg className="w-3 h-3" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+                Deep Dive · All Layers
               </button>
             </div>
 
@@ -857,8 +886,22 @@ const LandingPage: React.FC = () => {
           <LayerVideoModal
             layer={activeModalLayer}
             onClose={handleCloseModal}
+            onDeepDive={handleStartDeepDive}
           />
         </Suspense>
+      )}
+
+      {deepDiveActive && (
+        <DeepDiveOverlay
+          onClose={() => {
+            setDeepDiveActive(false);
+            setDeepDiveStartLayer(0);
+            setCinematicSpin(false);
+          }}
+          onLayerChange={(idx) => setSelected3DLayer(idx)}
+          onCinematicSpin={setCinematicSpin}
+          startLayerIdx={deepDiveStartLayer}
+        />
       )}
     </div>
   );
