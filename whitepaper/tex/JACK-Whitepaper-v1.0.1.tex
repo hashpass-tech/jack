@@ -1,0 +1,445 @@
+
+\documentclass[11pt]{article}
+
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{enumitem}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage{array}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+
+\newcommand{\version}{v1.0.1}
+\newcommand{\project}{JACK}
+
+\title{\textbf{\project: Just-in-time Autonomous Cross-chain Kernel}\\
+A Formal Architecture for Intent-Based, Privacy-Aware, and Policy-Enforced DeFi Execution\\
+{\large \version}
+}
+
+\author{
+Blockchain Foundation LatAm\\
+\texttt{research@lukas.lat}
+}
+\date{February 2026}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Liquidity, execution venues, and state have fragmented across heterogeneous blockchain ecosystems, creating a usability and safety bottleneck for decentralized finance. While bridges, aggregators, and routers enable cross-domain value movement, they do not provide a unified \emph{execution abstraction} with explicit policy enforcement and a rigorous failure model.
+
+This paper introduces \project, a protocol-level execution kernel that transforms high-level user intents into verifiable, policy-constrained execution plans and settles them on programmable venues (e.g., Uniswap v4 hooks). \project separates (i) intent representation, (ii) solver coordination, (iii) private constraint handling, (iv) routing, and (v) settlement adapters. We formalize an execution model in which off-chain solvers compete to satisfy intents while on-chain hooks enforce market policy at settlement time.
+
+\textbf{Scope note (v1).} \project~\version is a \emph{hackathon-grade} specification aligned with practical implementation constraints: private constraints are handled via a pluggable \emph{Confidential Constraint Module (CCM)} interface (e.g., confidential execution / coprocessors) rather than claiming production-ready FHE+ZK enforcement. Fully homomorphic evaluation and proof-carrying constraints remain a forward-looking research direction.
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+%-------------------------------------------------
+\section{Versioning, Scope, and Non-Goals}
+
+\subsection{Change Log}
+\begin{itemize}
+\item \textbf{v1.0.1} (Feb 2026): Clarifies v1 scope; replaces hard FHE claims with a CCM interface; adds explicit non-goals for cross-chain atomicity; adds a minimal solver economic model; expands threat model and hook security considerations.
+\item \textbf{v1.0.0} (Feb 2026): Initial formal architecture draft.
+\end{itemize}
+
+\subsection{What is in-scope for v1}
+\begin{itemize}
+\item A concrete intent format with public envelope and private constraints.
+\item Solver competition and a minimal economic security primitive (bonded execution).
+\item Routing via existing infrastructure (e.g., LI.FI) with explicit failure handling.
+\item Settlement on a single destination chain using programmable venues (Uniswap v4 hooks).
+\item A pluggable privacy interface (CCM) to reduce information leakage about constraints.
+\end{itemize}
+
+\subsection{Non-goals for v1}
+\begin{itemize}
+\item \textbf{Atomic cross-chain settlement} across heterogeneous finality domains.
+\item \textbf{Trustless bridge security} (bridges are treated as external dependencies with allowlists and circuit breakers).
+\item \textbf{Production-ready FHE+ZK} constraint proofs (research track only).
+\item \textbf{Global solver decentralization} guarantees (v1 focuses on correctness and observability).
+\end{itemize}
+
+\subsection{v1 vs. vNext}
+\begin{center}
+\begin{tabular}{>{\raggedright\arraybackslash}p{0.27\textwidth} p{0.32\textwidth} p{0.32\textwidth}}
+\toprule
+\textbf{Component} & \textbf{v1 (this document)} & \textbf{vNext (research / roadmap)} \\
+\midrule
+Private constraints & CCM interface; confidential execution / coprocessor possible & FHE+ZK proof-carrying constraints; threshold key mgmt \\
+Cross-chain execution & Best-effort routing + explicit failure states & Stronger atomicity / dispute games / optimistic safety \\
+Solver economics & Minimal bonded execution + fees & Auctions, staking, slashing, reputation, anti-collusion \\
+Venue policy & Uniswap v4 hooks enforce on-chain policy & Formal verification of policies; registries and attestations \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+%-------------------------------------------------
+\section{Introduction}
+
+Decentralized finance has evolved from single-chain composability into a multi-domain execution environment. The dominant interaction paradigm remains transaction-centric: users manually select routes, bridges, and execution venues. This model fails to scale across heterogeneous ecosystems and exposes execution strategies to adversarial observation and manipulation~\cite{daian2020flashbots}.
+
+\project proposes a kernel-level abstraction in which users express execution \emph{intents} rather than transactions. Execution is delegated to autonomous solvers that compete to satisfy the intent under constraints, while final settlement is performed by programmable on-chain execution venues equipped with policy logic (e.g., Uniswap v4 hooks)~\cite{uniswapv4core}. The core design goal is to make policy-enforced settlement explicit and verifiable, while enabling privacy-aware constraint handling via a modular interface.
+
+%-------------------------------------------------
+\section{Notation and Preliminaries}
+
+We denote by $\mathbb{B}=\{0,1\}$ the Boolean domain. For a probabilistic polynomial-time algorithm $A$, we write $y \leftarrow A(x)$ to denote randomized execution. Let $\lambda$ denote the security parameter.
+
+We denote a public-key encryption scheme by $\mathsf{PKE}=(\mathsf{KeyGen},\mathsf{Enc},\mathsf{Dec})$. For fully homomorphic encryption, we denote $\mathsf{FHE}=(\mathsf{KeyGen},\mathsf{Enc},\mathsf{Eval},\mathsf{Dec})$. For a statement $s$ and witness $w$, we denote a zero-knowledge proof system by $\mathsf{ZK}=(\mathsf{Prove},\mathsf{Verify})$.
+
+All cryptographic primitives are assumed to be secure against probabilistic polynomial-time adversaries.
+
+%-------------------------------------------------
+\section{System Architecture}
+
+\project is decomposed into five orthogonal layers:
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{Intent Layer}
+    \item \textbf{Solver and Coordination Layer}
+    \item \textbf{Privacy / Constraint Layer (CCM)}
+    \item \textbf{Execution Routing Layer}
+    \item \textbf{Settlement Adapter Layer}
+\end{enumerate}
+
+\subsection{Kernel Model}
+
+The \project kernel is defined as:
+\[
+\mathcal{K} = \langle \mathcal{I}, \mathcal{S}, \mathcal{C}, \mathcal{R}, \mathcal{V} \rangle
+\]
+where $\mathcal{I}$ denotes intent representation, $\mathcal{S}$ solvers, $\mathcal{C}$ constraint/privacy enforcement, $\mathcal{R}$ routing, and $\mathcal{V}$ settlement venues.
+
+Each layer operates independently but exposes standardized interfaces. In v1, the privacy/constraint layer is explicitly modeled as a \emph{pluggable module}.
+
+%-------------------------------------------------
+\section{Intent Model}
+
+\subsection{Formal Intent Definition}
+
+An intent is:
+\[
+I = \langle U, A, T, \Phi, \Omega \rangle
+\]
+where $U$ is user identifier, $A$ target asset(s), $T$ destination execution environment, $\Phi$ private constraint payload, and $\Omega$ public execution envelope.
+
+\subsection{Public and Private Components}
+
+We split:
+\begin{itemize}
+\item $I_{pub}$: routing compatibility and execution metadata
+\item $I_{priv}$: constraints and preferences
+\end{itemize}
+
+\[
+I = (I_{pub}, \mathsf{Enc}(I_{priv}))
+\]
+
+In v1, \emph{encryption is optional} depending on CCM implementation; at minimum, the design requires that sensitive constraints need not be publicly broadcast in cleartext.
+
+\subsection{Constraint Vector}
+
+The constraint vector may contain:
+\begin{itemize}
+\item maximum slippage bounds,
+\item execution deadlines,
+\item minimum output guarantees,
+\item venue policy requirements,
+\item routing allowlists / deny lists,
+\item optional compliance / disclosure flags (future work).
+\end{itemize}
+
+%-------------------------------------------------
+\section{Solver-Based Execution}
+
+\subsection{Solver Role}
+
+Solvers produce candidate execution plans:
+\[
+\pi = \langle r_1, r_2, \ldots, r_n, v \rangle
+\]
+where $r_i$ are routing/bridging steps and $v$ is the settlement venue.
+
+\subsection{Competition Model}
+
+The kernel verifies:
+\begin{enumerate}
+\item compatibility with the public envelope,
+\item satisfaction of constraints via CCM evidence,
+\item verifiability of final settlement on $v$.
+\end{enumerate}
+
+\subsection{Minimal Economic Security (v1)}
+To reduce griefing and align incentives, v1 specifies a minimal bonded execution model:
+
+\begin{itemize}
+\item Users specify a \textbf{max fee} and \textbf{deadline} inside $I_{pub}$ and sign the intent.
+\item Solvers register execution by posting a small \textbf{bond} $b$ (testnet ETH in v1).
+\item If the solver fails to reach settlement before deadline (or submits invalid evidence), the bond can be \textbf{slashed} (v1: retained by the protocol; vNext: redistributed to user / challengers).
+\item Winning solver receives the fee upon successful settlement (v1: paid by user off-chain or via a fee vault).
+\end{itemize}
+
+This model is intentionally minimal and is designed to be replaced by auctions, staking, and slashing in vNext.
+
+%-------------------------------------------------
+\section{Privacy / Constraint Layer: CCM}
+
+\subsection{Design Objective}
+The constraint layer aims to reduce information leakage (e.g., slippage bounds, intent size, routing preferences) that can be exploited for MEV or censorship, while keeping settlement verifiable.
+
+\subsection{CCM Interface (v1)}
+We define a Confidential Constraint Module (CCM) interface that produces evidence of constraint satisfaction without requiring public disclosure of raw constraints:
+
+\[
+\mathsf{CCM.Verify}(I_{pub}, \Phi, x) \rightarrow \mathbb{B}
+\]
+
+where $x$ are solver execution parameters (route, expected outputs, timing).
+
+A CCM may be implemented by:
+\begin{itemize}
+\item \textbf{Confidential execution / coprocessor} producing signed attestations (v1 implementable path).
+\item \textbf{FHE evaluation} of constraint circuits (research track)~\cite{gentry2009fhe,tfhe2020}.
+\item \textbf{ZK proofs} over committed constraints (research track).
+\end{itemize}
+
+\subsection{FHE+ZK as Research Track}
+For completeness, a future proof-carrying variant can model constraint evaluation as:
+\[
+\mathsf{Dec}(\mathsf{Eval}(\mathsf{Enc}(c), x)) = 1
+\]
+and produce a proof $\Pi_{priv} \leftarrow \mathsf{Prove}(\mathsf{Enc}(c), x)$ that the kernel can verify. This document does \textbf{not} claim that such a system is production-ready in v1.
+
+%-------------------------------------------------
+\section{Cross-Chain Routing Layer}
+
+\subsection{Routing Abstraction}
+
+\project defines a routing graph:
+\[
+G = (V_{chains}, E_{bridges})
+\]
+Edges encode cost/latency/risk attributes. In v1, routing is delegated to external routing infrastructure (e.g., LI.FI) and is constrained by allowlists and safety policies.
+
+\subsection{Failure Handling (v1)}
+Cross-domain execution is treated as \emph{best-effort} and modeled explicitly as a state machine:
+\[
+\texttt{CREATED} \rightarrow \texttt{QUOTED} \rightarrow \texttt{EXECUTING} \rightarrow (\texttt{SETTLED} \;|\; \texttt{ABORTED} \;|\; \texttt{EXPIRED})
+\]
+
+If a bridge or step fails, the execution transitions to \texttt{ABORTED} with a reason code; partial completion is not treated as atomic and must be handled by application-level recovery procedures (future work: dispute games / insurance / rollback primitives).
+
+\subsection{Safety Controls (v1)}
+\begin{itemize}
+\item Bridge/route allowlists.
+\item Value caps per execution.
+\item Circuit breaker (pause new executions).
+\item Timeouts aligned to destination-chain finality.
+\end{itemize}
+
+%-------------------------------------------------
+\section{Settlement Adapter Layer}
+
+\subsection{Venue Interface}
+
+Each settlement venue $v$ implements:
+\[
+Execute(v, \pi) \rightarrow tx
+\qquad\text{and}\qquad
+Verify(v, tx) \rightarrow \mathbb{B}
+\]
+
+\subsection{Programmable Policy Venues}
+
+Uniswap v4 pools equipped with hooks act as policy-enforced settlement venues~\cite{uniswapv4core}. Hooks are the on-chain controller for settlement-time policy.
+
+%-------------------------------------------------
+\section{Policy-Enforced Market Execution (Uniswap v4 Hooks)}
+
+\subsection{Hook as Policy Agent}
+Let $P$ denote a policy function:
+\[
+P(s_{pool}, s_{ref}, \theta) \rightarrow \{allow, reject, modify\}
+\]
+Hooks can enforce constraints such as max slippage, min-out guarantees, allowlisted assets, and oracle-based deviation checks.
+
+\subsection{Hook Security Considerations (v1)}
+Hooks increase attack surface. v1 requires:
+\begin{itemize}
+\item Strict access control: only PoolManager may call hook entrypoints.
+\item No unbounded loops; bounded gas usage.
+\item Minimal external calls (prefer none) during hook execution.
+\item Correct delta accounting and reentrancy-safe design.
+\end{itemize}
+In vNext, we propose an audited registry of approved hooks and optional on-chain attestations.
+
+%-------------------------------------------------
+\section{Execution Algorithm}
+
+\begin{algorithm}[H]
+\caption{\project Kernel Execution (v1)}
+\begin{algorithmic}[1]
+\State User constructs and signs intent $I=(I_{pub}, \Phi)$
+\State Kernel publishes $I_{pub}$ and stores $\Phi$ (optionally encrypted)
+\State Solvers generate candidate plans $\pi$ and parameters $x$
+\ForAll{solver submissions}
+    \State Verify public compatibility with $I_{pub}$
+    \State Verify CCM evidence: $\mathsf{CCM.Verify}(I_{pub}, \Phi, x)=1$
+\EndFor
+\State Select winning solver $\pi^\star$ (by fee / time / policy)
+\State Execute routing steps (best-effort) with explicit failure handling
+\State Submit settlement to venue $v$ (e.g., Uniswap v4 pool)
+\State Enforce policy via hook logic
+\State Verify settlement and emit public events
+\end{algorithmic}
+\end{algorithm}
+
+%-------------------------------------------------
+\section{Verification and Observability}
+
+\subsection{Execution Correctness}
+An execution is valid if:
+\[
+\mathsf{CCM.Verify}(\cdot)=1 \;\wedge\; \mathsf{Verify}(v, tx)=1
+\]
+
+\subsection{Public Verifiability}
+Observers can verify:
+\begin{itemize}
+\item settlement correctness and venue trace,
+\item policy hook decision path (events / revert codes),
+\item execution state transitions.
+\end{itemize}
+Private constraints remain opaque to the extent provided by the CCM.
+
+%-------------------------------------------------
+\section{Adversarial Model (Expanded)}
+
+We consider:
+\begin{itemize}
+\item \textbf{Malicious solvers}: invalid routes, censorship, griefing, collusion, Sybil attacks.
+\item \textbf{Adversarial observers}: MEV extraction, timing inference, metadata leakage.
+\item \textbf{Routing/bridge failures}: exploits, message verification bugs, compromised keys.
+\item \textbf{Malicious venues/hooks}: access control failures, reentrancy, DoS via gas exhaustion.
+\item \textbf{Oracle manipulation}: reference price distortion affecting policy checks.
+\end{itemize}
+
+We assume cryptographic hardness where used; in v1, trust assumptions depend on CCM implementation (e.g., coprocessor attestations).
+
+%-------------------------------------------------
+\section{Security Properties (v1)}
+
+\begin{enumerate}
+\item \textbf{Policy Enforceability:} settlement cannot bypass on-chain hook policy.
+\item \textbf{Execution Integrity:} kernel binds settlement to a signed intent and verified evidence.
+\item \textbf{Fail-Closed Behavior:} executions abort on missing evidence or policy violations.
+\item \textbf{Risk Containment:} allowlists, caps, and circuit breakers limit blast radius.
+\item \textbf{Privacy-Awareness:} sensitive constraints need not be publicly broadcast in cleartext.
+\end{enumerate}
+
+%-------------------------------------------------
+\section{PCPE: Policy-Constrained Private Execution}
+
+We define \emph{Policy-Constrained Private Execution (PCPE)} as an execution primitive that provides:
+\begin{enumerate}
+\item private constraints (via CCM),
+\item public settlement verifiability,
+\item programmable policy rejection or modification at settlement,
+\item bounded failure handling semantics.
+\end{enumerate}
+
+%-------------------------------------------------
+\section{Implementation Notes (v1)}
+
+\begin{itemize}
+\item Frontend: TypeScript, React / Next.js, wallet connection.
+\item Kernel coordination: off-chain services (intent store, solver coordination).
+\item Smart contracts: Solidity settlement adapters + Uniswap v4 hooks.
+\item Privacy/constraints: CCM interface; prototype may use confidential execution attestations.
+\item Routing: LI.FI or equivalent aggregation SDK; explicit allowlists and caps.
+\end{itemize}
+
+%-------------------------------------------------
+\section{Evaluation Plan (v1)}
+
+We measure:
+\begin{itemize}
+\item end-to-end latency (intent $\rightarrow$ settlement),
+\item policy hook gas overhead and revert rate,
+\item solver throughput and failure modes,
+\item CCM verification latency (attestation/proof verification),
+\item routing success rate under degraded conditions.
+\end{itemize}
+
+%-------------------------------------------------
+\section{Limitations and Future Work}
+
+\begin{itemize}
+\item Production-grade economic security (auctions, staking, slashing).
+\item Decentralized solver sets and anti-collusion mechanisms.
+\item Formal verification and auditing frameworks for hook policies.
+\item Stronger cross-domain atomicity / dispute resolution / insurance primitives.
+\item Proof-carrying private constraints (FHE+ZK) with practical performance.
+\end{itemize}
+
+%-------------------------------------------------
+\section{Conclusion}
+
+\project positions execution itself as a programmable primitive: users submit intents, solvers compete to execute them, and settlement venues enforce policy via hooks. \project~\version explicitly scopes v1 to practical, verifiable components while preserving a research path toward stronger private constraint proofs and cross-domain safety guarantees.
+
+\bibliographystyle{abbrv}
+\begin{thebibliography}{10}
+
+\bibitem{gentry2009fhe}
+Craig Gentry.
+\newblock Fully Homomorphic Encryption Using Ideal Lattices.
+\newblock In \emph{Proceedings of the 41st Annual ACM Symposium on Theory of Computing (STOC)}, 2009.
+
+\bibitem{tfhe2020}
+Ilaria Chillotti, Nicolas Gama, Mariya Georgieva, and Malika Izabach{\`e}ne.
+\newblock TFHE: Fast Fully Homomorphic Encryption over the Torus.
+\newblock \emph{Journal of Cryptology}, 33(1), 2020.
+
+\bibitem{daian2020flashbots}
+Philip Daian, Steven Goldfeder, Tyler Kell, Yunqi Li, Xueyuan Zhao, Ittay Eyal, and Emin G{\"u}n Sirer.
+\newblock Flash Boys 2.0: Frontrunning, Transaction Reordering, and Consensus Instability in Decentralized Exchanges.
+\newblock In \emph{IEEE Symposium on Security and Privacy}, 2020.
+
+\bibitem{uniswapv4core}
+Uniswap Labs.
+\newblock Uniswap v4 Core Architecture.
+\newblock \url{https://github.com/Uniswap/v4-core}, 2024.
+
+\bibitem{mevboost}
+Flashbots.
+\newblock MEV-Boost: Scaling Blockspace by Separating Proposers and Builders.
+\newblock \url{https://docs.flashbots.net/flashbots-mev-boost/}, 2022.
+
+\bibitem{intent}
+CoW Protocol.
+\newblock CoW Protocol: Batch Auctions and Solver Competition (Docs).
+\newblock \url{https://docs.cow.fi/}, 2024.
+
+\bibitem{uniswapx}
+Uniswap Labs.
+\newblock UniswapX (Docs).
+\newblock \url{https://docs.uniswap.org/uniswapx/overview}, 2024.
+
+\end{thebibliography}
+
+\end{document}

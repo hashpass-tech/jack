@@ -111,6 +111,8 @@ jack/
 - [Contracts Deployment Runbook](./apps/docs/docs/operations/contracts-deployment.md)
 - [Documentation Governance Runbook](./apps/docs/docs/operations/documentation-governance.md)
 - [Documentation Changelog](./apps/docs/docs/operations/documentation-changelog.md)
+- [Whitepaper Portal](./apps/docs/docs/whitepaper/index.mdx)
+- [Whitepaper Changelog](./apps/docs/docs/whitepaper/changelog.md)
 - [MVP Critical Roadmap](./apps/docs/docs/operations/mvp-critical-roadmap.md)
 
 ## Contributing
@@ -135,7 +137,10 @@ pnpm release -- --with-docs-deploy  # include docs build + trigger Pages deploy 
 pnpm release -- --skip-deploy       # local/tag-only release (no GCS/Cloud Run deploy)
 pnpm release:docs                   # docs-only build
 pnpm release:docs:deploy            # docs-only build + workflow dispatch
+pnpm whitepaper:build               # compile/sync all whitepaper artifacts from whitepaper/manifest.json
+pnpm whitepaper:validate            # validate whitepaper assets + manifest sync
 pnpm docs:impact:check              # validate docs impact for critical paths
+pnpm version:check                  # validate root/dashboard/changelog version sync
 ```
 
 The helper respects these environment variables to upload every release to GCloud:
@@ -143,7 +148,7 @@ The helper respects these environment variables to upload every release to GClou
 - `GCLOUD_PROJECT`: target GCloud project ID.
 - `GCLOUD_LANDING_BUCKET`: target bucket for the landing build (`dist/`).
 - `GCLOUD_LANDING_REGION`: bucket region (defaults to `us-west1` in setup script).
-- `GCLOUD_WHITEPAPER_BUCKET`: optional bucket to keep the `public/whitepapper/` exports in sync with the release path.
+- `GCLOUD_WHITEPAPER_BUCKET`: optional bucket to keep `apps/landing/public/whitepaper/` exports in sync with release paths.
 - `GCLOUD_RUN_SERVICE`: Cloud Run service name for the dashboard deployment.
 - `GCLOUD_RUN_REGION`: Cloud Run region (e.g. `us-west1`).
 - `GCLOUD_RUN_ALLOW_UNAUTH`: set to `true` to allow unauthenticated access.

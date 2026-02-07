@@ -66,10 +66,41 @@ const Scene3DLoadingFallback: React.FC = () => (
   </div>
 );
 
-const whitepaperVersions = [
-  { label: "Latest (v1.0.1)", filename: "JACK-Whitepaper-v1.0.1.pdf" },
-  { label: "v1.0.0", filename: "JACK-Whitepaper-v1.0.0.pdf" },
-];
+type WhitepaperVersionEntry = {
+  version: string;
+  releaseDate: string;
+  pdf: string;
+};
+
+type WhitepaperManifest = {
+  latest: string;
+  canonicalPdf: string;
+  publicPath?: string;
+  legacyPublicPath?: string;
+  versions: WhitepaperVersionEntry[];
+};
+
+const DEFAULT_WHITEPAPER_MANIFEST: WhitepaperManifest = {
+  latest: "1.0.2",
+  canonicalPdf: "JACK-Whitepaper.pdf",
+  publicPath: "/whitepaper",
+  legacyPublicPath: "/whitepapper",
+  versions: [
+    {
+      version: "1.0.2",
+      releaseDate: "2026-02-07",
+      pdf: "JACK-Whitepaper-v1.0.2.pdf",
+    },
+    {
+      version: "1.0.1",
+      releaseDate: "2026-02-06",
+      pdf: "JACK-Whitepaper-v1.0.1.pdf",
+    },
+  ],
+};
+
+const normalizeWhitepaperVersion = (value: string): string =>
+  value.replace(/^v/i, "").trim();
 
 const highlightTiles = [
   {
@@ -156,7 +187,30 @@ const LandingPage: React.FC = () => {
   const [contentVisible, setContentVisible] = useState(false);
   const [whitepaperOpen, setWhitepaperOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [whitepaperManifest, setWhitepaperManifest] =
+    useState<WhitepaperManifest>(DEFAULT_WHITEPAPER_MANIFEST);
   const whitepaperRef = useRef<HTMLDivElement | null>(null);
+  const latestWhitepaperVersion = useMemo(
+    () =>
+      normalizeWhitepaperVersion(
+        whitepaperManifest.latest || DEFAULT_WHITEPAPER_MANIFEST.latest,
+      ),
+    [whitepaperManifest.latest],
+  );
+  const whitepaperBasePath =
+    whitepaperManifest.publicPath || DEFAULT_WHITEPAPER_MANIFEST.publicPath;
+  const whitepaperVersions = useMemo(() => {
+    const latest = normalizeWhitepaperVersion(
+      whitepaperManifest.latest || DEFAULT_WHITEPAPER_MANIFEST.latest,
+    );
+    return whitepaperManifest.versions.map((entry) => {
+      const version = normalizeWhitepaperVersion(entry.version);
+      return {
+        label: version === latest ? `Latest (v${version})` : `v${version}`,
+        filename: entry.pdf,
+      };
+    });
+  }, [whitepaperManifest.latest, whitepaperManifest.versions]);
 
   // Detect mobile for performance tuning
   const isMobile = useMemo(() => {
@@ -181,6 +235,40 @@ const LandingPage: React.FC = () => {
         );
       }
     }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadWhitepaperManifest = async () => {
+      try {
+        const primary = await fetch("/whitepaper/manifest.json");
+        if (primary.ok) {
+          const manifest = (await primary.json()) as WhitepaperManifest;
+          if (active) {
+            setWhitepaperManifest(manifest);
+          }
+          return;
+        }
+
+        const legacy = await fetch("/whitepapper/manifest.json");
+        if (!legacy.ok) {
+          return;
+        }
+
+        const legacyManifest = (await legacy.json()) as WhitepaperManifest;
+        if (active) {
+          setWhitepaperManifest(legacyManifest);
+        }
+      } catch {
+        // Keep default manifest when fetch fails.
+      }
+    };
+
+    void loadWhitepaperManifest();
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -346,7 +434,7 @@ const LandingPage: React.FC = () => {
                   setWhitepaperOpen((prev) => !prev);
                 }}
               >
-                Whitepaper (v1.0.1)
+                {`Whitepaper (v${latestWhitepaperVersion})`}
                 <svg
                   className="h-3 w-3 stroke-current"
                   viewBox="0 0 24 24"
@@ -374,7 +462,7 @@ const LandingPage: React.FC = () => {
                   {whitepaperVersions.map((paper) => (
                     <a
                       key={paper.filename}
-                      href={`/whitepapper/${paper.filename}`}
+                      href={`${whitepaperBasePath}/${paper.filename}`}
                       target="_blank"
                       rel="noreferrer"
                       className="block rounded-xl border border-white/5 bg-white/5 px-4 py-3 text-[10px] font-bold text-white transition hover:border-[#F2B94B]/50 hover:bg-[#F2B94B]/10 uppercase tracking-widest"
@@ -453,7 +541,7 @@ const LandingPage: React.FC = () => {
                 {whitepaperVersions.map((p) => (
                   <a
                     key={p.filename}
-                    href={`/whitepapper/${p.filename}`}
+                    href={`${whitepaperBasePath}/${p.filename}`}
                     className="px-10 py-4 bg-white/5 border border-white/10 rounded-2xl text-[#F2B94B] text-[10px] text-center w-64 uppercase tracking-widest font-bold hover:bg-[#F2B94B]/10 transition-colors"
                     target="_blank"
                     rel="noreferrer"
@@ -629,7 +717,7 @@ const LandingPage: React.FC = () => {
                   Dashboard
                 </a>
                 <a
-                  href="/whitepapper/JACK-Whitepaper-v1.0.1.pdf"
+                  href={`${whitepaperBasePath}/${whitepaperManifest.canonicalPdf}`}
                   target="_blank"
                   rel="noreferrer"
                   className="hover:text-white transition-colors"

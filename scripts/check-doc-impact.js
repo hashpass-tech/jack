@@ -93,6 +93,10 @@ const criticalMatchers = [
     name: "Contract Ops Scripts",
     test: (filePath) => filePath.startsWith("scripts/contracts/"),
   },
+  {
+    name: "Whitepaper Source",
+    test: (filePath) => filePath.startsWith("whitepaper/"),
+  },
 ];
 
 const detectCriticalArea = (filePath) => {

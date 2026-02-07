@@ -45,10 +45,25 @@ pnpm release -- --with-docs-deploy
 pnpm release -- --skip-deploy
 pnpm release:docs
 pnpm release:docs:deploy
+pnpm whitepaper:build
+pnpm whitepaper:validate
 pnpm docs:impact:check
+pnpm version:check
 ```
 
 `release:all*` runs the same version bump pipeline and always includes docs deployment, so landing, dashboard, and docs publish under the same semver build.
+
+### Whitepaper Build Integration
+
+- Canonical metadata: `whitepaper/manifest.json`
+- Canonical LaTeX sources: `whitepaper/tex/*.tex`
+- Canonical markdown companion: `whitepaper/markdown/*.md`
+
+Every `pnpm release*` run now executes `pnpm whitepaper:build` before app builds. This compiles PDFs and syncs the manifest/artifacts into:
+
+- `apps/landing/public/whitepaper/` (canonical)
+- `apps/docs/static/whitepaper/` (docs downloads/embeds)
+- `apps/landing/public/whitepapper/` and `apps/docs/static/whitepapper/` (legacy compatibility)
 
 Docs deployment and DNS details are documented in [Docs Pages Deployment](./docs-pages-deployment.md).
 
