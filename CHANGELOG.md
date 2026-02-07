@@ -1,3 +1,14 @@
+## [0.1.46](https://github.com/hashpass-tech/JACK/compare/v0.1.45-testnet.1...v0.1.46) (2026-02-07)
+
+
+### Features
+
+* **landing:** add interactive video controls to Deep Dive overlay ([cb0802a](https://github.com/hashpass-tech/JACK/commit/cb0802a3bd5c9921f8e8f1bf219b484263388243))
+
+
+
+
+
 ## [0.1.45](https://github.com/hashpass-tech/JACK/compare/v0.1.44...v0.1.45) (2026-02-07)
 
 
