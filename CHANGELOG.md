@@ -1,11 +1,30 @@
-## [0.1.47](https://github.com/hashpass-tech/JACK/compare/v0.1.45-testnet.1...v0.1.47) (2026-02-07)
+## [0.1.48](https://github.com/hashpass-tech/JACK/compare/v0.1.47...v0.1.48) (2026-02-07)
+
+
+### Features
+
+* **landing:** add interactive video controls to Deep Dive overlay ([cb0802a](https://github.com/hashpass-tech/JACK/commit/cb0802a3bd5c9921f8e8f1bf219b484263388243))
+
+
+
+## [0.1.45-testnet.1](https://github.com/hashpass-tech/JACK/compare/v0.1.44...v0.1.45-testnet.1) (2026-02-07)
+
+
+### Features
+
+* **landing:** add cinematic Deep Dive auto-flow with sound & smooth 3D transitions ([d6b817c](https://github.com/hashpass-tech/JACK/commit/d6b817cb9687a41bad906d41226cbaf467c0dccb))
+
+
+
+
+
+## [0.1.47](https://github.com/hashpass-tech/JACK/compare/v0.1.46...v0.1.47) (2026-02-07)
 
 
 ### Features
 
 * **dashboard:** add neural background between top bar and footer ([b4de888](https://github.com/hashpass-tech/JACK/commit/b4de88812fa8852a5c3516001d3b0f95b25dd2a9))
 * **landing:** add interactive video controls to Deep Dive overlay ([cb0802a](https://github.com/hashpass-tech/JACK/commit/cb0802a3bd5c9921f8e8f1bf219b484263388243))
-
 
 
 
@@ -387,6 +406,10 @@
 ## [0.1.5](https://github.com/hashpass-tech/JACK/compare/v0.1.3...v0.1.5) (2026-02-05)
 
 
+
+
+* **dashboard:** add neural background between top bar and footer ([b4de888](https://github.com/hashpass-tech/JACK/commit/b4de88812fa8852a5c3516001d3b0f95b25dd2a9))
+* **landing:** add interactive video controls to Deep Dive overlay ([cb0802a](https://github.com/hashpass-tech/JACK/commit/cb0802a3bd5c9921f8e8f1bf219b484263388243))
 
 
 
