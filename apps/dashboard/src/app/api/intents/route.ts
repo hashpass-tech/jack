@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIntents, saveIntent } from '@/lib/store';
+import { fetchLifiQuote, fetchLifiRoute, fetchLifiStatus, type LifiFallback } from '@/lib/lifi';
+import type { IntentParams } from '../../../../../../packages/sdk';
+
+type FallbackReason = LifiFallback & { stage: 'QUOTE' | 'ROUTE' | 'STATUS' };
 
 type ProviderNotification = {
     intentId: string;
@@ -189,20 +193,38 @@ export async function POST(request: NextRequest) {
         const intentId = `JK-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
         const timestamp = Date.now();
 
+        const params: IntentParams = {
+            sourceChain: body.sourceChain,
+            destinationChain: body.destinationChain,
+            tokenIn: body.tokenIn,
+            tokenOut: body.tokenOut,
+            amountIn: body.amountIn,
+            minAmountOut: body.minAmountOut,
+            deadline: body.deadline,
+            signature: body.signature
+        } as IntentParams;
+
         const intent = {
             id: intentId,
             ...body,
+            params,
             status: 'CREATED',
             createdAt: timestamp,
             executionSteps: [
                 { step: 'Intent Signed & Broadcast', status: 'COMPLETED', timestamp }
             ],
             reasonCodes: [],
-            operatorLogs: []
+            operatorLogs: [],
+            fallbackMode: {
+                enabled: false,
+                reasons: [] as FallbackReason[]
+            }
         };
 
         saveIntent(intentId, intent);
 
+        // Start async LI.FI lifecycle execution
+        executeIntent(intentId, params);
         return NextResponse.json({ intentId, status: 'CREATED' });
     } catch (error) {
         return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
@@ -213,4 +235,115 @@ export async function GET() {
     const intents = getIntents();
     const list = Object.values(intents).sort((a: any, b: any) => b.createdAt - a.createdAt);
     return NextResponse.json(list);
+}
+
+async function executeIntent(intentId: string, params: IntentParams) {
+    const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+    const updateIntent = (updates: Record<string, any>) => {
+        const intents = getIntents();
+        const intent = intents[intentId];
+        if (intent) {
+            Object.assign(intent, updates);
+            saveIntent(intentId, intent);
+        }
+    };
+
+    const addFallback = (fallback: LifiFallback | undefined, stage: FallbackReason['stage']) => {
+        if (!fallback) return;
+        const intents = getIntents();
+        const intent = intents[intentId];
+        if (!intent) return;
+        const fallbackMode = intent.fallbackMode ?? { enabled: false, reasons: [] };
+        fallbackMode.enabled = true;
+        fallbackMode.reasons = [...(fallbackMode.reasons ?? []), { ...fallback, stage }];
+        intent.fallbackMode = fallbackMode;
+        saveIntent(intentId, intent);
+    };
+
+    const appendStep = (status: string, step: string, details: string) => {
+        const intents = getIntents();
+        const intent = intents[intentId];
+        if (intent) {
+            intent.status = status;
+            intent.executionSteps.push({
+                step,
+                status: 'COMPLETED',
+                timestamp: Date.now(),
+                details
+            });
+            saveIntent(intentId, intent);
+        }
+    };
+
+    // 1. LI.FI Quote (QUOTED)
+    await sleep(1500);
+    const quote = await fetchLifiQuote(params);
+    updateIntent({ lifi: { quote } });
+    addFallback(quote.fallback, 'QUOTE');
+    appendStep(
+        'QUOTED',
+        `Solver Matching (${quote.provider === 'lifi' ? 'LI.FI Live Quote' : 'Fallback Quote'})`,
+        quote.fallback
+            ? `Fallback enabled (${quote.fallback.reasonCode}): ${quote.fallback.message}`
+            : `Quote ID ${quote.routeId} with est. output ${quote.quote.amountOut}`
+    );
+
+    // 2. LI.FI Route (EXECUTING)
+    await sleep(2500);
+    const route = await fetchLifiRoute(params);
+    updateIntent({ lifi: { quote, route } });
+    addFallback(route.fallback, 'ROUTE');
+    appendStep(
+        'EXECUTING',
+        `Cross-Chain Routing (${route.provider === 'lifi' ? 'LI.FI Route' : 'Fallback Route'})`,
+        route.fallback
+            ? `Fallback enabled (${route.fallback.reasonCode}): ${route.fallback.message}`
+            : `Route ${route.routeId} with ${route.route?.steps?.length ?? 0} step(s)`
+    );
+
+    const statusTxHash = typeof route.raw === 'object' && route.raw && 'transactionHash' in (route.raw as Record<string, unknown>)
+        ? String((route.raw as Record<string, unknown>).transactionHash)
+        : undefined;
+
+    // 3. LI.FI Status (SETTLING)
+    await sleep(2500);
+    const status = await fetchLifiStatus(statusTxHash);
+    updateIntent({ lifi: { quote, route, status } });
+    addFallback(status.fallback, 'STATUS');
+    appendStep(
+        'SETTLING',
+        `Route Status (${status.provider === 'lifi' ? 'LI.FI Status' : 'Fallback Status'})`,
+        status.fallback
+            ? `Fallback enabled (${status.fallback.reasonCode}): ${status.fallback.message}`
+            : `Status: ${status.status.state}${status.status.substatus ? ` (${status.status.substatus})` : ''}`
+    );
+
+    // 4. Finality (provider status-derived)
+    await sleep(2000);
+    const intents = getIntents();
+    const intent = intents[intentId];
+    if (intent) {
+        intent.status = status.provider === 'lifi' ? 'SETTLED' : 'ABORTED';
+        intent.reasonCodes = intent.reasonCodes ?? [];
+        if (status.fallback?.reasonCode) {
+            intent.reasonCodes.push({
+                code: status.fallback.reasonCode,
+                timestamp: Date.now(),
+                source: status.provider
+            });
+        }
+        if (status.status.txHash) {
+            intent.settlementTx = status.status.txHash;
+        }
+        intent.executionSteps.push({
+            step: status.provider === 'lifi' ? 'Settlement Complete' : 'Settlement Unavailable',
+            status: status.provider === 'lifi' ? 'COMPLETED' : 'FAILED',
+            timestamp: Date.now(),
+            details: intent.fallbackMode?.enabled
+                ? 'Finalized with fallback routing mode.'
+                : 'Finalized with LI.FI routing metadata.'
+        });
+        saveIntent(intentId, intent);
+    }
 }
