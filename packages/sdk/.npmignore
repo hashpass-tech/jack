@@ -1,0 +1,34 @@
+# Source files
+src/
+tests/
+
+# Configuration files
+*.config.ts
+*.config.js
+tsconfig*.json
+
+# Environment and secrets
+.env*
+
+# Git files
+.git*
+
+# Coverage reports
+coverage/
+
+# Node modules (should never be included)
+node_modules/
+
+# Build artifacts that shouldn't be published
+*.tsbuildinfo
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
