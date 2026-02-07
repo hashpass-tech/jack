@@ -51,7 +51,7 @@ pnpm docs:impact:check
 pnpm version:check
 ```
 
-`release:all*` runs the same version bump pipeline and always includes docs deployment, so landing, dashboard, and docs publish under the same semver build.
+`release:all*` runs the same version bump pipeline and always includes docs deployment. Docs publish is now guarded by required app deploy checks, so docs cannot move ahead when landing/dashboard deploy checks fail for the same commit.
 
 ### Whitepaper Build Integration
 
