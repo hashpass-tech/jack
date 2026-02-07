@@ -16,6 +16,7 @@ The docs-impact gate treats these paths as critical:
 - `apps/dashboard/src/lib/**` integration paths (`lifi`, `yellow`, `intent`, `quote`, `route`, `execution`, `provider`)
 - `packages/sdk/**`
 - `scripts/contracts/**`
+- `whitepaper/**`
 
 If a PR touches these paths, it must either:
 
@@ -46,6 +47,8 @@ Template location: `.github/pull_request_template.md`
 - Merge changelog workflow: `.github/workflows/docs-changelog.yml`
 - Changelog updater script: `scripts/update-docs-changelog.js`
 - Output changelog page: `apps/docs/docs/operations/documentation-changelog.md`
+- Whitepaper builder: `scripts/whitepaper/build.js`
+- Whitepaper validator: `scripts/whitepaper/validate.js`
 
 ## Local Validation
 

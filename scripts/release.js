@@ -415,6 +415,9 @@ try {
   const version = packageJson.version;
   console.log(`New version: ${version}`);
 
+  console.log("Building whitepaper artifacts");
+  run("pnpm whitepaper:build");
+
   const currentBranch = getBranchName();
   const { skipDeploy: shouldSkipDeploy } = ensureReleaseDeployConfig({
     branch: currentBranch,
@@ -489,12 +492,12 @@ try {
   if (!shouldSkipDeploy && process.env.GCLOUD_WHITEPAPER_BUCKET) {
     transferBucket({
       bucket: process.env.GCLOUD_WHITEPAPER_BUCKET,
-      source: "apps/landing/public/whitepapper",
+      source: "apps/landing/public/whitepaper",
       target: "whitepaper",
     });
     transferBucket({
       bucket: process.env.GCLOUD_WHITEPAPER_BUCKET,
-      source: "apps/landing/public/whitepapper",
+      source: "apps/landing/public/whitepaper",
       target: `${releaseToken}/whitepaper`,
     });
   }
