@@ -1,4 +1,4 @@
-import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
@@ -14,32 +14,34 @@ import type {SidebarsConfig} from '@docusaurus/plugin-content-docs';
  */
 const sidebars: SidebarsConfig = {
   docsSidebar: [
-    'overview',
-    'setup',
-    'architecture',
-    'demo-script',
+    "overview",
+    "setup",
+    "architecture",
+    "demo-script",
     {
-      type: 'category',
-      label: 'Runbooks & Operations',
-      link: {type: 'doc', id: 'operations/index'},
+      type: "category",
+      label: "Runbooks & Operations",
+      link: { type: "doc", id: "operations/index" },
       items: [
         {
-          type: 'category',
-          label: 'Agent Orchestration',
-          link: {type: 'doc', id: 'operations/agent-orchestration/index'},
+          type: "category",
+          label: "Agent Orchestration",
+          link: { type: "doc", id: "operations/agent-orchestration/index" },
           items: [
-            'operations/agent-orchestration/agent-interface',
-            'operations/agent-orchestration/github-integration',
-            'operations/agent-orchestration/github-tracker',
+            "operations/agent-orchestration/agent-interface",
+            "operations/agent-orchestration/github-integration",
+            "operations/agent-orchestration/github-tracker",
           ],
         },
-        'operations/spec-system',
-        'operations/spec-quickstart',
-        'operations/multi-agent-config',
-        'operations/release-flow',
-        'operations/docs-pages-deployment',
-        'operations/contracts-deployment',
-        'operations/mvp-critical-roadmap',
+        "operations/spec-system",
+        "operations/spec-quickstart",
+        "operations/multi-agent-config",
+        "operations/release-flow",
+        "operations/docs-pages-deployment",
+        "operations/documentation-governance",
+        "operations/documentation-changelog",
+        "operations/contracts-deployment",
+        "operations/mvp-critical-roadmap",
       ],
     },
   ],
