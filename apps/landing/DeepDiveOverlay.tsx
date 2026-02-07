@@ -116,6 +116,10 @@ const DeepDiveOverlay: React.FC<DeepDiveOverlayProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startTimeRef = useRef(Date.now());
+  const [isPaused, setIsPaused] = useState(false);
+  const [isSeeking, setIsSeeking] = useState(false);
+  const progressBarRef = useRef<HTMLDivElement>(null);
+  const wasPausedBeforeSeekRef = useRef(false);
 
   const layer = LAYERS[layerIdx];
   const nextLayer =
@@ -205,6 +209,7 @@ const DeepDiveOverlay: React.FC<DeepDiveOverlayProps> = ({
     if (phase === "playing" && videoReady && videoRef.current) {
       videoRef.current.currentTime = 0;
       videoRef.current.muted = isMuted;
+      setIsPaused(false);
       videoRef.current
         .play()
         .catch(() => {
@@ -299,6 +304,113 @@ const DeepDiveOverlay: React.FC<DeepDiveOverlayProps> = ({
       return newVal;
     });
   }, []);
+
+  /* ── Play / Pause toggle ── */
+  const handlePlayPause = useCallback(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.ended) {
+      v.currentTime = 0;
+      setVideoProgress(0);
+      setIsPaused(false);
+      v.play().catch(() => {});
+      return;
+    }
+    if (v.paused) {
+      setIsPaused(false);
+      v.play().catch(() => {});
+    } else {
+      setIsPaused(true);
+      v.pause();
+    }
+  }, []);
+
+  /* ── Progress bar seek helpers ── */
+  const seekToPosition = useCallback((clientX: number) => {
+    const bar = progressBarRef.current;
+    const v = videoRef.current;
+    if (!bar || !v || !v.duration || !isFinite(v.duration)) return;
+    const rect = bar.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    v.currentTime = ratio * v.duration;
+    setVideoProgress(ratio);
+  }, []);
+
+  const handleProgressMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsSeeking(true);
+    const v = videoRef.current;
+    wasPausedBeforeSeekRef.current = v ? (v.paused && !v.ended) : false;
+    seekToPosition(e.clientX);
+    if (v && !v.paused) v.pause();
+
+    const onMove = (ev: MouseEvent) => seekToPosition(ev.clientX);
+    const onUp = () => {
+      setIsSeeking(false);
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+      const vid = videoRef.current;
+      if (vid && !wasPausedBeforeSeekRef.current) {
+        vid.play().catch(() => {});
+      }
+    };
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+  }, [seekToPosition]);
+
+  const handleProgressTouchStart = useCallback((e: React.TouchEvent) => {
+    setIsSeeking(true);
+    const v = videoRef.current;
+    wasPausedBeforeSeekRef.current = v ? (v.paused && !v.ended) : false;
+    const touch = e.touches[0];
+    if (touch) seekToPosition(touch.clientX);
+    if (v && !v.paused) v.pause();
+
+    const onMove = (ev: TouchEvent) => {
+      const t = ev.touches[0];
+      if (t) seekToPosition(t.clientX);
+    };
+    const onEnd = () => {
+      setIsSeeking(false);
+      document.removeEventListener("touchmove", onMove);
+      document.removeEventListener("touchend", onEnd);
+      const vid = videoRef.current;
+      if (vid && !wasPausedBeforeSeekRef.current) {
+        vid.play().catch(() => {});
+      }
+    };
+    document.addEventListener("touchmove", onMove, { passive: true });
+    document.addEventListener("touchend", onEnd);
+  }, [seekToPosition]);
+
+  /* ── Keyboard: Space / K to play-pause, ←/→ to seek 5 s ── */
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (phase !== "playing") return;
+      if (e.key === " " || e.key === "k") {
+        e.preventDefault();
+        handlePlayPause();
+      }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        const v = videoRef.current;
+        if (v && v.duration) {
+          v.currentTime = Math.max(0, v.currentTime - 5);
+          setVideoProgress(v.currentTime / v.duration);
+        }
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        const v = videoRef.current;
+        if (v && v.duration) {
+          v.currentTime = Math.min(v.duration, v.currentTime + 5);
+          setVideoProgress(v.currentTime / v.duration);
+        }
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [phase, handlePlayPause]);
 
   /* ── Circumference helpers ── */
   const introR = 70;
@@ -680,6 +792,82 @@ const DeepDiveOverlay: React.FC<DeepDiveOverlayProps> = ({
               </button>
             )}
 
+            {/* Play / Pause button (bottom-right) */}
+            {phase === "playing" && (
+              <button
+                onClick={(e) => { e.stopPropagation(); handlePlayPause(); }}
+                style={{
+                  position: "absolute",
+                  bottom: "12px",
+                  right: "12px",
+                  zIndex: 20,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  padding: "6px 14px",
+                  borderRadius: "20px",
+                  background: isPaused ? `${layer.accent}22` : "rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(8px)",
+                  border: isPaused ? `1px solid ${layer.accent}40` : "1px solid rgba(255,255,255,0.06)",
+                  color: isPaused ? layer.accent : "rgba(255,255,255,0.5)",
+                  cursor: "pointer",
+                  transition: "all 0.2s",
+                  fontSize: "10px",
+                  fontWeight: 900,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.1em",
+                }}
+              >
+                <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24">
+                  {isPaused ? (
+                    <path d="M8 5v14l11-7z" />
+                  ) : (
+                    <path d="M6 4h4v16H6zm8 0h4v16h-4z" />
+                  )}
+                </svg>
+                {isPaused ? "Play" : "Pause"}
+              </button>
+            )}
+
+            {/* Click-to-pause overlay + centered play icon when paused */}
+            {phase === "playing" && (
+              <div
+                onClick={handlePlayPause}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  zIndex: 10,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  background: isPaused ? "rgba(0,0,0,0.35)" : "transparent",
+                  transition: "background 0.3s ease",
+                }}
+              >
+                {isPaused && (
+                  <div
+                    style={{
+                      width: "72px",
+                      height: "72px",
+                      borderRadius: "50%",
+                      background: `${layer.accent}25`,
+                      border: `2px solid ${layer.accent}50`,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backdropFilter: "blur(8px)",
+                      animation: "dd-fadein 0.25s ease",
+                    }}
+                  >
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill={layer.accent}>
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* ── ROUTING COUNTDOWN OVERLAY (on top of paused video) ── */}
             {phase === "routing" && (
               <div
@@ -784,28 +972,59 @@ const DeepDiveOverlay: React.FC<DeepDiveOverlayProps> = ({
             )}
           </div>
 
-          {/* ── Time-remaining progress bar ── */}
+          {/* ── Interactive progress bar (click / drag / swipe to seek) ── */}
           <div
+            ref={progressBarRef}
+            onMouseDown={handleProgressMouseDown}
+            onTouchStart={handleProgressTouchStart}
             style={{
               position: "relative",
-              height: "3px",
-              marginTop: "6px",
-              borderRadius: "2px",
-              background: "rgba(255,255,255,0.06)",
-              overflow: "hidden",
+              height: "24px",
+              marginTop: "2px",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              touchAction: "none",
+              userSelect: "none",
+              WebkitUserSelect: "none",
             }}
           >
+            {/* Track background */}
             <div
               style={{
                 position: "absolute",
-                top: 0,
                 left: 0,
-                height: "100%",
-                width: `${(1 - videoProgress) * 100}%`,
+                right: 0,
+                height: "4px",
                 borderRadius: "2px",
-                background: `linear-gradient(90deg, ${layer.accent}, ${layer.accent}80)`,
+                background: "rgba(255,255,255,0.08)",
+              }}
+            />
+            {/* Filled track */}
+            <div
+              style={{
+                position: "absolute",
+                left: 0,
+                height: "4px",
+                width: `${videoProgress * 100}%`,
+                borderRadius: "2px",
+                background: `linear-gradient(90deg, ${layer.accent}, ${layer.accent}cc)`,
                 boxShadow: `0 0 8px ${layer.accent}40`,
-                transition: "width 0.25s linear",
+                transition: isSeeking ? "none" : "width 0.15s linear",
+              }}
+            />
+            {/* Seek thumb */}
+            <div
+              style={{
+                position: "absolute",
+                left: `calc(${videoProgress * 100}% - 6px)`,
+                width: "12px",
+                height: "12px",
+                borderRadius: "50%",
+                background: layer.accent,
+                boxShadow: `0 0 8px ${layer.accent}80`,
+                transition: isSeeking ? "none" : "left 0.15s linear, transform 0.15s",
+                transform: isSeeking ? "scale(1.3)" : "scale(1)",
               }}
             />
           </div>
