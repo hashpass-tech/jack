@@ -170,6 +170,15 @@ const runWithOutput = (command) => {
     .trim();
 };
 
+const commandExists = (command) => {
+  try {
+    runWithOutput(`command -v ${command}`);
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 const tryFetchBranches = () => {
   try {
     execSync("git fetch origin main develop --tags", { stdio: "ignore" });
@@ -375,6 +384,18 @@ const ensureReleaseDeployConfig = ({ branch, skipDeployFlag }) => {
         `Missing required deploy configuration: ${missing.join(", ")}.`,
         "Set the variables in your branch env file (e.g. .env.testnet/.env.production),",
         "or rerun with --skip-deploy for a local/tag-only release.",
+      ].join(" "),
+    );
+  }
+
+  const missingCommands = ["gcloud", "gsutil"].filter(
+    (command) => !commandExists(command),
+  );
+  if (missingCommands.length > 0) {
+    throw new Error(
+      [
+        `Missing required deploy CLI tools: ${missingCommands.join(", ")}.`,
+        "Install Google Cloud SDK or rerun with --skip-deploy for a local/tag-only release.",
       ].join(" "),
     );
   }
