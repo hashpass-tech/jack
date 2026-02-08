@@ -8,6 +8,8 @@
 [![Docs Impact Check](https://github.com/hashpass-tech/jack/actions/workflows/docs-impact.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/docs-impact.yml)
 [![CI (Agent Tasks)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Discord](https://img.shields.io/discord/YOUR_DISCORD_ID?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/7k8CdmYHpn)
+[![X (Twitter)](https://img.shields.io/badge/Follow-%40Jack__kernel-1DA1F2?logo=x&logoColor=white)](https://x.com/Jack_kernel)
 
 ## Overview
 
