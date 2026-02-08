@@ -201,6 +201,19 @@ const config: Config = {
             },
           ],
         },
+        {
+          title: 'Community',
+          items: [
+            {
+              label: 'Discord',
+              href: 'https://discord.gg/7k8CdmYHpn',
+            },
+            {
+              label: 'X',
+              href: 'https://x.com/Jack_kernel',
+            },
+          ],
+        },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} JACK.`,
     },
