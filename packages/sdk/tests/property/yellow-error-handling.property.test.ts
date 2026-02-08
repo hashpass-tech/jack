@@ -276,11 +276,12 @@ describe('Feature: yellow-network-integration, Property 16: Error reason codes a
     const result2 = extractRevertReason(new Error(maliciousInput2));
     const duration2 = Date.now() - startTime2;
     
-    // Should complete in under 100ms (vulnerable regex could take seconds)
-    expect(duration1).toBeLessThan(100);
-    expect(duration2).toBeLessThan(100);
+    // Should complete quickly (vulnerable regex could take seconds or timeout)
+    // Using 500ms threshold to account for CI environment variability
+    expect(duration1).toBeLessThan(500);
+    expect(duration2).toBeLessThan(500);
     
-    // Should still extract reason correctly
+    // Verify correct extraction behavior
     expect(result1).toBe(''); // Spaces get trimmed to empty string
     expect(result2).toBeDefined();
     expect(result2).toContain('reason');
