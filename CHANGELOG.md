@@ -1,3 +1,22 @@
+## [0.1.57](https://github.com/hashpass-tech/JACK/compare/v0.1.55-testnet.1...v0.1.57) (2026-02-08)
+
+
+### Bug Fixes
+
+* **ci:** allow docs deploy when no production Cloud Build triggers exist ([90373e9](https://github.com/hashpass-tech/JACK/commit/90373e97cb517d36aba46988c887079bc57f3137))
+* **cloudbuild:** use gsutil cp instead of rsync for glob patterns, auto-create production bucket ([9e6e8da](https://github.com/hashpass-tech/JACK/commit/9e6e8dac7ec35811c9e5a5993b014fb4b47984a3))
+* **release:** properly route CDN and Cloud Build config per environment ([5d0dc54](https://github.com/hashpass-tech/JACK/commit/5d0dc54bcc304addfb5a5787cd7fb05a6acd559a))
+* **video-recorder:** resolve all security linting errors and warnings ([c99b3cc](https://github.com/hashpass-tech/JACK/commit/c99b3cc7b374611302e4024a5b51cad3d6111d75))
+
+
+### Features
+
+* **dashboard:** proper fullscreen toggle for walkthrough video modal ([36dc8d5](https://github.com/hashpass-tech/JACK/commit/36dc8d5de3f954f2a35f05738d758769eaf929f8))
+
+
+
+
+
 ## [0.1.56](https://github.com/hashpass-tech/JACK/compare/v0.1.55-testnet.2...v0.1.56) (2026-02-08)
 
 
