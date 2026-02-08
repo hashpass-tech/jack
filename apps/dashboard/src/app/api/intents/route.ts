@@ -490,20 +490,29 @@ export async function POST(request: NextRequest) {
             }
 
             const intents = getIntents() as Record<string, IntentRecord>;
-            const intent: IntentRecord | undefined = intents[body.intentId];
-            if (!intent) {
+            const rawIntentId = (body as { intentId?: unknown }).intentId;
+            if (typeof rawIntentId !== 'string' ||
+                rawIntentId === '__proto__' ||
+                rawIntentId === 'constructor' ||
+                rawIntentId === 'prototype') {
+                return NextResponse.json({ error: 'Invalid intent identifier' }, { status: 403 });
+            }
+            const intentFromStore: IntentRecord | undefined = intents[rawIntentId];
+            if (!intentFromStore) {
                 return NextResponse.json({ error: 'Intent not found' }, { status: 404 });
             }
+            // Clone into a fresh object before mutating to avoid operating on a potentially polluted prototype chain.
+            const safeIntent: IntentRecord = { ...intentFromStore };
 
             const mapping = inferNotificationMapping(body);
-            const status = (mapping?.status || intent.status) as IntentStatus;
+            const status = (mapping?.status || safeIntent.status) as IntentStatus;
             const channelStatus = extractChannelStatus(body);
             const stateIntent = extractStateIntent(body);
             const stateVersion = extractStateVersion(body);
-            const channelId = extractChannelId(request, body) || intent.channelId;
-            const adjudicator = extractAdjudicator(request, body) || intent.adjudicator;
-            const challengePeriod = extractChallengePeriod(request, body) ?? intent.challengePeriod;
-            const challengeExpiration = extractChallengeExpiration(request, body) ?? intent.challengeExpiration;
+            const channelId = extractChannelId(request, body) || safeIntent.channelId;
+            const adjudicator = extractAdjudicator(request, body) || safeIntent.adjudicator;
+            const challengePeriod = extractChallengePeriod(request, body) ?? safeIntent.challengePeriod;
+            const challengeExpiration = extractChallengeExpiration(request, body) ?? safeIntent.challengeExpiration;
             const channelConfig = extractChannelConfig(body);
             const stepLabel = body.event || body.status || channelStatus || stateIntent || 'UNKNOWN';
             const step = mapping?.step || `Provider Update (${stepLabel})`;
@@ -530,39 +539,39 @@ export async function POST(request: NextRequest) {
                 (body.proofs && (body.proofs as unknown[]).length)
             );
 
-            intent.status = status;
-            intent.updatedAt = timestamp as number;
-            intent.provider = body.provider || intent.provider || 'Yellow Network';
-            intent.sessionId = body.sessionId || intent.sessionId;
-            if (typeof body.channel === 'string') {
-                intent.channel = body.channel;
+            safeIntent.status = status;
+            safeIntent.updatedAt = timestamp as number;
+            safeIntent.provider = (body as { provider?: unknown }).provider || safeIntent.provider || 'Yellow Network';
+            safeIntent.sessionId = (body as { sessionId?: unknown }).sessionId || safeIntent.sessionId;
+            if (typeof (body as { channel?: unknown }).channel === 'string') {
+                safeIntent.channel = (body as { channel: string }).channel;
             }
             if (channelId) {
-                intent.channelId = channelId;
+                safeIntent.channelId = channelId;
             }
             if (channelStatus) {
-                intent.channelStatus = channelStatus;
+                safeIntent.channelStatus = channelStatus;
             }
             if (stateIntent) {
-                intent.stateIntent = stateIntent;
+                safeIntent.stateIntent = stateIntent;
             }
             if (stateVersion !== undefined) {
-                intent.stateVersion = stateVersion;
+                safeIntent.stateVersion = stateVersion;
             }
-            if (body.stateHash) {
-                intent.stateHash = body.stateHash as string;
+            if ((body as { stateHash?: unknown }).stateHash) {
+                safeIntent.stateHash = (body as { stateHash: string }).stateHash;
             }
             if (adjudicator) {
-                intent.adjudicator = adjudicator;
+                safeIntent.adjudicator = adjudicator;
             }
             if (challengePeriod !== undefined) {
-                intent.challengePeriod = challengePeriod;
+                safeIntent.challengePeriod = challengePeriod;
             }
             if (challengeExpiration !== undefined) {
-                intent.challengeExpiration = challengeExpiration;
+                safeIntent.challengeExpiration = challengeExpiration;
             }
-            if (body.nonce !== undefined) {
-                intent.nonce = body.nonce as number;
+            if ((body as { nonce?: unknown }).nonce !== undefined) {
+                safeIntent.nonce = (body as { nonce: number }).nonce;
             }
             intent.reasonCodes = intent.reasonCodes ?? [];
             intent.operatorLogs = intent.operatorLogs ?? [];
