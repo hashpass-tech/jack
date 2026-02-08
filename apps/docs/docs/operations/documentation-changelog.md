@@ -15,3 +15,7 @@ Auto-updated on merged PRs to `develop` and `main`.
 - PR [#23](https://github.com/hashpass-tech/JACK/pull/23) into `develop` by @edcalderon: feat: JACK TypeScript SDK v1.0.0 - Complete implementation with tests and npm publishing | docs-impact: unspecified | areas: unlabeled | summary: feat: JACK TypeScript SDK v1.0.0 - Complete implementation with tests and npm publishing
 - PR [#20](https://github.com/hashpass-tech/JACK/pull/20) into `develop` by @edcalderon: Intents API: integrate Yellow Network provider notifications, auth, and persistence codex | docs-impact: required | areas: unlabeled | summary: Yellow Network notification ingestion, auth, and persistence added in intents API.
 - PR [#21](https://github.com/hashpass-tech/JACK/pull/21) into `develop` by @edcalderon: GH-18: integrate LI.FI quote/route/status with deterministic /api/quote and explicit fallback mode codex | docs-impact: required | areas: unlabeled | summary: LI.FI quote/route/status integration and deterministic /api/quote behavior.
+
+## 2026-02-08
+
+- PR [#32](https://github.com/hashpass-tech/JACK/pull/32) into `develop` by @Copilot: Fix prototype pollution via intentId in store and API routes | docs-impact: none (Internal security fix with no public API surface changes) | areas: unlabeled | summary: no public interface impact
