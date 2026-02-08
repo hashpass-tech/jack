@@ -458,3 +458,6 @@ export class JACK_SDK {
 
 // LI.FI integration
 export * from './lifi/index.js';
+
+// Uniswap v4 integration
+export * from './v4/index.js';
