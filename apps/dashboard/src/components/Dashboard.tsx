@@ -10,14 +10,17 @@ import NeuralBackground from "./NeuralBackground";
 import { ChangelogDrawer } from "@shared/drawer-changelog";
 
 const ThemeToggle: FC = () => {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<"dark" | "light">(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("jack-theme") as "dark" | "light" | null;
+      return stored || "dark";
+    }
+    return "dark";
+  });
 
   useEffect(() => {
-    const stored = localStorage.getItem("jack-theme") as "dark" | "light" | null;
-    const initial = stored || "dark";
-    setTheme(initial);
-    document.documentElement.setAttribute("data-theme", initial);
-  }, []);
+    document.documentElement.setAttribute("data-theme", theme);
+  }, [theme]);
 
   const toggle = () => {
     const next = theme === "dark" ? "light" : "dark";
@@ -52,11 +55,29 @@ const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
   const [selectedExecutionId, setSelectedExecutionId] = useState<string | null>(
     null,
   );
-  const [showTestnetModal, setShowTestnetModal] = useState(false);
+  const [showTestnetModal, setShowTestnetModal] = useState(() => {
+    if (isTestnet && typeof window !== "undefined") {
+      const { hostname } = window.location;
+      if (
+        hostname === "jack.lukas.money" ||
+        hostname === "www.jack.lukas.money"
+      ) {
+        return true;
+      }
+    }
+    return false;
+  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [docsUrl, setDocsUrl] = useState(
-    process.env.NEXT_PUBLIC_DOCS_URL ?? "https://docs.jack.lukas.money",
-  );
+  const [docsUrl] = useState(() => {
+    if (
+      typeof window !== "undefined" &&
+      (window.location.hostname.includes("localhost") ||
+        window.location.hostname === "127.0.0.1")
+    ) {
+      return "http://localhost:3002";
+    }
+    return process.env.NEXT_PUBLIC_DOCS_URL ?? "https://docs.jack.lukas.money";
+  });
   const dashboardVersion = process.env.NEXT_PUBLIC_DASHBOARD_VERSION ?? "0.0.0";
   const protocolTrack = process.env.NEXT_PUBLIC_JACK_PROTOCOL_TRACK ?? "v1";
   const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === "true";
@@ -64,28 +85,6 @@ const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
     ? "https://testnet.jack.lukas.money"
     : "https://jack.lukas.money";
   const environmentLabel = isTestnet ? "TESTNET" : "MAINNET";
-
-  useEffect(() => {
-    if (
-      typeof window !== "undefined" &&
-      (window.location.hostname.includes("localhost") ||
-        window.location.hostname === "127.0.0.1")
-    ) {
-      setDocsUrl("http://localhost:3002");
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isTestnet && typeof window !== "undefined") {
-      const { hostname } = window.location;
-      if (
-        hostname === "jack.lukas.money" ||
-        hostname === "www.jack.lukas.money"
-      ) {
-        setShowTestnetModal(true);
-      }
-    }
-  }, [isTestnet]);
 
   const handleBack = () => {
     if (typeof window !== "undefined") {
@@ -427,6 +426,12 @@ const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
             </a>
             <a href="https://github.com/hashpass-tech/JACK" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" style={{ color: "var(--fg-primary)" }}>
               GitHub
+            </a>
+            <a href="https://discord.gg/7k8CdmYHpn" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" style={{ color: "var(--fg-primary)" }}>
+              Discord
+            </a>
+            <a href="https://x.com/Jack_kernel" target="_blank" rel="noreferrer" className="transition-opacity hover:opacity-80" style={{ color: "var(--fg-primary)" }}>
+              X
             </a>
           </div>
         </div>

@@ -1,6 +1,6 @@
 {
   "name": "@jack-kernel/sdk",
-  "version": "1.0.0",
+  "version": "1.2.4",
   "description": "TypeScript SDK for JACK cross-chain execution kernel",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -39,8 +39,15 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/jack.git",
+    "url": "https://github.com/hashpass-tech/JACK.git",
     "directory": "packages/sdk"
+  },
+  "homepage": "https://docs.jack.lukas.money/docs/sdk",
+  "bugs": {
+    "url": "https://github.com/hashpass-tech/JACK/issues"
+  },
+  "dependencies": {
+    "@lifi/sdk": "^3.15.5"
   },
   "peerDependencies": {
     "viem": "^2.0.0"

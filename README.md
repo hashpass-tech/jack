@@ -8,6 +8,8 @@
 [![Docs Impact Check](https://github.com/hashpass-tech/jack/actions/workflows/docs-impact.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/docs-impact.yml)
 [![CI (Agent Tasks)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Discord](https://img.shields.io/discord/1131014788072349827?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/7k8CdmYHpn)
+[![X (Twitter)](https://img.shields.io/badge/Follow-%40Jack__kernel-1DA1F2?logo=x&logoColor=white)](https://x.com/Jack_kernel)
 
 ## Overview
 
@@ -104,7 +106,7 @@ jack/
 
 ## Documentation
 
-- [Docs Platform](https://docs.jack.lukas.money)
+- [Docs Platform](https://docs.jack.lukas.money/docs)
 - [Mission & Overview](./apps/docs/docs/overview.md)
 - [Architecture](./apps/docs/docs/architecture.md)
 - [Demo Narrative](./docs/demo-script.md)
@@ -115,6 +117,12 @@ jack/
 - [Whitepaper Portal](./apps/docs/docs/whitepaper/index.mdx)
 - [Whitepaper Changelog](./apps/docs/docs/whitepaper/changelog.md)
 - [MVP Critical Roadmap](./apps/docs/docs/operations/mvp-critical-roadmap.md)
+
+## Community
+
+- **Discord**: [Join our community](https://discord.gg/7k8CdmYHpn)
+- **X (Twitter)**: [@Jack_kernel](https://x.com/Jack_kernel)
+- **GitHub**: [hashpass-tech/JACK](https://github.com/hashpass-tech/JACK)
 
 ## Contributing
 

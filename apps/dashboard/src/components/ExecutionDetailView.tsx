@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { JACK_SDK, ExecutionStatus, Intent } from '@jack-kernel/sdk';
+import { JACK_SDK, Intent } from '@jack-kernel/sdk';
 
 interface ExecutionDetailViewProps {
 	id: string;
