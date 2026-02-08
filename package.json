@@ -37,7 +37,8 @@
     "contracts:test": "./scripts/contracts/forge.sh test -vv",
     "contracts:deploy:testnet": "./scripts/contracts/deploy-hook.sh contracts/.env.testnet",
     "contracts:deploy:mainnet": "./scripts/contracts/deploy-hook.sh contracts/.env.mainnet",
-    "contracts:smoke:testnet": "./scripts/contracts/smoke-hook.sh contracts/.env.testnet"
+    "contracts:smoke:testnet": "./scripts/contracts/smoke-hook.sh contracts/.env.testnet",
+    "clean:docs": "node --import tsx scripts/clean-docs.ts"
   },
   "dependencies": {
     "@metamask/sdk": "^0.34.0",
