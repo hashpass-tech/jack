@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getIntents, saveIntent } from '@/lib/store';
+import { getIntents, saveIntent, isValidIntentId } from '@/lib/store';
 import { fetchLifiQuote, fetchLifiRoute, fetchLifiStatus, type LifiFallback, type LifiStatusPayload } from '@/lib/lifi';
 import { getYellowProvider } from '@/lib/yellow';
 import type { IntentParams } from '../../../../../../packages/sdk';
@@ -491,10 +491,7 @@ export async function POST(request: NextRequest) {
 
             const intents = getIntents() as Record<string, IntentRecord>;
             const rawIntentId = (body as { intentId?: unknown }).intentId;
-            if (typeof rawIntentId !== 'string' ||
-                rawIntentId === '__proto__' ||
-                rawIntentId === 'constructor' ||
-                rawIntentId === 'prototype') {
+            if (!isValidIntentId(rawIntentId)) {
                 return NextResponse.json({ error: 'Invalid intent identifier' }, { status: 403 });
             }
             const intentFromStore: IntentRecord | undefined = intents[rawIntentId];
