@@ -54,11 +54,11 @@ Get an API key from: https://etherscan.io/myapikey
 Run the following commands to verify your setup:
 
 ```bash
-# Check deployer address
-cast wallet address 0xREDACTED_KEY_ROTATE_IMMEDIATELY
+# Check deployer address (use your own private key from contracts/.env)
+cast wallet address 0xYOUR_DEPLOYER_PRIVATE_KEY
 
-# Check Sepolia ETH balance
-cast balance 0x114d72D97Aa9C413A1ba3f0Cd37F439D668EA1aD --rpc-url YOUR_RPC_URL
+# Check Sepolia ETH balance (replace with your deployer address)
+cast balance YOUR_DEPLOYER_ADDRESS --rpc-url YOUR_RPC_URL
 
 # Verify PoolManager address exists on Sepolia
 cast code 0xE03A1074c86CFeDd5C142C4F04F1a1536e203543 --rpc-url YOUR_RPC_URL
