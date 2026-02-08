@@ -238,7 +238,4 @@ console.log('Managers available:', {
 
 ## Next Steps
 
-- [Quick Start Guide](./quickstart.md) - Build your first integration
-- [LI.FI Integration](./lifi-integration.md) - Cross-chain routing
-- [Yellow Network Integration](./yellow-integration.md) - State channels
-- [API Reference](./api-reference.md) - Complete API documentation
+Continue exploring the SDK documentation to learn more about creating and managing intents.

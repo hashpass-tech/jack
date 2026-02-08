@@ -1,6 +1,6 @@
 # JACK Demo Script (Canonical)
 
-This file is the canonical source for the JACK demo narrative. The live, formatted version is available in the Docusaurus docs at `apps/docs/docs/demo-script.md`.
+This file is the canonical source for the JACK demo narrative.
 
 ---
 

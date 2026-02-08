@@ -27,9 +27,9 @@ function HomepageHeader() {
             <div className={styles.heroButtons}>
               <Link
                 className="button button--primary button--lg"
-                to="/docs/setup"
+                to="/docs/overview"
               >
-                Setup in 3 steps
+                Get Started
               </Link>
               <Link
                 className="button button--outline button--lg"
@@ -39,9 +39,9 @@ function HomepageHeader() {
               </Link>
               <Link
                 className="button button--secondary button--lg"
-                to="/docs/demo-script"
+                to="/docs/sdk"
               >
-                Demo narrative
+                SDK Docs
               </Link>
               <Link
                 className="button button--secondary button--lg"

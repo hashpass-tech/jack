@@ -45,13 +45,13 @@ const FeatureList: FeatureItem[] = [
     ),
   },
   {
-    scope: 'Operations Layer',
-    title: 'Demo-ready operator workflows',
-    href: '/docs/operations',
+    scope: 'SDK & Integrations',
+    title: 'TypeScript SDK with routing integrations',
+    href: '/docs/sdk',
     description: (
       <>
-        Use runbooks for deployment, smoke checks, release flow, and multi-agent
-        execution so demos stay predictable under pressure.
+        Use the TypeScript SDK to create intents, manage execution, and integrate
+        with routing providers like LI.FI and Yellow Network.
       </>
     ),
   },

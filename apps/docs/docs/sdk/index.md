@@ -5,11 +5,6 @@ The JACK TypeScript SDK provides a comprehensive, type-safe interface for creati
 ## Quick Links
 
 - [Installation & Setup](./installation.md)
-- [Quick Start Guide](./quickstart.md)
-- [LI.FI Integration](./lifi-integration.md)
-- [Yellow Network Integration](./yellow-integration.md)
-- [API Reference](./api-reference.md)
-- [Examples](./examples.md)
 
 ## Features
 
@@ -122,7 +117,3 @@ const sdk = new JACK_SDK({
 ## Next Steps
 
 - [Installation & Setup](./installation.md) - Get started with the SDK
-- [Quick Start Guide](./quickstart.md) - Build your first integration
-- [LI.FI Integration](./lifi-integration.md) - Cross-chain routing
-- [Yellow Network Integration](./yellow-integration.md) - State channels
-- [API Reference](./api-reference.md) - Complete API documentation

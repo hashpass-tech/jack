@@ -46,7 +46,7 @@ Template location: `.github/pull_request_template.md`
 - Check script: `scripts/check-doc-impact.js`
 - Merge changelog workflow: `.github/workflows/docs-changelog.yml`
 - Changelog updater script: `scripts/update-docs-changelog.js`
-- Output changelog page: `apps/docs/docs/operations/documentation-changelog.md`
+- Output changelog page: `docs/operations/documentation-changelog.md`
 - Whitepaper builder: `scripts/whitepaper/build.js`
 - Whitepaper validator: `scripts/whitepaper/validate.js`
 

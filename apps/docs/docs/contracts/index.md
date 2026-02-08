@@ -92,7 +92,7 @@ forge test
 
 ### Deploy
 
-See [Contracts Deployment Runbook](../operations/contracts-deployment.md) for detailed deployment instructions.
+Deployment instructions are available in the internal operations documentation at `/docs/operations/contracts-deployment.md` in the repository.
 
 ## Security
 

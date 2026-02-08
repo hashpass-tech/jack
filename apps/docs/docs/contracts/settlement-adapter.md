@@ -451,7 +451,7 @@ This design allows policy rules to evolve independently while maintaining a stab
 - Liquidity requirements
 - Risk thresholds
 
-See [JACKPolicyHook documentation](./policy-hook.md) for details on policy configuration.
+Policy configuration details are available in the contract source code and deployment documentation.
 
 ## Deployment
 

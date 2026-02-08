@@ -124,7 +124,6 @@ const config: Config = {
           position: 'left',
           label: 'Docs',
         },
-        {to: '/docs/demo-script', label: 'Demo', position: 'left'},
         {
           type: 'custom-jackRuntime' as any,
           position: 'right',
@@ -158,12 +157,12 @@ const config: Config = {
               to: '/docs/overview',
             },
             {
-              label: 'Setup',
-              to: '/docs/setup',
-            },
-            {
               label: 'Architecture',
               to: '/docs/architecture',
+            },
+            {
+              label: 'SDK',
+              to: '/docs/sdk',
             },
           ],
         },
@@ -178,22 +177,18 @@ const config: Config = {
               label: 'Dashboard',
               to: '/go/dashboard',
             },
-            {
-              label: 'Demo Narrative',
-              to: '/docs/demo-script',
-            },
           ],
         },
         {
-          title: 'Operations',
+          title: 'Resources',
           items: [
             {
-              label: 'Runbooks',
-              to: '/docs/operations',
+              label: 'Smart Contracts',
+              to: '/docs/contracts',
             },
             {
-              label: 'Release Flow',
-              to: '/docs/operations/release-flow',
+              label: 'Integrations',
+              to: '/docs/integrations/yellow-network',
             },
             {
               label: 'GitHub',

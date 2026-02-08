@@ -15,9 +15,7 @@ import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 const sidebars: SidebarsConfig = {
   docsSidebar: [
     "overview",
-    "setup",
     "architecture",
-    "demo-script",
     {
       type: "category",
       label: "TypeScript SDK",
@@ -37,6 +35,13 @@ const sidebars: SidebarsConfig = {
     },
     {
       type: "category",
+      label: "Integrations",
+      items: [
+        "integrations/yellow-network",
+      ],
+    },
+    {
+      type: "category",
       label: "Whitepaper",
       link: { type: "doc", id: "whitepaper/index" },
       items: [
@@ -44,32 +49,6 @@ const sidebars: SidebarsConfig = {
         "whitepaper/whitepaper-v1.0.2",
         "whitepaper/whitepaper-v1.0.0",
         "whitepaper/changelog",
-      ],
-    },
-    {
-      type: "category",
-      label: "Runbooks & Operations",
-      link: { type: "doc", id: "operations/index" },
-      items: [
-        {
-          type: "category",
-          label: "Agent Orchestration",
-          link: { type: "doc", id: "operations/agent-orchestration/index" },
-          items: [
-            "operations/agent-orchestration/agent-interface",
-            "operations/agent-orchestration/github-integration",
-            "operations/agent-orchestration/github-tracker",
-          ],
-        },
-        "operations/spec-system",
-        "operations/spec-quickstart",
-        "operations/multi-agent-config",
-        "operations/release-flow",
-        "operations/docs-pages-deployment",
-        "operations/documentation-governance",
-        "operations/documentation-changelog",
-        "operations/contracts-deployment",
-        "operations/mvp-critical-roadmap",
       ],
     },
   ],
