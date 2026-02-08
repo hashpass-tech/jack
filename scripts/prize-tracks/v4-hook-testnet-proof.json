@@ -1,0 +1,87 @@
+{
+  "demo": "uniswap-v4-hook-testnet",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "wallet": "0x114d72D97Aa9C413A1ba3f0Cd37F439D668EA1aD",
+  "contracts": {
+    "policyHook": "0xE8142B1Ff0DA631866fec5771f4291CbCe718080",
+    "settlementAdapter": "0xd8f0415b488F2BA18EF14F5C41989EEf90E51D1A",
+    "poolManager": "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543"
+  },
+  "proofs": [
+    {
+      "step": "Contract verification",
+      "type": "read-only",
+      "data": {
+        "hookOwner": "0x4e59b44847b379578588920cA78FbF26c0B4956C",
+        "adpOwner": "0x114d72D97Aa9C413A1ba3f0Cd37F439D668EA1aD",
+        "lnkHook": "0xE8142B1Ff0DA631866fec5771f4291CbCe718080",
+        "lnkPM": "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543"
+      },
+      "ts": 1770575365203
+    },
+    {
+      "step": "Policy checks",
+      "type": "read-only",
+      "data": {
+        "count": 4
+      },
+      "ts": 1770575366011
+    },
+    {
+      "step": "Solver authorization",
+      "type": "on-chain",
+      "txHash": "0xeebe60b0e4290b02295a943a133c4962cc7222f92ef07d1694b9c3ad53fed92a",
+      "etherscanUrl": "https://sepolia.etherscan.io/tx/0xeebe60b0e4290b02295a943a133c4962cc7222f92ef07d1694b9c3ad53fed92a",
+      "data": {
+        "solver": "0xB5b5e033a3B40D686f9ccE41a5E87e68E8545047",
+        "block": "10219193"
+      },
+      "ts": 1770575396417
+    },
+    {
+      "step": "Solver de-authorization",
+      "type": "on-chain",
+      "txHash": "0x8f847f54cd37c6696a56b308ab68a8318d8739c6513b3c6452f9a954308e5934",
+      "etherscanUrl": "https://sepolia.etherscan.io/tx/0x8f847f54cd37c6696a56b308ab68a8318d8739c6513b3c6452f9a954308e5934",
+      "data": {
+        "solver": "0xB5b5e033a3B40D686f9ccE41a5E87e68E8545047",
+        "block": "10219194"
+      },
+      "ts": 1770575410077
+    },
+    {
+      "step": "Self-authorization",
+      "type": "on-chain",
+      "txHash": "0x758028ae5465d6e7d3312ce35e37fc6d43572c2b4b683f38407f8eee4dd9b262",
+      "etherscanUrl": "https://sepolia.etherscan.io/tx/0x758028ae5465d6e7d3312ce35e37fc6d43572c2b4b683f38407f8eee4dd9b262",
+      "data": {
+        "solver": "0x114d72D97Aa9C413A1ba3f0Cd37F439D668EA1aD",
+        "block": "10219196"
+      },
+      "ts": 1770575431738
+    },
+    {
+      "step": "Second solver auth",
+      "type": "on-chain",
+      "txHash": "0x0e314314ab9f0bf967364bcdddcaa11e87ebc6c83ebed1c45256776550a3308d",
+      "etherscanUrl": "https://sepolia.etherscan.io/tx/0x0e314314ab9f0bf967364bcdddcaa11e87ebc6c83ebed1c45256776550a3308d",
+      "data": {
+        "solver": "0xc1000170aE9F3912BA2e428A1e806648E4A01236",
+        "block": "10219197"
+      },
+      "ts": 1770575445155
+    },
+    {
+      "step": "EIP-712 intent hash",
+      "type": "read-only",
+      "data": {
+        "intentId": "0xcebf9046d6915bfbb876959e9bd36b53a2fac87b50e2b82e3888409945e7e466",
+        "hash": "0xe76f5bd1033bbeab9427b8b35d3ec02c0948625bdb0f2b3891d0f3d2a42592d8"
+      },
+      "ts": 1770575445360
+    }
+  ],
+  "durationMs": 82489,
+  "timestamp": "2026-02-08T18:30:45.361Z"
+}
