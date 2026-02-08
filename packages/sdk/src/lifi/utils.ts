@@ -18,7 +18,15 @@
 export function toBaseUnits(amount: string, decimals: number): string {
   const [whole = '0', fraction = ''] = amount.split('.');
   const normalizedFraction = fraction.padEnd(decimals, '0').slice(0, decimals);
-  const base = `${whole}${normalizedFraction}`.replace(/^0+(?=\d)/, '');
+  const combined = `${whole}${normalizedFraction}`;
+  
+  // Remove leading zeros without using regex to avoid ReDoS vulnerability
+  let start = 0;
+  while (start < combined.length - 1 && combined[start] === '0') {
+    start++;
+  }
+  const base = combined.slice(start);
+  
   return base.length ? base : '0';
 }
 
@@ -36,6 +44,14 @@ export function fromBaseUnits(amount: string, decimals: number): string {
   if (!amount || amount === '0') return '0';
   const padded = amount.padStart(decimals + 1, '0');
   const whole = padded.slice(0, -decimals) || '0';
-  const fraction = padded.slice(-decimals).replace(/0+$/, '');
+  
+  // Remove trailing zeros without using regex to avoid ReDoS vulnerability
+  let fraction = padded.slice(-decimals);
+  let end = fraction.length;
+  while (end > 0 && fraction[end - 1] === '0') {
+    end--;
+  }
+  fraction = fraction.slice(0, end);
+  
   return fraction ? `${whole}.${fraction}` : whole;
 }
