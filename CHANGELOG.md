@@ -1,3 +1,21 @@
+## [0.1.54](https://github.com/hashpass-tech/JACK/compare/v0.1.53-testnet.1...v0.1.54) (2026-02-08)
+
+
+### Bug Fixes
+
+* **security:** ensure CI workflow fails on security issues ([0f10284](https://github.com/hashpass-tech/JACK/commit/0f10284f4e431fe40966161840c91f396d8b5607))
+
+
+### Features
+
+* implement GCS asset management for dashboard videos and images ([d0d0dbd](https://github.com/hashpass-tech/JACK/commit/d0d0dbd4ca1bf19e6f4800a11a97bf1b36289c17))
+* **security:** add comprehensive security linting enforcement ([fb4f82a](https://github.com/hashpass-tech/JACK/commit/fb4f82aea22610e300059ffd44913ad5e2285383))
+* **security:** add security rules to all package ESLint configs ([4bdd00b](https://github.com/hashpass-tech/JACK/commit/4bdd00bda7fbbaae6e70e3c2c79fd640f9e7e9dd))
+
+
+
+
+
 ## [0.1.53](https://github.com/hashpass-tech/JACK/compare/v0.1.52-testnet.1...v0.1.53) (2026-02-08)
 
 
