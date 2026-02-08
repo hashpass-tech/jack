@@ -37,11 +37,13 @@ const LAYER_DESCRIPTION: Record<string, string> = {
 interface LayerVideoModalProps {
   layer: string;
   onClose: () => void;
+  onDeepDive?: (layerName: string) => void;
 }
 
 const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
   layer,
   onClose,
+  onDeepDive,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const videoV3Ref = useRef<HTMLVideoElement>(null);
@@ -51,6 +53,8 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [v3VideoLoaded, setV3VideoLoaded] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [v3VideoProgress, setV3VideoProgress] = useState(0);
 
   const accent = LAYER_ACCENT[layer] ?? "#F2B94B";
   const videoSrc = LAYER_VIDEO_MAP[layer];
@@ -134,6 +138,36 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
     if (videoV3Ref.current) videoV3Ref.current.muted = newMuted;
   };
 
+  const handleTimeUpdate = useCallback(() => {
+    const v = videoRef.current;
+    if (v && v.duration && isFinite(v.duration)) {
+      setVideoProgress(v.currentTime / v.duration);
+    }
+  }, []);
+
+  const handleV3TimeUpdate = useCallback(() => {
+    const v = videoV3Ref.current;
+    if (v && v.duration && isFinite(v.duration)) {
+      setV3VideoProgress(v.currentTime / v.duration);
+    }
+  }, []);
+
+  const handleDeepDiveClick = () => {
+    if (expanded) {
+      // "Compact View" should always collapse back
+      toggleExpand();
+    } else if (onDeepDive) {
+      // Not expanded → launch full deep-dive auto-flow
+      setEntered(false);
+      setTimeout(() => {
+        onClose();
+        onDeepDive(layer);
+      }, 350);
+    } else {
+      toggleExpand();
+    }
+  };
+
   return (
     <div
       ref={modalRef}
@@ -198,6 +232,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               playsInline
               preload="metadata"
               onLoadedData={() => setVideoLoaded(true)}
+              onTimeUpdate={handleTimeUpdate}
               className="absolute inset-0 w-full h-full object-cover"
               style={{
                 opacity: videoLoaded && !expanded ? 1 : 0,
@@ -216,6 +251,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               playsInline
               preload="auto"
               onLoadedData={() => setV3VideoLoaded(true)}
+              onTimeUpdate={handleV3TimeUpdate}
               className="absolute inset-0 w-full h-full object-cover"
               style={{
                 opacity: v3VideoLoaded ? 1 : 0,
@@ -293,7 +329,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               )}
             </svg>
             <span className="text-[10px] font-bold uppercase tracking-wider">
-              {expanded ? "Collapse" : "Deep Dive"}
+              {expanded ? "Compact" : "Expand"}
             </span>
           </div>
         </div>
@@ -307,13 +343,31 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
             transition: "all 0.5s ease 0.15s",
           }}
         >
-          {/* Accent line */}
+          {/* Time-remaining progress bar */}
           <div
-            className="w-full h-[2px] rounded-full mb-4 sm:mb-6"
             style={{
-              background: `linear-gradient(to right, ${accent}, ${accent}40, transparent)`,
+              position: "relative",
+              height: "3px",
+              borderRadius: "2px",
+              background: "rgba(255,255,255,0.06)",
+              overflow: "hidden",
+              marginBottom: expanded ? "16px" : "16px",
             }}
-          />
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                height: "100%",
+                width: `${(1 - (expanded ? v3VideoProgress : videoProgress)) * 100}%`,
+                borderRadius: "2px",
+                background: `linear-gradient(90deg, ${accent}, ${accent}80)`,
+                boxShadow: `0 0 8px ${accent}40`,
+                transition: "width 0.25s linear",
+              }}
+            />
+          </div>
 
           {/* Layer title */}
           <div className="flex items-center space-x-3 mb-3">
@@ -354,7 +408,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
               Return to Scene
             </button>
             <button
-              onClick={toggleExpand}
+              onClick={handleDeepDiveClick}
               className="flex-1 py-2.5 sm:py-3.5 rounded-xl sm:rounded-2xl font-black uppercase tracking-[0.2em] sm:tracking-[0.3em] text-[10px] sm:text-xs transition-all hover:scale-[1.01] active:scale-[0.99]"
               style={{
                 background: `${accent}18`,
@@ -362,7 +416,7 @@ const LayerVideoModal: React.FC<LayerVideoModalProps> = ({
                 color: accent,
               }}
             >
-              {expanded ? "▴ Compact View" : "▾ Deep Dive"}
+              {expanded ? "▴ Compact View" : onDeepDive ? "▾ Deep Dive · All Layers" : "▾ Expand"}
             </button>
           </div>
         </div>

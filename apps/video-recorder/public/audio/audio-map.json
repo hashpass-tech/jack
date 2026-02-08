@@ -1,0 +1,177 @@
+{
+  "voice": "en-GB-ThomasNeural",
+  "fps": 30,
+  "totalDurationS": 180.06666666666666,
+  "totalFrames": 5402,
+  "sections": {
+    "intro": {
+      "file": "section-intro.mp3",
+      "durationS": 16.536,
+      "durationFrames": 497,
+      "startFrame": 0,
+      "endFrame": 497
+    },
+    "create-intent": {
+      "file": "section-create-intent.mp3",
+      "durationS": 52.32,
+      "durationFrames": 1570,
+      "startFrame": 497,
+      "endFrame": 2067
+    },
+    "executions": {
+      "file": "section-executions.mp3",
+      "durationS": 47.616,
+      "durationFrames": 1429,
+      "startFrame": 2067,
+      "endFrame": 3496
+    },
+    "agent-costs": {
+      "file": "section-agent-costs.mp3",
+      "durationS": 39.288,
+      "durationFrames": 1179,
+      "startFrame": 3496,
+      "endFrame": 4675
+    },
+    "outro": {
+      "file": "section-outro.mp3",
+      "durationS": 24.216,
+      "durationFrames": 727,
+      "startFrame": 4675,
+      "endFrame": 5402
+    }
+  },
+  "subtitles": [
+    {
+      "startFrame": 10,
+      "endFrame": 250,
+      "text": "Grrr! What's up everyone — I'm JACK, your DeFi settlement captain. Welcome aboard, matey!",
+      "id": "intro-1"
+    },
+    {
+      "startFrame": 259,
+      "endFrame": 456,
+      "text": "Today I'm walking you through the JACK Kernel dashboard. Anchors aweigh — let's dive in!",
+      "id": "intro-2"
+    },
+    {
+      "startFrame": 507,
+      "endFrame": 697,
+      "text": "Arrr, first up — the Create Intent tab. This is where every voyage begins!",
+      "id": "create-1"
+    },
+    {
+      "startFrame": 709,
+      "endFrame": 933,
+      "text": "I've got three modes: Quick Intent with natural language, Templates for common strategies, and Advanced for full control.",
+      "id": "create-2"
+    },
+    {
+      "startFrame": 945,
+      "endFrame": 1270,
+      "text": "Pick your source chain, destination chain, token, and amount. I handle the rest — routing, bridging, settlement. Grrr, smooth sailing!",
+      "id": "create-3"
+    },
+    {
+      "startFrame": 1282,
+      "endFrame": 1532,
+      "text": "Check out the sidebar — on-chain policy enforcement, execution pipeline. Everything is transparent and verifiable.",
+      "id": "create-4"
+    },
+    {
+      "startFrame": 1543,
+      "endFrame": 1817,
+      "text": "Hit 'Resolve Best Route' and I chart the fastest course through the DeFi seas. Then authorize and — boom — intent created!",
+      "id": "create-5"
+    },
+    {
+      "startFrame": 1829,
+      "endFrame": 2021,
+      "text": "My Kernel Guardrails ensure your constraints are always respected. No surprises.",
+      "id": "create-6"
+    },
+    {
+      "startFrame": 2077,
+      "endFrame": 2291,
+      "text": "Arrr, next up — the Executions tab. This be your mission control, your fleet tracker!",
+      "id": "exec-1"
+    },
+    {
+      "startFrame": 2303,
+      "endFrame": 2518,
+      "text": "Every intent shows up here with real-time status — Pending, Routing, Executing, Settling, Settled.",
+      "id": "exec-2"
+    },
+    {
+      "startFrame": 2530,
+      "endFrame": 2761,
+      "text": "Color-coded so you know exactly what's happening at a glance. Green means settled, sky blue means in-flight.",
+      "id": "exec-3"
+    },
+    {
+      "startFrame": 2773,
+      "endFrame": 3014,
+      "text": "Click into any execution for the full trace — timeline, steps, on-chain proof. Total transparency.",
+      "id": "exec-4"
+    },
+    {
+      "startFrame": 3026,
+      "endFrame": 3340,
+      "text": "Agent-based execution means atomic settlement. No partial fills. No stranded treasure. Grrr — that's a captain's promise!",
+      "id": "exec-5"
+    },
+    {
+      "startFrame": 3349,
+      "endFrame": 3449,
+      "text": "That's my guarantee. Arrr!",
+      "id": "exec-6"
+    },
+    {
+      "startFrame": 3506,
+      "endFrame": 3718,
+      "text": "Last but not least — Agent and Costs. A wise pirate always knows where his gold goes!",
+      "id": "costs-1"
+    },
+    {
+      "startFrame": 3730,
+      "endFrame": 3955,
+      "text": "Agent fees, gas costs, protocol fees — all broken down per issue. Full budget tracking.",
+      "id": "costs-2"
+    },
+    {
+      "startFrame": 3968,
+      "endFrame": 4220,
+      "text": "Green means within budget. Red means over. Simple. You're always in control of spending.",
+      "id": "costs-3"
+    },
+    {
+      "startFrame": 4232,
+      "endFrame": 4431,
+      "text": "This is the kind of transparency DeFi needs. No hidden fees, no surprises.",
+      "id": "costs-4"
+    },
+    {
+      "startFrame": 4443,
+      "endFrame": 4630,
+      "text": "Every doubloon is accounted for on-chain. Grrr — that's the JACK Kernel way!",
+      "id": "costs-5"
+    },
+    {
+      "startFrame": 4685,
+      "endFrame": 4900,
+      "text": "That's the dashboard. Three tabs. Full control over your cross-chain settlements.",
+      "id": "outro-1"
+    },
+    {
+      "startFrame": 4911,
+      "endFrame": 5179,
+      "text": "Head to testnet.jack.lukas.money, connect your wallet, and start navigating the DeFi seas. The treasure awaits!",
+      "id": "outro-2"
+    },
+    {
+      "startFrame": 5191,
+      "endFrame": 5372,
+      "text": "I'm JACK. Grrr — set sail, mateys! Let's gooo!",
+      "id": "outro-3"
+    }
+  ]
+}

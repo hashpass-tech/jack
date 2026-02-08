@@ -1,0 +1,13 @@
+{
+  "version": "v1.0.0",
+  "createdAt": "2026-02-07",
+  "description": "ETHGlobal demo walkthrough script (v1) from user",
+  "scriptFile": "script.txt",
+  "audioDir": "audio",
+  "renderDir": "renders",
+  "dashboard": {
+    "url": "",
+    "htmlHash": "",
+    "htmlFile": ""
+  }
+}

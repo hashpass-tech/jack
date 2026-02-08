@@ -1,7 +1,193 @@
+## [0.1.54](https://github.com/hashpass-tech/JACK/compare/v0.1.53-testnet.1...v0.1.54) (2026-02-08)
+
+
+### Bug Fixes
+
+* **security:** ensure CI workflow fails on security issues ([0f10284](https://github.com/hashpass-tech/JACK/commit/0f10284f4e431fe40966161840c91f396d8b5607))
+
+
+### Features
+
+* implement GCS asset management for dashboard videos and images ([d0d0dbd](https://github.com/hashpass-tech/JACK/commit/d0d0dbd4ca1bf19e6f4800a11a97bf1b36289c17))
+* **security:** add comprehensive security linting enforcement ([fb4f82a](https://github.com/hashpass-tech/JACK/commit/fb4f82aea22610e300059ffd44913ad5e2285383))
+* **security:** add security rules to all package ESLint configs ([4bdd00b](https://github.com/hashpass-tech/JACK/commit/4bdd00bda7fbbaae6e70e3c2c79fd640f9e7e9dd))
+
+
+
+
+
+## [0.1.53](https://github.com/hashpass-tech/JACK/compare/v0.1.52-testnet.1...v0.1.53) (2026-02-08)
+
+
+
+
+
+## [0.1.52](https://github.com/hashpass-tech/JACK/compare/v0.1.51-testnet.1...v0.1.52) (2026-02-08)
+
+
+### Bug Fixes
+
+* **ci:** skip agent CI workflow for tag pushes ([6b37e09](https://github.com/hashpass-tech/JACK/commit/6b37e097f1440158d9575e18ecc5ee91f5b94bfa))
+* **sdk:** correct repository URLs and add homepage/bugs fields for npm v1.2.4 ([687b857](https://github.com/hashpass-tech/JACK/commit/687b85740e633bc0d93041db5ffecfb47cd71d29))
+* **sdk:** prevent prototype pollution in event mapper ([af0fb4d](https://github.com/hashpass-tech/JACK/commit/af0fb4df07e2dd015a2c1abf9d9c675566f6b25d))
+
+
+### Features
+
+* add automated documentation archiving system ([e8d2040](https://github.com/hashpass-tech/JACK/commit/e8d20407c71f4eaaea0377839ac6d7ab7a1b61de))
+* **avatar:** restore original JACK avatar v1.0.0 + add versioning ([4222115](https://github.com/hashpass-tech/JACK/commit/4222115eae5c4e8ac2f8c644b6ab01cfd3ce8a55)), closes [#6a3a1](https://github.com/hashpass-tech/JACK/issues/6a3a1)
+* dashboard video v1.0.3, versioned Jack avatar, testnet banner, walkthrough modal ([fa3430d](https://github.com/hashpass-tech/JACK/commit/fa3430dd4890a08dad7b69ab181974c302cb6ad0))
+* **sdk:** add Yellow Network integration v1.1.0 ([fcd8ef3](https://github.com/hashpass-tech/JACK/commit/fcd8ef335dc3b27c0f8c8dab7e8e628bec839503))
+* **sdk:** release v1.2.1 with LI.FI integration ([546b4ff](https://github.com/hashpass-tech/JACK/commit/546b4ffaf1819a0f0e688b42774273fa575c2a1d))
+
+
+
+
+
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [0.1.51](https://github.com/hashpass-tech/JACK/compare/v0.1.50-testnet.1...v0.1.51) (2026-02-07)
+
+
+## [SDK v1.2.3] - 2026-02-08
+
+### Changed - Badge Updates
+- **Discord Badge**: Updated with live member count (Server ID: 1131014788072349827)
+- **X (Twitter) Badge**: Added to both main and SDK READMEs
+- **README Badges**: Now show Discord member count and X follow link
+
+### Technical Details
+- **No Code Changes**: This is a documentation-only release to update npm package README
+- **Testing**: 517 tests still passing
+- **Build**: All targets compile successfully
+
+## [SDK v1.2.2] - 2026-02-08
+
+### Changed - Documentation Updates
+- **README Updates**: Updated SDK README with latest features and correct links
+  - Added LI.FI integration examples and usage
+  - Added Yellow Network integration examples
+  - Added dual provider architecture documentation
+  - Updated all import statements to use `@jack-kernel/sdk`
+  - Updated repository URL to `https://github.com/hashpass-tech/JACK`
+  - Added Discord link: `https://discord.gg/7k8CdmYHpn`
+  - Added X (Twitter) link: `https://x.com/Jack_kernel`
+  - Updated documentation link to `https://jack.hashpass.tech/docs`
+- **Main README**: Added Community section with Discord and X links
+- **Package Metadata**: Corrected package name and repository references
+
+### Technical Details
+- **No Code Changes**: This is a documentation-only release
+- **Testing**: 517 tests still passing
+- **Build**: All targets compile successfully
+
+## [SDK v1.2.1] - 2026-02-07
+
+### Added - LI.FI Integration
+- **LI.FI SDK Integration**: Complete integration of `@lifi/sdk` for cross-chain routing and quotes
+  - `LifiProvider` class with `fetchQuote`, `fetchRoute`, and `fetchStatus` methods
+  - Chain and token resolution with case-insensitive lookups
+  - Fallback logic with static rates when LI.FI API is unavailable
+  - Retry logic with exponential backoff for transient failures
+  - Full TypeScript type definitions for all LI.FI payloads
+- **SDK Exports**: New exports in `@jack-kernel/sdk`
+  - `LifiProvider`, `LifiConfig` for provider initialization
+  - `LifiQuotePayload`, `LifiRoutePayload`, `LifiStatusPayload` types
+  - `resolveChain`, `resolveToken` utilities for chain/token resolution
+  - `toBaseUnits`, `fromBaseUnits` for unit conversion
+- **JACK_SDK Integration**: Optional `lifi` config parameter
+  - `sdk.lifi` property for direct provider access
+  - `sdk.getLifiQuote()` and `sdk.getLifiRoute()` convenience methods
+- **Dashboard Migration**: Refactored `apps/dashboard/src/lib/lifi.ts` to use SDK-level provider
+  - Removed ~300 lines of raw REST calls
+  - Preserved same export signatures for backward compatibility
+
+### Added - Settlement Adapter & Documentation
+- **Smart Contracts**: Production-ready `JACKSettlementAdapter`
+  - EIP-712 signature validation for intent authenticity
+  - Solver authorization with whitelist-based access control
+  - Policy integration through `JACKPolicyHook`
+  - Atomic swaps via Uniswap v4 unlock/callback pattern
+  - Comprehensive test suite with 211 test cases
+- **Documentation**: Complete contract documentation
+  - Settlement adapter architecture and flow diagrams
+  - API reference and usage examples
+  - Integration guides for solvers
+
+### Added - Community & UI
+- **Social Links**: Added Discord and X (Twitter) links
+  - Dashboard footer: Discord (`https://discord.gg/7k8CdmYHpn`) and X (`https://x.com/Jack_kernel`)
+  - Landing page footer: Discord and X links
+  - Documentation footer: Community section with Discord and X
+
+### Technical Details
+- **Compatibility**: LI.FI and Yellow Network integrations work side-by-side
+- **Testing**: 517 tests passing (Yellow + LI.FI + core SDK)
+- **Build**: All targets compile successfully (ESM, CJS, types)
+
+## [0.1.50](https://github.com/hashpass-tech/JACK/compare/v0.1.49-testnet.1...v0.1.50) (2026-02-07)
+
+
+### Features
+
+* **dashboard:** futuristic UX rewrite — SVG icons, voice input, receipt upload, auto-route resolver ([3598e65](https://github.com/hashpass-tech/JACK/commit/3598e656e8dd3f5ee9d3b1e0dbb3cecf325bad76))
+
+
+## [0.1.49](https://github.com/hashpass-tech/JACK/compare/v0.1.48...v0.1.49) (2026-02-07)
+
+
+### Features
+
+* **dashboard:** refresh favicon assets ([82bb671](https://github.com/hashpass-tech/JACK/commit/82bb6715e916cbf6c7bfd71a75c38d42fc26d46c))
+
+
+
+
+
+## [0.1.48](https://github.com/hashpass-tech/JACK/compare/v0.1.47...v0.1.48) (2026-02-07)
+
+
+### Features
+
+* **landing:** add interactive video controls to Deep Dive overlay ([cb0802a](https://github.com/hashpass-tech/JACK/commit/cb0802a3bd5c9921f8e8f1bf219b484263388243))
+
+
+
+## [0.1.45-testnet.1](https://github.com/hashpass-tech/JACK/compare/v0.1.44...v0.1.45-testnet.1) (2026-02-07)
+
+
+### Features
+
+* **landing:** add cinematic Deep Dive auto-flow with sound & smooth 3D transitions ([d6b817c](https://github.com/hashpass-tech/JACK/commit/d6b817cb9687a41bad906d41226cbaf467c0dccb))
+
+
+
+
+
+## [0.1.47](https://github.com/hashpass-tech/JACK/compare/v0.1.46...v0.1.47) (2026-02-07)
+
+
+### Features
+
+* **dashboard:** add neural background between top bar and footer ([b4de888](https://github.com/hashpass-tech/JACK/commit/b4de88812fa8852a5c3516001d3b0f95b25dd2a9))
+* **landing:** add interactive video controls to Deep Dive overlay ([cb0802a](https://github.com/hashpass-tech/JACK/commit/cb0802a3bd5c9921f8e8f1bf219b484263388243))
+
+
+
+
 ## [0.1.46](https://github.com/hashpass-tech/JACK/compare/v0.1.45...v0.1.46) (2026-02-07)
 
 
+### Features
 
+* **landing:** add interactive video controls to Deep Dive overlay ([cb0802a](https://github.com/hashpass-tech/JACK/commit/cb0802a3bd5c9921f8e8f1bf219b484263388243))
+
+
+### Documentation
+
+* **api:** add ERC-7824 Yellow setup details ([90a1207](https://github.com/hashpass-tech/JACK/commit/90a12075f1cf809cfa4dd592b458984b44df07fb))
 
 
 ## [0.1.45](https://github.com/hashpass-tech/JACK/compare/v0.1.44...v0.1.45) (2026-02-07)
@@ -10,6 +196,7 @@
 ### Features
 
 * **dashboard:** add neural background between top bar and footer ([b4de888](https://github.com/hashpass-tech/JACK/commit/b4de88812fa8852a5c3516001d3b0f95b25dd2a9))
+* **landing:** add cinematic Deep Dive auto-flow with sound & smooth 3D transitions ([d6b817c](https://github.com/hashpass-tech/JACK/commit/d6b817cb9687a41bad906d41226cbaf467c0dccb))
 
 
 
@@ -367,6 +554,10 @@
 ## [0.1.5](https://github.com/hashpass-tech/JACK/compare/v0.1.3...v0.1.5) (2026-02-05)
 
 
+
+
+* **dashboard:** add neural background between top bar and footer ([b4de888](https://github.com/hashpass-tech/JACK/commit/b4de88812fa8852a5c3516001d3b0f95b25dd2a9))
+* **landing:** add interactive video controls to Deep Dive overlay ([cb0802a](https://github.com/hashpass-tech/JACK/commit/cb0802a3bd5c9921f8e8f1bf219b484263388243))
 
 
 

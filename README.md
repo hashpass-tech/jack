@@ -8,6 +8,8 @@
 [![Docs Impact Check](https://github.com/hashpass-tech/jack/actions/workflows/docs-impact.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/docs-impact.yml)
 [![CI (Agent Tasks)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml/badge.svg)](https://github.com/hashpass-tech/jack/actions/workflows/agent-ci.yml)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Discord](https://img.shields.io/discord/1131014788072349827?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/7k8CdmYHpn)
+[![X (Twitter)](https://img.shields.io/badge/Follow-%40Jack__kernel-1DA1F2?logo=x&logoColor=white)](https://x.com/Jack_kernel)
 
 ## Overview
 
@@ -46,7 +48,17 @@ graph TB
 - **Developer SDK**: Comprehensive SDK for integration with existing applications
 - **Dashboard Interface**: Intuitive web dashboard for monitoring and management
 
-## Current System State (February 7, 2026)
+## Current System State (February 8, 2026)
+
+### Latest Updates
+
+- ✅ **Uniswap v4 Integration**: Successfully deployed JACKPolicyHook and JACKSettlementAdapter to Sepolia testnet
+  - JACKPolicyHook: [`0xE8142B1Ff0DA631866fec5771f4291CbCe718080`](https://sepolia.etherscan.io/address/0xE8142B1Ff0DA631866fec5771f4291CbCe718080#code)
+  - JACKSettlementAdapter: [`0xd8f0415b488F2BA18EF14F5C41989EEf90E51D1A`](https://sepolia.etherscan.io/address/0xd8f0415b488F2BA18EF14F5C41989EEf90E51D1A#code)
+  - Verified on Sourcify (exact match)
+  - Deployment transactions: [Policy Hook](https://sepolia.etherscan.io/tx/0xfe8a64c351c62df57919d79b85a952bacb5dd410e684d6342e01f060ef18929e) | [Settlement Adapter](https://sepolia.etherscan.io/tx/0xf9ce7f6309ce153e66bc4e2160ae5338e6db3fc82e77edc7fadef3ab567098f5)
+
+### System Components
 
 - `develop` includes merged execution/API work from PR `#20` (Yellow notification/auth/persistence flow) and PR `#21` (LI.FI quote/route/status integration + `/api/quote` endpoint).
 - Issues `#17` and `#18` are closed as merged into `develop`.
@@ -54,6 +66,14 @@ graph TB
 - Explicit fallback mode exists for LI.FI when provider calls fail or inputs are unsupported.
 - Yellow provider callbacks support ERC-7824 (Nitrolite) channel metadata/guards (`channelId`, `channelStatus`, `stateIntent`, `stateVersion`, optional adjudicator + challenge period checks).
 - Remaining hardening work is tracked in follow-up issue `#22` (lint/type cleanup and provider-state reliability tightening).
+
+### Prize Track Participation
+
+JACK is participating in two ETHGlobal prize tracks:
+- **Uniswap Foundation Prize Track** ($10,000) - Contracts deployed ✅
+- **Yellow Network Prize Track** ($15,000) - Integration in progress ⏳
+
+See [Prize Track Submission](./docs/PRIZE_TRACK_SUBMISSION.md) for details.
 
 ## 3-Step Setup Guide
 
@@ -104,7 +124,7 @@ jack/
 
 ## Documentation
 
-- [Docs Platform](https://docs.jack.lukas.money)
+- [Docs Platform](https://docs.jack.lukas.money/docs)
 - [Mission & Overview](./apps/docs/docs/overview.md)
 - [Architecture](./apps/docs/docs/architecture.md)
 - [Demo Narrative](./docs/demo-script.md)
@@ -115,6 +135,36 @@ jack/
 - [Whitepaper Portal](./apps/docs/docs/whitepaper/index.mdx)
 - [Whitepaper Changelog](./apps/docs/docs/whitepaper/changelog.md)
 - [MVP Critical Roadmap](./apps/docs/docs/operations/mvp-critical-roadmap.md)
+
+## Community
+
+- **Discord**: [Join our community](https://discord.gg/7k8CdmYHpn)
+- **X (Twitter)**: [@Jack_kernel](https://x.com/Jack_kernel)
+- **GitHub**: [hashpass-tech/JACK](https://github.com/hashpass-tech/JACK)
+
+## Security
+
+JACK enforces multiple layers of security linting to protect against common vulnerabilities:
+
+- **Pre-commit hooks**: Automated checks before each commit
+- **ESLint security rules**: Detects command injection, unsafe patterns, and more
+- **Secret detection**: Prevents accidental exposure of credentials
+- **CI/CD enforcement**: All PRs are automatically scanned for security issues
+
+For detailed information, see [Security Linting Documentation](./docs/SECURITY_LINTING.md).
+
+### Running Security Checks Locally
+
+```bash
+# Run all linters
+pnpm run lint
+
+# Check for secrets
+npx secretlint "**/*"
+
+# Custom secret check
+./scripts/check-secrets.sh
+```
 
 ## Contributing
 

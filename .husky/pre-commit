@@ -1,2 +1,3 @@
 ./scripts/check-secrets.sh
 npx lint-staged
+pnpm clean:docs

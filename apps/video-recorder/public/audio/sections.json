@@ -1,0 +1,64 @@
+[
+  {
+    "id": "intro",
+    "label": "INTRO",
+    "screenshot": "full",
+    "zoomTarget": null,
+    "startFrame": 0,
+    "endFrame": 497,
+    "audioFile": "section-intro.mp3",
+    "audioDurationS": 16.536
+  },
+  {
+    "id": "create-intent",
+    "label": "CREATE INTENT",
+    "screenshot": "createIntent",
+    "zoomTarget": {
+      "x": 0.35,
+      "y": 0.45,
+      "scale": 1.2
+    },
+    "startFrame": 497,
+    "endFrame": 2067,
+    "audioFile": "section-create-intent.mp3",
+    "audioDurationS": 52.32
+  },
+  {
+    "id": "executions",
+    "label": "EXECUTIONS",
+    "screenshot": "executions",
+    "zoomTarget": {
+      "x": 0.5,
+      "y": 0.5,
+      "scale": 1.15
+    },
+    "startFrame": 2067,
+    "endFrame": 3496,
+    "audioFile": "section-executions.mp3",
+    "audioDurationS": 47.616
+  },
+  {
+    "id": "agent-costs",
+    "label": "AGENT & COSTS",
+    "screenshot": "agentCosts",
+    "zoomTarget": {
+      "x": 0.5,
+      "y": 0.45,
+      "scale": 1.2
+    },
+    "startFrame": 3496,
+    "endFrame": 4675,
+    "audioFile": "section-agent-costs.mp3",
+    "audioDurationS": 39.288
+  },
+  {
+    "id": "outro",
+    "label": "GET STARTED",
+    "screenshot": "full",
+    "zoomTarget": null,
+    "startFrame": 4675,
+    "endFrame": 5402,
+    "audioFile": "section-outro.mp3",
+    "audioDurationS": 24.216
+  }
+]

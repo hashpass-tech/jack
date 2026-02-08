@@ -2,8 +2,12 @@ name: Agent Tasks CI
 
 on:
   push:
+    branches:
+      - '**'
     paths:
       - '.agent-tasks/**'
+    tags-ignore:
+      - '**'
   workflow_dispatch:
 
 permissions:
@@ -43,6 +47,13 @@ jobs:
         run: |
           git config user.name "Agent Bot"
           git config user.email "bot@jack.dev"
+          
+          # Check if we're in detached HEAD state (e.g., from a tag)
+          if ! git symbolic-ref -q HEAD > /dev/null; then
+            echo "Detached HEAD detected (likely from tag push). Skipping commit."
+            exit 0
+          fi
+          
           git add .
           git commit -m "chore: agent-generated code execution results" || true
           git push

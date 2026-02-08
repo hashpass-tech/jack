@@ -1,4 +1,21 @@
 steps:
+  # Upload assets to GCS bucket
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo "Uploading assets to GCS..."
+        gsutil -m rsync -r -d apps/dashboard/public/videos gs://jack-dashboard-assets/videos
+        gsutil -m rsync -r apps/dashboard/public/*.png gs://jack-dashboard-assets/ || true
+        gsutil -m rsync -r apps/dashboard/public/*.jpg gs://jack-dashboard-assets/ || true
+        gsutil -m rsync -r apps/dashboard/public/*.svg gs://jack-dashboard-assets/ || true
+        gsutil -m rsync -r apps/dashboard/public/*.ico gs://jack-dashboard-assets/ || true
+        gsutil -m rsync -r apps/dashboard/public/*.webmanifest gs://jack-dashboard-assets/ || true
+        gsutil -m setmeta -h "Cache-Control:public, max-age=31536000, immutable" gs://jack-dashboard-assets/**
+        echo "Assets uploaded successfully"
+  
+  # Build Docker image
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -7,6 +24,8 @@ steps:
       - apps/dashboard/Dockerfile
       - --build-arg
       - NEXT_PUBLIC_IS_TESTNET=${_NEXT_PUBLIC_IS_TESTNET}
+      - --build-arg
+      - NEXT_PUBLIC_CDN_URL=https://storage.googleapis.com/jack-dashboard-assets
       - -t
       - ${_IMAGE}
 images:

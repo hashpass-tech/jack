@@ -1,0 +1,45 @@
+{
+  "name": "@jack/video-recorder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JACK 3D Avatar Video Recorder — Remotion Recorder + Three.js VRM + Real-Time AI",
+  "scripts": {
+    "dev": "remotion studio",
+    "dev:preview": "vite",
+    "build": "remotion bundle",
+    "render": "remotion render JackAvatar",
+    "render:landscape": "remotion render JackAvatarLandscape",
+    "render:all": "remotion render JackAvatar && remotion render JackAvatarLandscape",
+    "upgrade": "remotion upgrade",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gabber/client-react": "0.1.0-alpha21",
+    "@pixiv/three-vrm": "^3.3.2",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
+    "@remotion/animation-utils": "^4.0.0",
+    "@remotion/cli": "^4.0.0",
+    "@remotion/google-fonts": "^4.0.0",
+    "@remotion/shapes": "^4.0.0",
+    "@remotion/three": "^4.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "remotion": "^4.0.0",
+    "three": "^0.182.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@remotion/eslint-config-flat": "^4.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/three": "^0.182.0",
+    "@vitejs/plugin-react": "^4.3.0",
+    "eslint": "^9.0.0",
+    "puppeteer": "^24.37.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.0",
+    "vite": "^5.4.0"
+  }
+}
