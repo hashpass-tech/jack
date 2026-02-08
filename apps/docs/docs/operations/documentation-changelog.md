@@ -18,6 +18,7 @@ Auto-updated on merged PRs to `develop` and `main`.
 
 ## 2026-02-08
 
+- PR [#40](https://github.com/hashpass-tech/JACK/pull/40) into `develop` by @Copilot: feat(security): enforce security linting to prevent command injection and vulnerability patterns | docs-impact: required (added comprehensive security linting documentation and updated README with security enforcement details) | areas: unlabeled | summary: added security linting enforcement with eslint-plugin-security, CI workflow, and pre-commit hooks to prevent vulnerabilities
 - PR [#37](https://github.com/hashpass-tech/JACK/pull/37) into `develop` by @edcalderon: Add prize track readiness audit issue | docs-impact: unspecified | areas: unlabeled | summary: Add prize track readiness audit issue
 - PR [#36](https://github.com/hashpass-tech/JACK/pull/36) into `develop` by @edcalderon: Fix ReDoS risks in SDK error parsing | docs-impact: unspecified | areas: unlabeled | summary: Fix ReDoS risks in SDK error parsing
 - PR [#32](https://github.com/hashpass-tech/JACK/pull/32) into `develop` by @Copilot: Fix prototype pollution via intentId in store and API routes | docs-impact: none (Internal security fix with no public API surface changes) | areas: unlabeled | summary: no public interface impact
