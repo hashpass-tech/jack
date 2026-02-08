@@ -10,12 +10,17 @@ RUN corepack enable
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY packages ./packages
 COPY apps/dashboard ./apps/dashboard
+COPY components ./components
+COPY CHANGELOG.md ./CHANGELOG.md
+
+ARG NEXT_PUBLIC_IS_TESTNET=false
+ENV NEXT_PUBLIC_IS_TESTNET=$NEXT_PUBLIC_IS_TESTNET
 
 # Install deps (workspace)
 RUN pnpm install --frozen-lockfile
 
-# Build dashboard
-RUN pnpm --filter dashboard build
+# Build SDK first, then dashboard
+RUN pnpm --filter @jack-kernel/sdk build && pnpm --filter dashboard build
 
 EXPOSE 8080
 ENV NODE_ENV=production

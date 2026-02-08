@@ -538,8 +538,8 @@ export async function POST(request: NextRequest) {
 
             safeIntent.status = status;
             safeIntent.updatedAt = timestamp as number;
-            safeIntent.provider = (body as { provider?: unknown }).provider || safeIntent.provider || 'Yellow Network';
-            safeIntent.sessionId = (body as { sessionId?: unknown }).sessionId || safeIntent.sessionId;
+            safeIntent.provider = String((body as { provider?: unknown }).provider || safeIntent.provider || 'Yellow Network');
+            safeIntent.sessionId = String((body as { sessionId?: unknown }).sessionId || safeIntent.sessionId || '');
             if (typeof (body as { channel?: unknown }).channel === 'string') {
                 safeIntent.channel = (body as { channel: string }).channel;
             }
@@ -570,30 +570,30 @@ export async function POST(request: NextRequest) {
             if ((body as { nonce?: unknown }).nonce !== undefined) {
                 safeIntent.nonce = (body as { nonce: number }).nonce;
             }
-            intent.reasonCodes = intent.reasonCodes ?? [];
-            intent.operatorLogs = intent.operatorLogs ?? [];
+            safeIntent.reasonCodes = safeIntent.reasonCodes ?? [];
+            safeIntent.operatorLogs = safeIntent.operatorLogs ?? [];
 
             if (body.reasonCode) {
-                intent.reasonCodes.push({
+                safeIntent.reasonCodes.push({
                     code: body.reasonCode as string,
                     timestamp: timestamp as number,
-                    source: intent.provider as string
+                    source: safeIntent.provider as string
                 });
             }
 
             if (body.operatorLog) {
-                intent.operatorLogs.push({
+                safeIntent.operatorLogs.push({
                     message: body.operatorLog as string,
                     timestamp: timestamp as number,
-                    source: intent.provider as string
+                    source: safeIntent.provider as string
                 });
             }
 
             if (body.settlementTx) {
-                intent.settlementTx = body.settlementTx as string;
+                safeIntent.settlementTx = body.settlementTx as string;
             }
 
-            const executionSteps = intent.executionSteps ?? [];
+            const executionSteps = safeIntent.executionSteps ?? [];
             executionSteps.push({
                 step,
                 status: stepStatus,
@@ -604,12 +604,12 @@ export async function POST(request: NextRequest) {
                     (body.operatorLog as string | undefined) ||
                     (erc7824Details ? `ERC-7824 ${erc7824Details}` : undefined)
             });
-            intent.executionSteps = executionSteps;
+            safeIntent.executionSteps = executionSteps;
 
             if (body.metadata || hasErc7824Metadata) {
                 const providerMetadataBase =
-                    intent.providerMetadata && typeof intent.providerMetadata === 'object'
-                        ? intent.providerMetadata
+                    safeIntent.providerMetadata && typeof safeIntent.providerMetadata === 'object'
+                        ? safeIntent.providerMetadata
                         : {};
                 const existingErc7824 =
                     providerMetadataBase.erc7824 && typeof providerMetadataBase.erc7824 === 'object'
@@ -638,10 +638,10 @@ export async function POST(request: NextRequest) {
                     };
                 }
 
-                intent.providerMetadata = nextProviderMetadata;
+                safeIntent.providerMetadata = nextProviderMetadata;
             }
 
-            saveIntent(body.intentId, intent);
+            saveIntent(body.intentId, safeIntent);
 
             // Update YellowProvider local channel state if available (Requirement 12.2)
             // This is fire-and-forget: we don't await or block the response.
@@ -663,7 +663,7 @@ export async function POST(request: NextRequest) {
                 }
             }
 
-            return NextResponse.json({ intentId: body.intentId, status: intent.status });
+            return NextResponse.json({ intentId: body.intentId, status: safeIntent.status });
         }
 
         // --- New intent creation (non-provider-notification) ---
