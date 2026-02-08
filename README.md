@@ -48,7 +48,17 @@ graph TB
 - **Developer SDK**: Comprehensive SDK for integration with existing applications
 - **Dashboard Interface**: Intuitive web dashboard for monitoring and management
 
-## Current System State (February 7, 2026)
+## Current System State (February 8, 2026)
+
+### Latest Updates
+
+- ✅ **Uniswap v4 Integration**: Successfully deployed JACKPolicyHook and JACKSettlementAdapter to Sepolia testnet
+  - JACKPolicyHook: [`0xE8142B1Ff0DA631866fec5771f4291CbCe718080`](https://sepolia.etherscan.io/address/0xE8142B1Ff0DA631866fec5771f4291CbCe718080#code)
+  - JACKSettlementAdapter: [`0xd8f0415b488F2BA18EF14F5C41989EEf90E51D1A`](https://sepolia.etherscan.io/address/0xd8f0415b488F2BA18EF14F5C41989EEf90E51D1A#code)
+  - Verified on Sourcify (exact match)
+  - Deployment transactions: [Policy Hook](https://sepolia.etherscan.io/tx/0xfe8a64c351c62df57919d79b85a952bacb5dd410e684d6342e01f060ef18929e) | [Settlement Adapter](https://sepolia.etherscan.io/tx/0xf9ce7f6309ce153e66bc4e2160ae5338e6db3fc82e77edc7fadef3ab567098f5)
+
+### System Components
 
 - `develop` includes merged execution/API work from PR `#20` (Yellow notification/auth/persistence flow) and PR `#21` (LI.FI quote/route/status integration + `/api/quote` endpoint).
 - Issues `#17` and `#18` are closed as merged into `develop`.
@@ -56,6 +66,14 @@ graph TB
 - Explicit fallback mode exists for LI.FI when provider calls fail or inputs are unsupported.
 - Yellow provider callbacks support ERC-7824 (Nitrolite) channel metadata/guards (`channelId`, `channelStatus`, `stateIntent`, `stateVersion`, optional adjudicator + challenge period checks).
 - Remaining hardening work is tracked in follow-up issue `#22` (lint/type cleanup and provider-state reliability tightening).
+
+### Prize Track Participation
+
+JACK is participating in two ETHGlobal prize tracks:
+- **Uniswap Foundation Prize Track** ($10,000) - Contracts deployed ✅
+- **Yellow Network Prize Track** ($15,000) - Integration in progress ⏳
+
+See [Prize Track Submission](./docs/PRIZE_TRACK_SUBMISSION.md) for details.
 
 ## 3-Step Setup Guide
 
