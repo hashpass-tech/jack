@@ -1,3 +1,31 @@
+## [0.1.53](https://github.com/hashpass-tech/JACK/compare/v0.1.52-testnet.1...v0.1.53) (2026-02-08)
+
+
+
+
+
+## [0.1.52](https://github.com/hashpass-tech/JACK/compare/v0.1.51-testnet.1...v0.1.52) (2026-02-08)
+
+
+### Bug Fixes
+
+* **ci:** skip agent CI workflow for tag pushes ([6b37e09](https://github.com/hashpass-tech/JACK/commit/6b37e097f1440158d9575e18ecc5ee91f5b94bfa))
+* **sdk:** correct repository URLs and add homepage/bugs fields for npm v1.2.4 ([687b857](https://github.com/hashpass-tech/JACK/commit/687b85740e633bc0d93041db5ffecfb47cd71d29))
+* **sdk:** prevent prototype pollution in event mapper ([af0fb4d](https://github.com/hashpass-tech/JACK/commit/af0fb4df07e2dd015a2c1abf9d9c675566f6b25d))
+
+
+### Features
+
+* add automated documentation archiving system ([e8d2040](https://github.com/hashpass-tech/JACK/commit/e8d20407c71f4eaaea0377839ac6d7ab7a1b61de))
+* **avatar:** restore original JACK avatar v1.0.0 + add versioning ([4222115](https://github.com/hashpass-tech/JACK/commit/4222115eae5c4e8ac2f8c644b6ab01cfd3ce8a55)), closes [#6a3a1](https://github.com/hashpass-tech/JACK/issues/6a3a1)
+* dashboard video v1.0.3, versioned Jack avatar, testnet banner, walkthrough modal ([fa3430d](https://github.com/hashpass-tech/JACK/commit/fa3430dd4890a08dad7b69ab181974c302cb6ad0))
+* **sdk:** add Yellow Network integration v1.1.0 ([fcd8ef3](https://github.com/hashpass-tech/JACK/commit/fcd8ef335dc3b27c0f8c8dab7e8e628bec839503))
+* **sdk:** release v1.2.1 with LI.FI integration ([546b4ff](https://github.com/hashpass-tech/JACK/commit/546b4ffaf1819a0f0e688b42774273fa575c2a1d))
+
+
+
+
+
 # Changelog
 
 All notable changes to this project will be documented in this file.
