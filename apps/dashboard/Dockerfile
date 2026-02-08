@@ -9,7 +9,9 @@ COPY components ./components
 COPY CHANGELOG.md ./CHANGELOG.md
 
 ARG NEXT_PUBLIC_IS_TESTNET=false
+ARG NEXT_PUBLIC_CDN_URL
 ENV NEXT_PUBLIC_IS_TESTNET=$NEXT_PUBLIC_IS_TESTNET
+ENV NEXT_PUBLIC_CDN_URL=$NEXT_PUBLIC_CDN_URL
 
 RUN corepack enable && pnpm install --frozen-lockfile
 RUN pnpm --filter @jack-kernel/sdk build && pnpm --filter dashboard build

@@ -40,7 +40,13 @@
     "contracts:deploy:testnet": "./scripts/contracts/deploy-hook.sh contracts/.env.testnet",
     "contracts:deploy:mainnet": "./scripts/contracts/deploy-hook.sh contracts/.env.mainnet",
     "contracts:smoke:testnet": "./scripts/contracts/smoke-hook.sh contracts/.env.testnet",
-    "clean:docs": "node --import tsx scripts/clean-docs.ts"
+    "clean:docs": "node --import tsx scripts/clean-docs.ts",
+    "upload:assets": "node --import tsx scripts/upload-assets.ts",
+    "upload:assets:testnet": "node --import tsx scripts/upload-assets.ts --env=testnet",
+    "upload:assets:production": "node --import tsx scripts/upload-assets.ts --env=production",
+    "setup:bucket": "bash scripts/setup-asset-bucket.sh",
+    "setup:bucket:testnet": "bash scripts/setup-asset-bucket.sh testnet",
+    "setup:bucket:production": "bash scripts/setup-asset-bucket.sh production"
   },
   "dependencies": {
     "@metamask/sdk": "^0.34.0",
@@ -57,6 +63,7 @@
   },
   "devDependencies": {
     "@edcalderon/versioning": "^1.0.11",
+    "@google-cloud/storage": "^7.19.0",
     "@secretlint/quick-start": "^11.3.1",
     "@secretlint/secretlint-rule-preset-recommend": "^11.3.1",
     "@types/blessed": "^0.1.27",
