@@ -3,13 +3,21 @@
 **Release Date**: February 7, 2026  
 **Version**: 1.0.0 → 1.1.0  
 **Branch**: develop  
-**Commit**: fcd8ef3  
+**Commit**: af0fb4d  
 **Tag**: sdk-v1.1.0  
 **npm Package**: @jack-kernel/sdk@1.1.0 (publishing via GitHub Actions)
 
 ## Overview
 
 This release adds comprehensive Yellow Network integration to the JACK SDK, enabling state channel-based clearing and settlement via ERC-7824. The integration is fully backward compatible with existing SDK usage.
+
+## Bug Fixes
+
+### Prototype Pollution Prevention
+Fixed a security issue in the event mapper where arbitrary strings could access Object.prototype properties (like "constructor") instead of returning undefined. Now uses `Object.hasOwn()` to safely check for property existence.
+
+**Impact**: Property-based tests now pass 100% (517/517)  
+**Commit**: af0fb4d
 
 ## What's New
 
