@@ -851,6 +851,22 @@ const LandingPage: React.FC = () => {
                 >
                   GitHub
                 </a>
+                <a
+                  href="https://discord.gg/7k8CdmYHpn"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  Discord
+                </a>
+                <a
+                  href="https://x.com/Jack_kernel"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  X
+                </a>
               </div>
             </div>
           </footer>

@@ -41,14 +41,16 @@ const jackLightTheme = lightTheme({
     fontStack: 'system',
 });
 
-export function Providers({ children }: { children: any }) {
-    const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+export function Providers({ children }: { children: React.ReactNode }) {
+    const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+        if (typeof document !== 'undefined') {
+            const current = document.documentElement.getAttribute('data-theme');
+            if (current === 'light') return 'light';
+        }
+        return 'dark';
+    });
 
     useEffect(() => {
-        // Read initial theme
-        const current = document.documentElement.getAttribute('data-theme');
-        if (current === 'light') setTheme('light');
-
         // Watch for theme changes
         const observer = new MutationObserver((mutations) => {
             for (const mutation of mutations) {
@@ -66,7 +68,7 @@ export function Providers({ children }: { children: any }) {
         <WagmiProvider config={config}>
             <QueryClientProvider client={queryClient}>
                 <RainbowKitProvider theme={theme === 'light' ? jackLightTheme : jackDarkTheme}>
-                    {children}
+                    <>{children}</>
                 </RainbowKitProvider>
             </QueryClientProvider>
         </WagmiProvider>

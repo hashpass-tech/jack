@@ -1,6 +1,6 @@
 {
   "name": "@jack-kernel/sdk",
-  "version": "1.1.0",
+  "version": "1.2.1",
   "description": "TypeScript SDK for JACK cross-chain execution kernel",
   "main": "./dist/cjs/index.js",
   "module": "./dist/esm/index.js",
@@ -41,6 +41,9 @@
     "type": "git",
     "url": "https://github.com/your-org/jack.git",
     "directory": "packages/sdk"
+  },
+  "dependencies": {
+    "@lifi/sdk": "^3.15.5"
   },
   "peerDependencies": {
     "viem": "^2.0.0"

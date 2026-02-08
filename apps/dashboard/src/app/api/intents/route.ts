@@ -1,10 +1,79 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIntents, saveIntent } from '@/lib/store';
-import { fetchLifiQuote, fetchLifiRoute, fetchLifiStatus, type LifiFallback } from '@/lib/lifi';
+import { fetchLifiQuote, fetchLifiRoute, fetchLifiStatus, type LifiFallback, type LifiStatusPayload } from '@/lib/lifi';
 import { getYellowProvider } from '@/lib/yellow';
 import type { IntentParams } from '../../../../../../packages/sdk';
 
+// ---------------------------------------------------------------------------
+// Explicit types for intent records (replaces implicit `any`)
+// ---------------------------------------------------------------------------
+
+type IntentStatus =
+    | 'CREATED'
+    | 'QUOTED'
+    | 'EXECUTING'
+    | 'SETTLING'
+    | 'SETTLED'
+    | 'ABORTED'
+    | 'EXPIRED';
+
+type ExecutionStepStatus = 'COMPLETED' | 'IN_PROGRESS' | 'PENDING' | 'FAILED';
+
+interface ExecutionStep {
+    step: string;
+    status: ExecutionStepStatus;
+    timestamp: number;
+    details?: string;
+}
+
+interface ReasonCodeEntry {
+    code: string;
+    timestamp: number;
+    source: string;
+}
+
+interface OperatorLogEntry {
+    message: string;
+    timestamp: number;
+    source: string;
+}
+
 type FallbackReason = LifiFallback & { stage: 'QUOTE' | 'ROUTE' | 'STATUS' };
+
+interface IntentRecord {
+    id: string;
+    params: IntentParams;
+    status: IntentStatus;
+    createdAt: number;
+    updatedAt?: number;
+    executionSteps: ExecutionStep[];
+    reasonCodes: ReasonCodeEntry[];
+    operatorLogs: OperatorLogEntry[];
+    fallbackMode?: {
+        enabled: boolean;
+        reasons: FallbackReason[];
+    };
+    provider?: string;
+    sessionId?: string;
+    channel?: string;
+    channelId?: string;
+    channelStatus?: string;
+    stateIntent?: string;
+    stateVersion?: number;
+    stateHash?: string;
+    adjudicator?: string;
+    challengePeriod?: number;
+    challengeExpiration?: number;
+    nonce?: number;
+    settlementTx?: string;
+    lifi?: {
+        quote?: unknown;
+        route?: unknown;
+        status?: unknown;
+    };
+    providerMetadata?: Record<string, unknown>;
+    [key: string]: unknown;
+}
 
 type StepStatus = 'COMPLETED' | 'IN_PROGRESS' | 'PENDING' | 'FAILED';
 
@@ -208,6 +277,10 @@ const STATE_INTENT_MAP: Record<string, NotificationMapping> = {
     }
 };
 
+// ---------------------------------------------------------------------------
+// Helper utilities
+// ---------------------------------------------------------------------------
+
 const normalizeEvent = (value?: string) =>
     value ? value.trim().toLowerCase().replace(/[\s-]+/g, '_') : '';
 
@@ -352,9 +425,63 @@ const requireProviderAuth = (request: NextRequest, notification: ProviderNotific
     return { ok: true, status: 200, message: 'OK' };
 };
 
+// ---------------------------------------------------------------------------
+// Provider-driven status resolution helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Normalize a LI.FI status state string to an IntentStatus.
+ * Maps LI.FI-specific states (e.g. "DONE", "FAILED", "PENDING", "NOT_FOUND")
+ * to the intent lifecycle statuses used by the dashboard.
+ */
+const normalizeLifiState = (lifiState: string): IntentStatus => {
+    const upper = lifiState.toUpperCase();
+    switch (upper) {
+        case 'DONE':
+            return 'SETTLED';
+        case 'FAILED':
+            return 'ABORTED';
+        case 'PENDING':
+        case 'NOT_FOUND':
+            return 'EXECUTING';
+        case 'INVALID':
+            return 'ABORTED';
+        default:
+            return 'EXECUTING';
+    }
+};
+
+/**
+ * Derive the final outcome for an intent based on the LI.FI status payload.
+ * Returns the resolved IntentStatus and a human-readable label for the
+ * execution step.
+ */
+const deriveFinalOutcome = (
+    statusPayload: LifiStatusPayload
+): { status: IntentStatus; stepLabel: string; stepStatus: ExecutionStepStatus } => {
+    if (statusPayload.provider === 'lifi') {
+        const resolved = normalizeLifiState(statusPayload.status.state);
+        return {
+            status: resolved,
+            stepLabel: resolved === 'SETTLED' ? 'Settlement Complete' : `Settlement Status: ${statusPayload.status.state}`,
+            stepStatus: resolved === 'SETTLED' ? 'COMPLETED' : 'FAILED'
+        };
+    }
+    // Fallback provider – cannot confirm settlement
+    return {
+        status: 'ABORTED',
+        stepLabel: 'Settlement Unavailable',
+        stepStatus: 'FAILED'
+    };
+};
+
+// ---------------------------------------------------------------------------
+// Route handlers
+// ---------------------------------------------------------------------------
+
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json();
+        const body = (await request.json()) as Record<string, unknown>;
 
         if (isProviderNotification(body)) {
             const authCheck = requireProviderAuth(request, body);
@@ -362,14 +489,14 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: authCheck.message }, { status: authCheck.status });
             }
 
-            const intents = getIntents();
-            const intent = intents[body.intentId];
+            const intents = getIntents() as Record<string, IntentRecord>;
+            const intent: IntentRecord | undefined = intents[body.intentId];
             if (!intent) {
                 return NextResponse.json({ error: 'Intent not found' }, { status: 404 });
             }
 
             const mapping = inferNotificationMapping(body);
-            const status = mapping?.status || intent.status;
+            const status = (mapping?.status || intent.status) as IntentStatus;
             const channelStatus = extractChannelStatus(body);
             const stateIntent = extractStateIntent(body);
             const stateVersion = extractStateVersion(body);
@@ -380,7 +507,7 @@ export async function POST(request: NextRequest) {
             const channelConfig = extractChannelConfig(body);
             const stepLabel = body.event || body.status || channelStatus || stateIntent || 'UNKNOWN';
             const step = mapping?.step || `Provider Update (${stepLabel})`;
-            const stepStatus = mapping?.stepStatus || 'COMPLETED';
+            const stepStatus: ExecutionStepStatus = mapping?.stepStatus || 'COMPLETED';
             const timestamp = body.timestamp ?? Date.now();
             const erc7824Details = [
                 channelId ? `channelId ${channelId}` : '',
@@ -400,11 +527,11 @@ export async function POST(request: NextRequest) {
                 body.nonce !== undefined ||
                 channelConfig ||
                 body.state ||
-                (body.proofs && body.proofs.length)
+                (body.proofs && (body.proofs as unknown[]).length)
             );
 
             intent.status = status;
-            intent.updatedAt = timestamp;
+            intent.updatedAt = timestamp as number;
             intent.provider = body.provider || intent.provider || 'Yellow Network';
             intent.sessionId = body.sessionId || intent.sessionId;
             if (typeof body.channel === 'string') {
@@ -423,7 +550,7 @@ export async function POST(request: NextRequest) {
                 intent.stateVersion = stateVersion;
             }
             if (body.stateHash) {
-                intent.stateHash = body.stateHash;
+                intent.stateHash = body.stateHash as string;
             }
             if (adjudicator) {
                 intent.adjudicator = adjudicator;
@@ -435,41 +562,43 @@ export async function POST(request: NextRequest) {
                 intent.challengeExpiration = challengeExpiration;
             }
             if (body.nonce !== undefined) {
-                intent.nonce = body.nonce;
+                intent.nonce = body.nonce as number;
             }
-            intent.reasonCodes = intent.reasonCodes || [];
-            intent.operatorLogs = intent.operatorLogs || [];
+            intent.reasonCodes = intent.reasonCodes ?? [];
+            intent.operatorLogs = intent.operatorLogs ?? [];
 
             if (body.reasonCode) {
                 intent.reasonCodes.push({
-                    code: body.reasonCode,
-                    timestamp,
-                    source: intent.provider
+                    code: body.reasonCode as string,
+                    timestamp: timestamp as number,
+                    source: intent.provider as string
                 });
             }
 
             if (body.operatorLog) {
                 intent.operatorLogs.push({
-                    message: body.operatorLog,
-                    timestamp,
-                    source: intent.provider
+                    message: body.operatorLog as string,
+                    timestamp: timestamp as number,
+                    source: intent.provider as string
                 });
             }
 
             if (body.settlementTx) {
-                intent.settlementTx = body.settlementTx;
+                intent.settlementTx = body.settlementTx as string;
             }
 
-            intent.executionSteps.push({
+            const executionSteps = intent.executionSteps ?? [];
+            executionSteps.push({
                 step,
                 status: stepStatus,
-                timestamp,
+                timestamp: timestamp as number,
                 details:
-                    body.details ||
-                    body.reasonCode ||
-                    body.operatorLog ||
+                    (body.details as string | undefined) ||
+                    (body.reasonCode as string | undefined) ||
+                    (body.operatorLog as string | undefined) ||
                     (erc7824Details ? `ERC-7824 ${erc7824Details}` : undefined)
             });
+            intent.executionSteps = executionSteps;
 
             if (body.metadata || hasErc7824Metadata) {
                 const providerMetadataBase =
@@ -478,11 +607,11 @@ export async function POST(request: NextRequest) {
                         : {};
                 const existingErc7824 =
                     providerMetadataBase.erc7824 && typeof providerMetadataBase.erc7824 === 'object'
-                        ? providerMetadataBase.erc7824
+                        ? (providerMetadataBase.erc7824 as Record<string, unknown>)
                         : {};
                 const nextProviderMetadata: Record<string, unknown> = {
                     ...providerMetadataBase,
-                    ...(body.metadata || {})
+                    ...((body.metadata as Record<string, unknown>) || {})
                 };
 
                 if (hasErc7824Metadata) {
@@ -499,7 +628,7 @@ export async function POST(request: NextRequest) {
                         nonce: body.nonce,
                         channel: channelConfig,
                         state: body.state,
-                        proofsCount: body.proofs?.length ?? 0
+                        proofsCount: (body.proofs as unknown[] | undefined)?.length ?? 0
                     };
                 }
 
@@ -531,21 +660,22 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ intentId: body.intentId, status: intent.status });
         }
 
-        const intentId = `JK-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        // --- New intent creation (non-provider-notification) ---
+        const intentId = `JK-${Math.random().toString(36).slice(2, 11).toUpperCase()}`;
         const timestamp = Date.now();
 
         const params: IntentParams = {
-            sourceChain: body.sourceChain,
-            destinationChain: body.destinationChain,
-            tokenIn: body.tokenIn,
-            tokenOut: body.tokenOut,
-            amountIn: body.amountIn,
-            minAmountOut: body.minAmountOut,
-            deadline: body.deadline,
-            signature: body.signature
+            sourceChain: body.sourceChain as string,
+            destinationChain: body.destinationChain as string,
+            tokenIn: body.tokenIn as string,
+            tokenOut: body.tokenOut as string,
+            amountIn: body.amountIn as string,
+            minAmountOut: (body.minAmountOut as string) ?? '',
+            deadline: (body.deadline as number) ?? 0,
+            signature: (body.signature as string) ?? ''
         } as IntentParams;
 
-        const intent = {
+        const intent: IntentRecord = {
             id: intentId,
             ...body,
             params,
@@ -573,23 +703,27 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET() {
-    const intents = getIntents();
+    const intents = getIntents() as Record<string, IntentRecord>;
     const list = Object
         .values(intents)
         .sort(
             (a, b) =>
-                Number((b as { createdAt?: number }).createdAt ?? 0) -
-                Number((a as { createdAt?: number }).createdAt ?? 0)
+                Number(b.createdAt ?? 0) -
+                Number(a.createdAt ?? 0)
         );
     return NextResponse.json(list);
 }
+
+// ---------------------------------------------------------------------------
+// Async intent lifecycle execution
+// ---------------------------------------------------------------------------
 
 async function executeIntent(intentId: string, params: IntentParams) {
     const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
     const updateIntent = (updates: Record<string, unknown>) => {
-        const intents = getIntents();
-        const intent = intents[intentId];
+        const intents = getIntents() as Record<string, IntentRecord>;
+        const intent: IntentRecord | undefined = intents[intentId];
         if (intent) {
             Object.assign(intent, updates);
             saveIntent(intentId, intent);
@@ -598,8 +732,8 @@ async function executeIntent(intentId: string, params: IntentParams) {
 
     const addFallback = (fallback: LifiFallback | undefined, stage: FallbackReason['stage']) => {
         if (!fallback) return;
-        const intents = getIntents();
-        const intent = intents[intentId];
+        const intents = getIntents() as Record<string, IntentRecord>;
+        const intent: IntentRecord | undefined = intents[intentId];
         if (!intent) return;
         const fallbackMode = intent.fallbackMode ?? { enabled: false, reasons: [] };
         fallbackMode.enabled = true;
@@ -608,17 +742,19 @@ async function executeIntent(intentId: string, params: IntentParams) {
         saveIntent(intentId, intent);
     };
 
-    const appendStep = (status: string, step: string, details: string) => {
-        const intents = getIntents();
-        const intent = intents[intentId];
+    const appendStep = (status: IntentStatus, step: string, details: string) => {
+        const intents = getIntents() as Record<string, IntentRecord>;
+        const intent: IntentRecord | undefined = intents[intentId];
         if (intent) {
             intent.status = status;
-            intent.executionSteps.push({
+            const executionSteps: ExecutionStep[] = intent.executionSteps ?? [];
+            executionSteps.push({
                 step,
                 status: 'COMPLETED',
                 timestamp: Date.now(),
                 details
             });
+            intent.executionSteps = executionSteps;
             saveIntent(intentId, intent);
         }
     };
@@ -668,10 +804,11 @@ async function executeIntent(intentId: string, params: IntentParams) {
 
     // 4. Finality (provider status-derived)
     await sleep(2000);
-    const intents = getIntents();
-    const intent = intents[intentId];
+    const intents = getIntents() as Record<string, IntentRecord>;
+    const intent: IntentRecord | undefined = intents[intentId];
     if (intent) {
-        intent.status = status.provider === 'lifi' ? 'SETTLED' : 'ABORTED';
+        const outcome = deriveFinalOutcome(status);
+        intent.status = outcome.status;
         intent.reasonCodes = intent.reasonCodes ?? [];
         if (status.fallback?.reasonCode) {
             intent.reasonCodes.push({
@@ -683,14 +820,16 @@ async function executeIntent(intentId: string, params: IntentParams) {
         if (status.status.txHash) {
             intent.settlementTx = status.status.txHash;
         }
-        intent.executionSteps.push({
-            step: status.provider === 'lifi' ? 'Settlement Complete' : 'Settlement Unavailable',
-            status: status.provider === 'lifi' ? 'COMPLETED' : 'FAILED',
+        const executionSteps: ExecutionStep[] = intent.executionSteps ?? [];
+        executionSteps.push({
+            step: outcome.stepLabel,
+            status: outcome.stepStatus,
             timestamp: Date.now(),
             details: intent.fallbackMode?.enabled
                 ? 'Finalized with fallback routing mode.'
                 : 'Finalized with LI.FI routing metadata.'
         });
+        intent.executionSteps = executionSteps;
         saveIntent(intentId, intent);
     }
 }

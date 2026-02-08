@@ -1,3 +1,51 @@
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+## [SDK v1.2.1] - 2026-02-07
+
+### Added - LI.FI Integration
+- **LI.FI SDK Integration**: Complete integration of `@lifi/sdk` for cross-chain routing and quotes
+  - `LifiProvider` class with `fetchQuote`, `fetchRoute`, and `fetchStatus` methods
+  - Chain and token resolution with case-insensitive lookups
+  - Fallback logic with static rates when LI.FI API is unavailable
+  - Retry logic with exponential backoff for transient failures
+  - Full TypeScript type definitions for all LI.FI payloads
+- **SDK Exports**: New exports in `@jack-kernel/sdk`
+  - `LifiProvider`, `LifiConfig` for provider initialization
+  - `LifiQuotePayload`, `LifiRoutePayload`, `LifiStatusPayload` types
+  - `resolveChain`, `resolveToken` utilities for chain/token resolution
+  - `toBaseUnits`, `fromBaseUnits` for unit conversion
+- **JACK_SDK Integration**: Optional `lifi` config parameter
+  - `sdk.lifi` property for direct provider access
+  - `sdk.getLifiQuote()` and `sdk.getLifiRoute()` convenience methods
+- **Dashboard Migration**: Refactored `apps/dashboard/src/lib/lifi.ts` to use SDK-level provider
+  - Removed ~300 lines of raw REST calls
+  - Preserved same export signatures for backward compatibility
+
+### Added - Settlement Adapter & Documentation
+- **Smart Contracts**: Production-ready `JACKSettlementAdapter`
+  - EIP-712 signature validation for intent authenticity
+  - Solver authorization with whitelist-based access control
+  - Policy integration through `JACKPolicyHook`
+  - Atomic swaps via Uniswap v4 unlock/callback pattern
+  - Comprehensive test suite with 211 test cases
+- **Documentation**: Complete contract documentation
+  - Settlement adapter architecture and flow diagrams
+  - API reference and usage examples
+  - Integration guides for solvers
+
+### Added - Community & UI
+- **Social Links**: Added Discord and X (Twitter) links
+  - Dashboard footer: Discord (`https://discord.gg/7k8CdmYHpn`) and X (`https://x.com/Jack_kernel`)
+  - Landing page footer: Discord and X links
+  - Documentation footer: Community section with Discord and X
+
+### Technical Details
+- **Compatibility**: LI.FI and Yellow Network integrations work side-by-side
+- **Testing**: 517 tests passing (Yellow + LI.FI + core SDK)
+- **Build**: All targets compile successfully (ESM, CJS, types)
+
 ## [0.1.49](https://github.com/hashpass-tech/JACK/compare/v0.1.48...v0.1.49) (2026-02-07)
 
 
