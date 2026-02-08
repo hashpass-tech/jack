@@ -255,4 +255,54 @@ describe('Feature: yellow-network-integration, Property 16: Error reason codes a
       { numRuns: 100 },
     );
   });
+
+  /**
+   * **Security: ReDoS Protection**
+   *
+   * Verifies that extractRevertReason handles malicious inputs with many spaces
+   * without catastrophic backtracking (ReDoS vulnerability).
+   */
+  it('extractRevertReason handles strings with many spaces efficiently', () => {
+    // Test with pathological input that would cause ReDoS with vulnerable regex
+    const manySpaces = ' '.repeat(1000);
+    const maliciousInput1 = `execution reverted:${manySpaces}`;
+    const maliciousInput2 = `execution reverted:${manySpaces}reason`;
+    
+    const startTime1 = Date.now();
+    const result1 = extractRevertReason(new Error(maliciousInput1));
+    const duration1 = Date.now() - startTime1;
+    
+    const startTime2 = Date.now();
+    const result2 = extractRevertReason(new Error(maliciousInput2));
+    const duration2 = Date.now() - startTime2;
+    
+    // Should complete in under 100ms (vulnerable regex could take seconds)
+    expect(duration1).toBeLessThan(100);
+    expect(duration2).toBeLessThan(100);
+    
+    // Should still extract reason correctly
+    expect(result1).toBe(''); // Spaces get trimmed to empty string
+    expect(result2).toBeDefined();
+    expect(result2).toContain('reason');
+  });
+
+  /**
+   * **Security: ReDoS Protection**
+   *
+   * Verifies extractRevertReason handles edge case with spaces before reason.
+   */
+  it('extractRevertReason handles spaces before reason correctly', () => {
+    const testCases = [
+      { input: 'execution reverted: reason', expected: 'reason' },
+      { input: 'execution reverted:reason', expected: 'reason' },
+      { input: 'execution reverted:  reason', expected: 'reason' }, // extra space trimmed
+      { input: 'revert: reason', expected: 'reason' },
+      { input: 'reverted with reason: reason', expected: 'reason' },
+    ];
+    
+    testCases.forEach(({ input, expected }) => {
+      const result = extractRevertReason(new Error(input));
+      expect(result).toBe(expected);
+    });
+  });
 });

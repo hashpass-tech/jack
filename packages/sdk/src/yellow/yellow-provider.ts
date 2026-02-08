@@ -156,13 +156,15 @@ export function extractRevertReason(error: unknown): string | undefined {
 
   // Match common revert reason patterns
   // viem format: "execution reverted: <reason>"
-  const revertMatch = message.match(/execution reverted:\s*(.+?)(?:\n|$)/i);
+  // Use [^\n]+ instead of .+? to prevent catastrophic backtracking
+  const revertMatch = message.match(/execution reverted: ?([^\n]+)/i);
   if (revertMatch) {
     return revertMatch[1].trim();
   }
 
   // Generic revert pattern: "revert <reason>" or "reverted with reason: <reason>"
-  const genericMatch = message.match(/revert(?:ed)?(?:\s+with\s+reason)?[:\s]+(.+?)(?:\n|$)/i);
+  // Use [^\n]+ instead of .+? to prevent catastrophic backtracking
+  const genericMatch = message.match(/revert(?:ed)?(?: with reason)?[: ]+([^\n]+)/i);
   if (genericMatch) {
     return genericMatch[1].trim();
   }
