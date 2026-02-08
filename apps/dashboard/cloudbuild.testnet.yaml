@@ -1,4 +1,21 @@
 steps:
+  # Upload assets to GCS bucket
+  - name: gcr.io/cloud-builders/gcloud
+    entrypoint: bash
+    args:
+      - -c
+      - |
+        echo "Uploading assets to GCS..."
+        gsutil -m rsync -r -d apps/dashboard/public/videos gs://jack-dashboard-testnet-assets/videos
+        gsutil -m rsync -r apps/dashboard/public/*.png gs://jack-dashboard-testnet-assets/ || true
+        gsutil -m rsync -r apps/dashboard/public/*.jpg gs://jack-dashboard-testnet-assets/ || true
+        gsutil -m rsync -r apps/dashboard/public/*.svg gs://jack-dashboard-testnet-assets/ || true
+        gsutil -m rsync -r apps/dashboard/public/*.ico gs://jack-dashboard-testnet-assets/ || true
+        gsutil -m rsync -r apps/dashboard/public/*.webmanifest gs://jack-dashboard-testnet-assets/ || true
+        gsutil -m setmeta -h "Cache-Control:public, max-age=31536000, immutable" gs://jack-dashboard-testnet-assets/**
+        echo "Assets uploaded successfully"
+  
+  # Build Docker image
   - name: gcr.io/cloud-builders/docker
     args:
       - build
@@ -7,12 +24,18 @@ steps:
       - apps/dashboard/Dockerfile
       - --build-arg
       - NEXT_PUBLIC_IS_TESTNET=true
+      - --build-arg
+      - NEXT_PUBLIC_CDN_URL=https://storage.googleapis.com/jack-dashboard-testnet-assets
       - -t
       - ${_IMAGE}
+  
+  # Push Docker image
   - name: gcr.io/cloud-builders/docker
     args:
       - push
       - ${_IMAGE}
+  
+  # Deploy to Cloud Run
   - name: gcr.io/cloud-builders/gcloud
     args:
       - run
@@ -25,6 +48,8 @@ steps:
       - --project
       - ${_PROJECT}
       - --allow-unauthenticated
+      - --set-env-vars
+      - NEXT_PUBLIC_CDN_URL=https://storage.googleapis.com/jack-dashboard-testnet-assets
 images:
   - ${_IMAGE}
 substitutions:

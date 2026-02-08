@@ -1,0 +1,102 @@
+name: Upload Dashboard Assets
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to upload to'
+        required: true
+        type: choice
+        options:
+          - testnet
+          - production
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/dashboard/public/**'
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  upload-assets:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 8.15.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      
+      - name: Determine environment
+        id: env
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "environment=testnet" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "release" ]; then
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            echo "environment=testnet" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: Upload assets to ${{ steps.env.outputs.environment }}
+        run: pnpm upload:assets --env=${{ steps.env.outputs.environment }}
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GCP_SA_KEY }}
+      
+      - name: Verify upload
+        run: |
+          ENV=${{ steps.env.outputs.environment }}
+          if [ "$ENV" = "testnet" ]; then
+            BUCKET="jack-dashboard-testnet-assets"
+          else
+            BUCKET="jack-dashboard-assets"
+          fi
+          
+          echo "Verifying assets in gs://$BUCKET..."
+          gsutil ls -r gs://$BUCKET/videos/ || echo "No videos found"
+          
+          echo ""
+          echo "Testing video accessibility..."
+          curl -I "https://storage.googleapis.com/$BUCKET/videos/walkthrough.mp4" || echo "Video not accessible"
+      
+      - name: Summary
+        run: |
+          ENV=${{ steps.env.outputs.environment }}
+          if [ "$ENV" = "testnet" ]; then
+            URL="https://storage.googleapis.com/jack-dashboard-testnet-assets"
+          else
+            URL="https://storage.googleapis.com/jack-dashboard-assets"
+          fi
+          
+          echo "## Asset Upload Complete 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Environment:** $ENV" >> $GITHUB_STEP_SUMMARY
+          echo "**CDN URL:** $URL" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Example URLs" >> $GITHUB_STEP_SUMMARY
+          echo "- Video: $URL/videos/walkthrough.mp4" >> $GITHUB_STEP_SUMMARY

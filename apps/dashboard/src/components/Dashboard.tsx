@@ -175,7 +175,7 @@ const OnboardingVideoModal: FC<{ onClose: () => void }> = ({ onClose }) => {
       >
         <video
           ref={videoRef}
-          src="/videos/walkthrough.mp4"
+          src={process.env.NEXT_PUBLIC_CDN_URL ? `${process.env.NEXT_PUBLIC_CDN_URL}/videos/walkthrough.mp4` : "/videos/walkthrough.mp4"}
           muted
           playsInline
           preload="auto"
