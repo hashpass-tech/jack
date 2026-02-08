@@ -1,0 +1,90 @@
+JACK Demo Video - Voice Script (v1.0.0)
+
+Opening (dashboard loads - header visible)
+JACK avatar:
+Hi, I'm Jack.
+I'm the JACK Kernel -- an execution autopilot for cross-chain DeFi.
+
+I'm not a DEX.
+I'm an execution layer that lets users express what they want to do, and I enforce how execution is allowed to happen.
+
+Scene 1 - Create Intent view (natural input visible)
+JACK avatar:
+Here, instead of manually routing a swap, I create an intent.
+I simply describe the action I want to execute.
+
+Cursor focuses the input field
+JACK avatar:
+For example:
+Swap one thousand USDC on Arbitrum into WETH on Base, with a guaranteed minimum receive.
+
+Click "PLAN"
+
+Scene 2 - Policy section scrolls into view
+JACK avatar:
+Before any execution happens, I convert the request into a policy-constrained intent.
+These are not UI preferences.
+These constraints are enforced on-chain.
+
+Scroll over the policy cards
+JACK avatar:
+The minimum amount I must receive is enforced by a Uniswap v4 hook.
+Only approved liquidity venues are allowed.
+Only approved cross-chain bridges are allowed.
+The total execution and solver fee is capped.
+And a settlement deadline is enforced.
+
+Scene 3 - Execution pipeline section
+JACK avatar:
+Once the intent is defined, I launch the execution pipeline.
+
+Point to Solver Auction
+JACK avatar:
+First, bonded solvers compete to execute the intent.
+
+Point to Route Optimization
+JACK avatar:
+Then the best cross-chain route is selected using LI.FI.
+
+Point to Policy Validation
+JACK avatar:
+Before settlement, the Uniswap v4 hook validates that every policy is respected.
+
+Point to Atomic Settlement
+JACK avatar:
+If any rule is violated, the execution reverts.
+
+Scene 4 - Back to the form (advanced tab visible)
+JACK avatar:
+Advanced users can still configure the intent explicitly.
+Source chain, destination chain, assets, and guaranteed minimum receive.
+But the important part is not the form.
+The important part is that the execution itself is constrained.
+
+Scene 5 - Execution Autopilot badge / toggle visible
+JACK avatar:
+I act as an execution autopilot.
+Users only describe what they want.
+I enforce how it is allowed to be executed.
+
+Scene 6 - Privacy toggle (Fhenix confidential intent)
+JACK avatar:
+Optionally, constraints can be encrypted using a confidential execution module.
+This allows solvers to route the intent without exposing sensitive parameters publicly.
+
+Scene 7 - Kernel Guardrails section
+JACK avatar:
+I'm designed as infrastructure.
+Your tokens never leave your wallet until execution is validated at settlement.
+And every execution is fail-closed by default.
+
+Scene 8 - Short positioning for LUKAS and beyond
+JACK avatar:
+My first use case is LUKAS -- a regional asset for Latin America.
+But I'm asset-agnostic and application-agnostic.
+Any protocol, treasury, or agent system can use this kernel to safely execute cross-chain actions.
+
+Final screen - logo and dashboard
+JACK avatar (closing line):
+I turn DeFi execution into a programmable, policy-enforced workflow.
+This is the JACK Kernel.

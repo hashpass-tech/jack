@@ -18,7 +18,7 @@ JACK is the **cross-chain execution kernel** that turns high-level intents into 
 
 | Surface | Purpose |
 | --- | --- |
-| **Landing** | Introduce the JACK protocol and value story. |
+| **Landing** | Introduce the JACK Kernel and value story. |
 | **Dashboard** | Author intents, inspect execution, and monitor policies. |
 | **Kernel + Hooks** | The on-chain + off-chain execution engine powering cross-chain runs. |
 

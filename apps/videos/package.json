@@ -2,7 +2,7 @@
   "name": "@jack/videos",
   "version": "0.1.0",
   "private": true,
-  "description": "JACK Protocol explainer videos — Remotion + React Three Fiber",
+  "description": "JACK Kernel explainer videos — Remotion + React Three Fiber",
   "scripts": {
     "dev": "remotion studio",
     "build": "remotion bundle",

@@ -10,6 +10,8 @@
     "dev:dashboard": "cd apps/dashboard && pnpm dev",
     "dev:docs": "cd apps/docs && pnpm dev",
     "dev:videos": "cd apps/videos && pnpm dev",
+    "dev:video-recorder": "cd apps/video-recorder && pnpm dev",
+    "dev:video-recorder:preview": "cd apps/video-recorder && pnpm dev:preview",
     "dev:all": "concurrently \"pnpm dev:landing\" \"pnpm dev:dashboard\" \"pnpm dev:docs\"",
     "lint": "turbo run lint",
     "release": "node scripts/release.js patch",

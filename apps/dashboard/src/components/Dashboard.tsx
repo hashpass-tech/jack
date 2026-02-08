@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type FC } from "react";
+import { useState, useEffect, useRef, type FC } from "react";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { CreateIntentView } from "./CreateIntentView";
 import { ExecutionsListView } from "./ExecutionsListView";
@@ -48,6 +48,374 @@ const ThemeToggle: FC = () => {
   );
 };
 
+const OnboardingVideoModal: FC<{ onClose: () => void }> = ({ onClose }) => {
+  const [entered, setEntered] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [showUnmuteBanner, setShowUnmuteBanner] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    requestAnimationFrame(() => requestAnimationFrame(() => setEntered(true)));
+    const v = videoRef.current;
+    if (!v) return;
+
+    // Start muted so autoplay always works
+    v.muted = true;
+    v.play().then(() => {
+      setIsPlaying(true);
+    }).catch(() => {
+      setIsPlaying(false);
+    });
+
+    // Unmute on the very first user interaction (click/touch/key)
+    const unmute = () => {
+      if (v && v.muted) {
+        v.muted = false;
+        setIsMuted(false);
+        setShowUnmuteBanner(false);
+      }
+      document.removeEventListener("click", unmute, true);
+      document.removeEventListener("touchstart", unmute, true);
+      document.removeEventListener("keydown", unmute, true);
+    };
+    document.addEventListener("click", unmute, true);
+    document.addEventListener("touchstart", unmute, true);
+    document.addEventListener("keydown", unmute, true);
+
+    return () => {
+      document.removeEventListener("click", unmute, true);
+      document.removeEventListener("touchstart", unmute, true);
+      document.removeEventListener("keydown", unmute, true);
+    };
+  }, []);
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
+    const onVolumeChange = () => setIsMuted(v.muted);
+    v.addEventListener("play", onPlay);
+    v.addEventListener("pause", onPause);
+    v.addEventListener("volumechange", onVolumeChange);
+    return () => {
+      v.removeEventListener("play", onPlay);
+      v.removeEventListener("pause", onPause);
+      v.removeEventListener("volumechange", onVolumeChange);
+    };
+  }, []);
+
+  const handleUnmute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = false;
+    setIsMuted(false);
+    setShowUnmuteBanner(false);
+    if (v.paused) v.play();
+  };
+
+  const togglePlay = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.paused) { v.play(); } else { v.pause(); }
+  };
+
+  const toggleMute = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.muted = !v.muted;
+    setIsMuted(v.muted);
+    if (!v.muted) setShowUnmuteBanner(false);
+  };
+
+  const goFullscreen = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    if (v.requestFullscreen) v.requestFullscreen();
+  };
+
+  const glass = {
+    background: 'rgba(0,0,0,0.4)',
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    color: '#fff',
+  } as const;
+
+  return (
+    <div
+      className="fixed inset-0 z-[300] flex items-center justify-center p-2 sm:p-0"
+      style={{ opacity: entered ? 1 : 0, transition: 'opacity 0.5s ease' }}
+    >
+      {/* Backdrop — blurred, shows dashboard behind */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'rgba(2, 6, 16, 0.55)',
+          backdropFilter: 'blur(24px) saturate(1.4)',
+          WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
+        }}
+        onClick={onClose}
+      />
+
+      {/* Video container */}
+      <div
+        className="relative"
+        style={{
+          width: 'min(93vw, 93vh * 16 / 9)',
+          height: 'min(93vh, 93vw * 9 / 16)',
+          borderRadius: 'clamp(0.75rem, 2vw, 1.5rem)',
+          overflow: 'hidden',
+          background: '#000',
+          boxShadow: '0 0 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06)',
+          transform: entered ? 'scale(1)' : 'scale(0.96)',
+          transition: 'transform 0.5s ease',
+        }}
+      >
+        <video
+          ref={videoRef}
+          src="/videos/walkthrough.mp4"
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full"
+          style={{ objectFit: 'contain', background: '#000' }}
+        />
+
+        {/* Tap to unmute banner */}
+        {showUnmuteBanner && isMuted && isPlaying && (
+          <button
+            onClick={handleUnmute}
+            className="absolute z-20 flex items-center gap-2 left-1/2 top-1/2"
+            style={{
+              transform: 'translate(-50%, -50%)',
+              ...glass,
+              borderRadius: '3rem',
+              padding: '0.75rem 1.5rem',
+              animation: 'pulse 2s infinite',
+              cursor: 'pointer',
+            }}
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+            <span className="text-xs font-bold uppercase tracking-widest">Tap to unmute</span>
+          </button>
+        )}
+
+        {/* Tap to play (if autoplay totally blocked) */}
+        {!isPlaying && (
+          <button
+            onClick={() => { const v = videoRef.current; if (v) { v.muted = false; v.play(); setShowUnmuteBanner(false); } }}
+            className="absolute z-20 left-1/2 top-1/2"
+            style={{
+              transform: 'translate(-50%, -50%)',
+              width: 72, height: 72, borderRadius: '50%',
+              ...glass,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}
+          >
+            <svg className="w-8 h-8 ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+          </button>
+        )}
+
+        {/* Top-left: REC indicator */}
+        <div
+          className="absolute top-3 left-3 sm:top-5 sm:left-5 flex items-center gap-2 z-10"
+          style={{ ...glass, borderRadius: '2rem', padding: '0.35rem 0.75rem' }}
+        >
+          <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full" style={{ background: '#ef4444', boxShadow: '0 0 8px #ef4444', animation: 'pulse 2s infinite' }} />
+          <span className="text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-white/70">JACK Walkthrough</span>
+        </div>
+
+        {/* Top-right: Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 sm:top-5 sm:right-5 z-10 w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95"
+          style={glass}
+        >
+          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+
+        {/* Bottom controls */}
+        <div
+          className="absolute bottom-0 left-0 right-0 z-10 flex items-end justify-between"
+          style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)', padding: 'clamp(2rem, 6vw, 3.5rem) clamp(0.75rem, 2vw, 1.25rem) clamp(0.75rem, 2vw, 1.25rem)' }}
+        >
+          {/* Left: transport */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button onClick={togglePlay} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95" style={glass} title={isPlaying ? "Pause" : "Play"}>
+              {isPlaying
+                ? <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="currentColor" viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16" rx="1" /><rect x="14" y="4" width="4" height="16" rx="1" /></svg>
+                : <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+              }
+            </button>
+            <button onClick={toggleMute} className="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95" style={glass} title={isMuted ? "Unmute" : "Mute"}>
+              {isMuted
+                ? <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /><path strokeLinecap="round" strokeLinejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" /></svg>
+                : <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M15.536 8.464a5 5 0 010 7.072M18.364 5.636a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" /></svg>
+              }
+            </button>
+            <button onClick={goFullscreen} className="hidden sm:flex w-9 h-9 rounded-full items-center justify-center transition-all hover:scale-110" style={glass} title="Fullscreen">
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M4 8V4h4M20 8V4h-4M4 16v4h4M20 16v4h-4" /></svg>
+            </button>
+          </div>
+          {/* Right: actions */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <button
+              className="px-2.5 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.1em] transition-all hover:scale-[1.03] active:scale-95"
+              style={{ ...glass, color: 'rgba(255,255,255,0.55)' }}
+              onClick={() => { localStorage.setItem("jack-hide-onboarding", "true"); onClose(); }}
+            >
+              Don&apos;t show again
+            </button>
+            <button
+              className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-full text-[8px] sm:text-[10px] font-bold uppercase tracking-[0.1em] transition-all hover:scale-[1.03] active:scale-95"
+              style={{ background: 'var(--fg-accent)', color: '#0a0f1a', border: 'none' }}
+              onClick={onClose}
+            >
+              Skip
+            </button>
+          </div>
+        </div>
+      </div>
+      <style>{`@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }`}</style>
+    </div>
+  );
+};
+
+const SettingsDialog: FC<{ open: boolean; onClose: () => void; showOnboarding: boolean; setShowOnboarding: (v: boolean) => void; showBanner: boolean; setShowBanner: (v: boolean) => void }> = ({ open, onClose, showOnboarding, setShowOnboarding, showBanner, setShowBanner }) => {
+  const [entered, setEntered] = useState(false);
+  useEffect(() => {
+    if (open) requestAnimationFrame(() => requestAnimationFrame(() => setEntered(true)));
+    else setEntered(false);
+  }, [open]);
+  if (!open) return null;
+  return (
+    <div
+      className="fixed inset-0 z-[400] flex items-center justify-center p-4"
+      style={{
+        background: entered ? 'rgba(4, 12, 28, 0.8)' : 'rgba(4, 12, 28, 0)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        transition: 'background 0.4s ease',
+      }}
+      onClick={onClose}
+    >
+      <div
+        onClick={e => e.stopPropagation()}
+        className="relative flex flex-col w-full max-w-sm"
+        style={{
+          background: 'var(--bg-secondary)',
+          border: '1px solid var(--border-secondary)',
+          borderRadius: '1.25rem',
+          padding: '1.75rem',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.4), 0 0 30px rgba(56,189,248,0.05)',
+          opacity: entered ? 1 : 0,
+          transform: entered ? 'translateY(0) scale(1)' : 'translateY(24px) scale(0.97)',
+          transition: 'opacity 0.4s ease, transform 0.4s ease',
+        }}
+      >
+        {/* Close */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-110"
+          style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-secondary)', color: 'var(--fg-muted)' }}
+        >
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+        </button>
+
+        {/* Header */}
+        <div className="flex items-center gap-2.5 mb-6">
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: 'var(--fg-accent)' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <h2 className="text-sm font-extrabold uppercase tracking-[0.12em]" style={{ color: 'var(--fg-primary)' }}>Settings</h2>
+        </div>
+
+        {/* Tutorials section */}
+        <div className="mb-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--fg-accent)' }}>Tutorials</p>
+          <label
+            htmlFor="show-onboarding"
+            className="flex items-center justify-between py-3 px-4 rounded-xl cursor-pointer transition-all hover:border-[var(--fg-accent)]"
+            style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-secondary)' }}
+          >
+            <span className="text-xs font-bold" style={{ color: 'var(--fg-primary)' }}>Show walkthrough on load</span>
+            <div
+              className="relative w-9 h-5 rounded-full transition-colors cursor-pointer"
+              style={{ background: showOnboarding ? 'var(--fg-accent)' : 'var(--border-secondary)' }}
+            >
+              <div
+                className="absolute top-0.5 w-4 h-4 rounded-full transition-transform shadow-sm"
+                style={{
+                  background: 'var(--fg-primary)',
+                  left: showOnboarding ? '1.125rem' : '0.125rem',
+                  transition: 'left 0.2s ease',
+                }}
+              />
+              <input
+                type="checkbox"
+                checked={showOnboarding}
+                onChange={e => {
+                  setShowOnboarding(e.target.checked);
+                  localStorage.setItem("jack-hide-onboarding", (!e.target.checked).toString());
+                }}
+                id="show-onboarding"
+                className="sr-only"
+              />
+            </div>
+          </label>
+        </div>
+
+        {/* Notifications section */}
+        <div className="mb-5">
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] mb-3" style={{ color: 'var(--fg-accent)' }}>Notifications</p>
+          <label
+            htmlFor="show-banner"
+            className="flex items-center justify-between py-3 px-4 rounded-xl cursor-pointer transition-all hover:border-[var(--fg-accent)]"
+            style={{ background: 'var(--bg-primary)', border: '1px solid var(--border-secondary)' }}
+          >
+            <span className="text-xs font-bold" style={{ color: 'var(--fg-primary)' }}>Show notification banner</span>
+            <div
+              className="relative w-9 h-5 rounded-full transition-colors cursor-pointer"
+              style={{ background: showBanner ? 'var(--fg-accent)' : 'var(--border-secondary)' }}
+            >
+              <div
+                className="absolute top-0.5 w-4 h-4 rounded-full transition-transform shadow-sm"
+                style={{
+                  background: 'var(--fg-primary)',
+                  left: showBanner ? '1.125rem' : '0.125rem',
+                  transition: 'left 0.2s ease',
+                }}
+              />
+              <input
+                type="checkbox"
+                checked={showBanner}
+                onChange={e => {
+                  setShowBanner(e.target.checked);
+                  localStorage.setItem("jack-hide-banner", (!e.target.checked).toString());
+                }}
+                id="show-banner"
+                className="sr-only"
+              />
+            </div>
+          </label>
+        </div>
+
+        {/* Done */}
+        <button
+          className="w-full py-2.5 rounded-xl text-xs font-black uppercase tracking-[0.15em] transition-all hover:scale-[1.02]"
+          style={{ background: 'var(--fg-accent)', color: 'var(--bg-primary)' }}
+          onClick={onClose}
+        >
+          Done
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
   const [activeTab, setActiveTab] = useState<
     "create" | "executions" | "cost-dashboard"
@@ -78,6 +446,19 @@ const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
     }
     return process.env.NEXT_PUBLIC_DOCS_URL ?? "https://docs.jack.lukas.money";
   });
+  const [showOnboardingModal, setShowOnboardingModal] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [showBanner, setShowBanner] = useState(true);
+  const [bannerToast, setBannerToast] = useState<string | null>(null);
+    // Onboarding modal logic
+    useEffect(() => {
+      const hide = localStorage.getItem("jack-hide-onboarding");
+      setShowOnboarding(hide !== "true");
+      if (hide !== "true") setShowOnboardingModal(true);
+      const hideBanner = localStorage.getItem("jack-hide-banner");
+      setShowBanner(hideBanner !== "true");
+    }, []);
   const dashboardVersion = process.env.NEXT_PUBLIC_DASHBOARD_VERSION ?? "0.0.0";
   const protocolTrack = process.env.NEXT_PUBLIC_JACK_PROTOCOL_TRACK ?? "v1";
   const isTestnet = process.env.NEXT_PUBLIC_IS_TESTNET === "true";
@@ -192,15 +573,14 @@ const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
                 </button>
               ))}
             </div>
-            <a
-              href={docsUrl}
-              target="_blank"
-              rel="noreferrer"
+            <button
               className="px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border transition-all hover:opacity-90"
               style={{ borderColor: "var(--border-secondary)", color: "var(--fg-secondary)" }}
+              onClick={() => setSettingsOpen(true)}
+              title="Settings"
             >
-              Docs
-            </a>
+              Settings
+            </button>
             <ThemeToggle />
             <ConnectButton.Custom>
               {({ account, chain, openAccountModal, openChainModal, openConnectModal, mounted }) => {
@@ -239,8 +619,16 @@ const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
             </ConnectButton.Custom>
           </div>
 
-          {/* Mobile: theme toggle + hamburger */}
+          {/* Mobile: settings + theme toggle + hamburger */}
           <div className="flex items-center space-x-2 md:hidden">
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="p-2 rounded-xl transition-all"
+              style={{ color: "var(--fg-muted)" }}
+              title="Settings"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </button>
             <ThemeToggle />
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -302,19 +690,59 @@ const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
         </nav>
       </div>
 
-      {/* ── Testnet Banner ────────────────────────────── */}
-      {isTestnet && (
+      {/* ── Notification Banner (Marquee) ─────────────── */}
+      {isTestnet && showBanner && (
         <div
-          className="px-4 py-2.5 text-center text-xs font-bold border-b"
-          style={{ background: "var(--fg-accent)", color: "var(--bg-primary)", borderColor: "var(--border-accent)" }}
+          className="relative overflow-hidden border-b"
+          style={{ background: "var(--fg-accent)", borderColor: "var(--border-accent)", height: 32 }}
         >
-          ⚠️ TESTNET MODE · For mainnet, visit{" "}
-          <a href="https://jack.lukas.money/dashboard" className="underline font-black hover:opacity-80" target="_blank" rel="noopener noreferrer">
-            jack.lukas.money/dashboard
-          </a>
-          <span className="ml-2 text-[10px] font-normal opacity-80">(mainnet launch Q3 2026)</span>
+          <div className="absolute inset-0 flex items-center animate-marquee whitespace-nowrap" style={{ animation: "marquee 20s linear infinite", lineHeight: "32px" }}>
+            <span className="text-[11px] font-bold mx-8 leading-[32px]" style={{ color: "var(--bg-primary)" }}>
+              ⚠️ TESTNET MODE · For mainnet, visit <a href="https://jack.lukas.money/dashboard" className="underline font-black hover:opacity-80" target="_blank" rel="noopener noreferrer">jack.lukas.money/dashboard</a> (mainnet launch Q3 2026)
+            </span>
+            <span className="text-[11px] font-bold mx-8 leading-[32px]" style={{ color: "var(--bg-primary)" }}>
+              ⚠️ TESTNET MODE · For mainnet, visit <a href="https://jack.lukas.money/dashboard" className="underline font-black hover:opacity-80" target="_blank" rel="noopener noreferrer">jack.lukas.money/dashboard</a> (mainnet launch Q3 2026)
+            </span>
+            <span className="text-[11px] font-bold mx-8 leading-[32px]" style={{ color: "var(--bg-primary)" }}>
+              ⚠️ TESTNET MODE · For mainnet, visit <a href="https://jack.lukas.money/dashboard" className="underline font-black hover:opacity-80" target="_blank" rel="noopener noreferrer">jack.lukas.money/dashboard</a> (mainnet launch Q3 2026)
+            </span>
+          </div>
+          <button
+            onClick={() => {
+              setShowBanner(false);
+              localStorage.setItem("jack-hide-banner", "true");
+              setBannerToast("Notification banner closed — reopen in Settings");
+              setTimeout(() => setBannerToast(null), 3500);
+            }}
+            className="absolute right-0 inset-y-0 flex items-center z-10 pl-4 pr-2"
+            style={{ background: "var(--fg-accent)" }}
+          >
+            <span className="w-6 h-6 rounded-md flex items-center justify-center transition-all hover:scale-110" style={{ background: "rgba(0,0,0,0.2)", color: "var(--bg-primary)" }}>
+              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+            </span>
+          </button>
+          <style>{`@keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-33.333%); } }`}</style>
         </div>
       )}
+
+      {/* Toast notification */}
+      {bannerToast && (
+        <div
+          className="fixed bottom-6 left-1/2 z-[500] flex items-center gap-2 px-5 py-3 rounded-full text-xs font-bold shadow-2xl"
+          style={{
+            transform: "translateX(-50%)",
+            background: "var(--bg-secondary)",
+            border: "1px solid var(--border-secondary)",
+            color: "var(--fg-primary)",
+            boxShadow: "0 12px 40px rgba(0,0,0,0.4)",
+            animation: "toastIn 0.4s ease",
+          }}
+        >
+          <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" style={{ color: "var(--fg-accent)" }}><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          {bannerToast}
+        </div>
+      )}
+      <style>{`@keyframes toastIn { 0% { opacity: 0; transform: translateX(-50%) translateY(16px); } 100% { opacity: 1; transform: translateX(-50%) translateY(0); } }`}</style>
 
       {/* ── Mobile Tab Bar ────────────────────────────── */}
       <div
@@ -436,6 +864,14 @@ const Dashboard: FC<{ changelog?: string }> = ({ changelog = "" }) => {
           </div>
         </div>
       </footer>
+
+      {/* Onboarding Video Modal */}
+      {showOnboardingModal && showOnboarding && (
+        <OnboardingVideoModal onClose={() => setShowOnboardingModal(false)} />
+      )}
+
+      {/* Settings Dialog */}
+      <SettingsDialog open={settingsOpen} onClose={() => setSettingsOpen(false)} showOnboarding={showOnboarding} setShowOnboarding={setShowOnboarding} showBanner={showBanner} setShowBanner={setShowBanner} />
     </div>
   );
 };

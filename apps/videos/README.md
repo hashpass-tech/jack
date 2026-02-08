@@ -1,6 +1,6 @@
-# JACK Protocol — Video Generator
+# JACK Kernel — Video Generator
 
-Programmatic video generation for JACK protocol explainers using **Remotion + React Three Fiber**.
+Programmatic video generation for JACK Kernel explainers using **Remotion + React Three Fiber**.
 
 ## Architecture
 
