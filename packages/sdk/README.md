@@ -1,6 +1,6 @@
 # JACK TypeScript SDK
 
-[![npm version](https://img.shields.io/npm/v/@jack/sdk.svg)](https://www.npmjs.com/package/@jack/sdk)
+[![npm version](https://img.shields.io/npm/v/@jack-kernel/sdk.svg)](https://www.npmjs.com/package/@jack-kernel/sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 TypeScript SDK for the JACK cross-chain execution kernel. Provides a comprehensive, type-safe interface for creating and managing cross-chain intents, tracking execution, and monitoring costs.
@@ -14,17 +14,19 @@ TypeScript SDK for the JACK cross-chain execution kernel. Provides a comprehensi
 - 🚀 **Batch Operations**: Submit and track multiple intents efficiently
 - 🛡️ **Error Handling**: Detailed error types with context for debugging
 - 📦 **Dual Module Support**: Works with both ESM and CommonJS
+- 🌐 **Dual Provider Support**: LI.FI for DEX aggregation + Yellow Network for state channels
+- ⚡ **Cross-Chain Routing**: Seamless token swaps across Arbitrum, Optimism, Base, and Polygon
 
 ## Installation
 
 ```bash
-npm install @jack/sdk
+npm install @jack-kernel/sdk
 ```
 
 Or with pnpm:
 
 ```bash
-pnpm add @jack/sdk
+pnpm add @jack-kernel/sdk
 ```
 
 ### Peer Dependencies
@@ -35,12 +37,21 @@ The SDK requires `viem` for EIP-712 signing:
 npm install viem
 ```
 
+### Optional Dependencies
+
+For LI.FI cross-chain routing (included by default):
+
+```bash
+# Already included as a dependency
+@lifi/sdk
+```
+
 ## Quick Start
 
 ### Basic Usage
 
 ```typescript
-import { JACK_SDK } from '@jack/sdk';
+import { JACK_SDK } from '@jack-kernel/sdk';
 
 // Initialize the SDK
 const sdk = new JACK_SDK({ 
@@ -73,10 +84,92 @@ const intent = await sdk.waitForSettlement(intentId);
 console.log('Settlement tx:', intent.settlementTx);
 ```
 
+### LI.FI Integration (Cross-Chain Routing)
+
+```typescript
+import { JACK_SDK } from '@jack-kernel/sdk';
+
+// Initialize with LI.FI support
+const sdk = new JACK_SDK({
+  baseUrl: 'https://api.jack.example',
+  lifi: {
+    integrator: 'jackkernel',
+    maxRetries: 3
+  }
+});
+
+// Get cross-chain quote
+const quote = await sdk.getLifiQuote({
+  sourceChain: 'arbitrum',
+  destinationChain: 'optimism',
+  tokenIn: 'USDC',
+  tokenOut: 'WETH',
+  amountIn: '100',
+  minAmountOut: '0.035',
+  deadline: Date.now() + 3600000
+});
+
+console.log(`Quote: ${quote.quote.amountOut} WETH`);
+console.log(`Provider: ${quote.provider}`); // 'lifi' or 'fallback'
+```
+
+### Yellow Network Integration (State Channels)
+
+```typescript
+import { JACK_SDK } from '@jack-kernel/sdk';
+
+// Initialize with Yellow Network support
+const sdk = new JACK_SDK({
+  baseUrl: 'https://api.jack.example',
+  yellow: {
+    custodyAddress: '0x...',
+    adjudicatorAddress: '0x...',
+    chainId: 1,
+    walletClient: myWalletClient
+  }
+});
+
+// Create state channel
+const channel = await sdk.yellow?.createChannel({
+  counterparty: '0x...',
+  asset: '0xUSDC...',
+  amount: '1000000'
+});
+
+console.log('Channel created:', channel.channelId);
+```
+
+### Dual Provider Architecture
+
+Both LI.FI and Yellow Network work together:
+
+```typescript
+const sdk = new JACK_SDK({
+  baseUrl: 'https://api.jack.example',
+  
+  // Yellow Network for state channels
+  yellow: {
+    custodyAddress: '0x...',
+    adjudicatorAddress: '0x...',
+    chainId: 1,
+    walletClient: myWalletClient
+  },
+  
+  // LI.FI for cross-chain routing
+  lifi: {
+    integrator: 'jackkernel'
+  }
+});
+
+// Use both providers
+await sdk.yellow?.createChannel(...);
+await sdk.lifi?.fetchQuote(...);
+```
+
 ### Track Execution Progress
 
 ```typescript
-import { ExecutionStatus } from '@jack/sdk';
+import { ExecutionStatus } from '@jack-kernel/sdk';
 
 // Poll until specific status is reached
 const intent = await sdk.execution.waitForStatus(
@@ -195,7 +288,7 @@ import {
   ValidationError,// Client-side validation failed
   TimeoutError,   // Operation timed out
   RetryError      // All retry attempts exhausted
-} from '@jack/sdk';
+} from '@jack-kernel/sdk';
 ```
 
 ### Handling Errors
@@ -310,7 +403,7 @@ subscription.unsubscribe();
 Enforce custom policies on intent parameters:
 
 ```typescript
-import { Policy } from '@jack/sdk';
+import { Policy } from '@jack-kernel/sdk';
 
 const policy: Policy = {
   maxAmountIn: '1000000000', // Max 1000 USDC
@@ -452,14 +545,28 @@ import type {
   ExecutionWatcher,
   
   // Policy Types
-  Policy
-} from '@jack/sdk';
+  Policy,
+  
+  // LI.FI Types
+  LifiProvider,
+  LifiConfig,
+  LifiQuotePayload,
+  LifiRoutePayload,
+  LifiStatusPayload,
+  
+  // Yellow Network Types
+  YellowProvider,
+  YellowConfig,
+  ChannelState,
+  YellowQuote,
+  ClearingResult
+} from '@jack-kernel/sdk';
 ```
 
 ### Type-Safe Intent Creation
 
 ```typescript
-import type { IntentParams } from '@jack/sdk';
+import type { IntentParams } from '@jack-kernel/sdk';
 
 function createIntent(
   sourceChain: string,
@@ -481,7 +588,7 @@ function createIntent(
 ### Type Guards
 
 ```typescript
-import { ExecutionStatus } from '@jack/sdk';
+import { ExecutionStatus } from '@jack-kernel/sdk';
 
 function isTerminalStatus(status: ExecutionStatus): boolean {
   return [
@@ -612,7 +719,7 @@ class AgentUtils {
 ### Complete Intent Lifecycle
 
 ```typescript
-import { JACK_SDK, ExecutionStatus } from '@jack/sdk';
+import { JACK_SDK, ExecutionStatus } from '@jack-kernel/sdk';
 
 async function executeIntent() {
   const sdk = new JACK_SDK({ baseUrl: 'https://api.jack.example' });
@@ -671,7 +778,7 @@ async function executeIntent() {
 ### Agent with Batch Processing
 
 ```typescript
-import { JACK_SDK } from '@jack/sdk';
+import { JACK_SDK } from '@jack-kernel/sdk';
 
 async function processIntentBatch(intentRequests: IntentRequest[]) {
   const sdk = new JACK_SDK({ baseUrl: 'https://api.jack.example' });
@@ -721,9 +828,9 @@ If you're upgrading from an older version of the SDK:
 import JACK_SDK from '@jack/sdk';
 
 // New (both work)
-import { JACK_SDK } from '@jack/sdk';
+import { JACK_SDK } from '@jack-kernel/sdk';
 // or
-import JACK_SDK from '@jack/sdk';
+import JACK_SDK from '@jack-kernel/sdk';
 ```
 
 ### Method Changes
@@ -748,10 +855,12 @@ MIT © JACK Team
 
 ## Support
 
-- **Documentation**: [Full API Documentation](https://docs.jack.example)
-- **Issues**: [GitHub Issues](https://github.com/your-org/jack/issues)
-- **Discord**: [Join our community](https://discord.gg/jack)
+- **Documentation**: [https://jack.hashpass.tech/docs](https://jack.hashpass.tech/docs)
+- **Repository**: [https://github.com/hashpass-tech/JACK](https://github.com/hashpass-tech/JACK)
+- **Issues**: [GitHub Issues](https://github.com/hashpass-tech/JACK/issues)
+- **Discord**: [Join our community](https://discord.gg/7k8CdmYHpn)
+- **X (Twitter)**: [@Jack_kernel](https://x.com/Jack_kernel)
 
 ## Changelog
 
-See [CHANGELOG.md](./CHANGELOG.md) for release history and migration guides.
+See [CHANGELOG.md](../../CHANGELOG.md) for release history and migration guides.

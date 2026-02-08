@@ -104,7 +104,7 @@ jack/
 
 ## Documentation
 
-- [Docs Platform](https://docs.jack.lukas.money)
+- [Docs Platform](https://jack.hashpass.tech/docs)
 - [Mission & Overview](./apps/docs/docs/overview.md)
 - [Architecture](./apps/docs/docs/architecture.md)
 - [Demo Narrative](./docs/demo-script.md)
@@ -115,6 +115,12 @@ jack/
 - [Whitepaper Portal](./apps/docs/docs/whitepaper/index.mdx)
 - [Whitepaper Changelog](./apps/docs/docs/whitepaper/changelog.md)
 - [MVP Critical Roadmap](./apps/docs/docs/operations/mvp-critical-roadmap.md)
+
+## Community
+
+- **Discord**: [Join our community](https://discord.gg/7k8CdmYHpn)
+- **X (Twitter)**: [@Jack_kernel](https://x.com/Jack_kernel)
+- **GitHub**: [hashpass-tech/JACK](https://github.com/hashpass-tech/JACK)
 
 ## Contributing
 

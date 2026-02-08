@@ -2,6 +2,26 @@
 
 All notable changes to this project will be documented in this file.
 
+## [SDK v1.2.2] - 2026-02-08
+
+### Changed - Documentation Updates
+- **README Updates**: Updated SDK README with latest features and correct links
+  - Added LI.FI integration examples and usage
+  - Added Yellow Network integration examples
+  - Added dual provider architecture documentation
+  - Updated all import statements to use `@jack-kernel/sdk`
+  - Updated repository URL to `https://github.com/hashpass-tech/JACK`
+  - Added Discord link: `https://discord.gg/7k8CdmYHpn`
+  - Added X (Twitter) link: `https://x.com/Jack_kernel`
+  - Updated documentation link to `https://jack.hashpass.tech/docs`
+- **Main README**: Added Community section with Discord and X links
+- **Package Metadata**: Corrected package name and repository references
+
+### Technical Details
+- **No Code Changes**: This is a documentation-only release
+- **Testing**: 517 tests still passing
+- **Build**: All targets compile successfully
+
 ## [SDK v1.2.1] - 2026-02-07
 
 ### Added - LI.FI Integration
