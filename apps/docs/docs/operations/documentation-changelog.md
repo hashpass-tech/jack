@@ -18,4 +18,5 @@ Auto-updated on merged PRs to `develop` and `main`.
 
 ## 2026-02-08
 
+- PR [#36](https://github.com/hashpass-tech/JACK/pull/36) into `develop` by @edcalderon: Fix ReDoS risks in SDK error parsing | docs-impact: unspecified | areas: unlabeled | summary: Fix ReDoS risks in SDK error parsing
 - PR [#32](https://github.com/hashpass-tech/JACK/pull/32) into `develop` by @Copilot: Fix prototype pollution via intentId in store and API routes | docs-impact: none (Internal security fix with no public API surface changes) | areas: unlabeled | summary: no public interface impact
