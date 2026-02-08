@@ -36,6 +36,14 @@ export function fromBaseUnits(amount: string, decimals: number): string {
   if (!amount || amount === '0') return '0';
   const padded = amount.padStart(decimals + 1, '0');
   const whole = padded.slice(0, -decimals) || '0';
-  const fraction = padded.slice(-decimals).replace(/0+$/, '');
+  const fraction = trimTrailingZeros(padded.slice(-decimals));
   return fraction ? `${whole}.${fraction}` : whole;
+}
+
+function trimTrailingZeros(value: string): string {
+  let end = value.length;
+  while (end > 0 && value[end - 1] === '0') {
+    end -= 1;
+  }
+  return value.slice(0, end);
 }

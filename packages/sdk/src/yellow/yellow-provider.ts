@@ -153,21 +153,68 @@ export function mapErrorToReasonCode(error: unknown): YellowReasonCode {
  */
 export function extractRevertReason(error: unknown): string | undefined {
   const message = error instanceof Error ? error.message : String(error);
+  const lowerMessage = message.toLowerCase();
 
   // Match common revert reason patterns
   // viem format: "execution reverted: <reason>"
-  const revertMatch = message.match(/execution reverted:\s*(.+?)(?:\n|$)/i);
-  if (revertMatch) {
-    return revertMatch[1].trim();
+  const executionPrefix = 'execution reverted';
+  const executionIndex = lowerMessage.indexOf(executionPrefix);
+  if (executionIndex !== -1) {
+    const reason = extractRevertReasonFromSuffix(
+      message.slice(executionIndex + executionPrefix.length),
+    );
+    if (reason) {
+      return reason;
+    }
   }
 
   // Generic revert pattern: "revert <reason>" or "reverted with reason: <reason>"
-  const genericMatch = message.match(/revert(?:ed)?(?:\s+with\s+reason)?[:\s]+(.+?)(?:\n|$)/i);
-  if (genericMatch) {
-    return genericMatch[1].trim();
+  const revertIndex = lowerMessage.indexOf('revert');
+  if (revertIndex !== -1) {
+    const reason = extractRevertReasonFromSuffix(
+      message.slice(revertIndex + 'revert'.length),
+    );
+    if (reason) {
+      return reason;
+    }
   }
 
   return undefined;
+}
+
+function extractRevertReasonFromSuffix(suffix: string): string | undefined {
+  let text = suffix;
+  if (!text) return undefined;
+
+  const trimmedStart = text.trimStart();
+  const lowerTrimmed = trimmedStart.toLowerCase();
+  if (lowerTrimmed.startsWith('ed')) {
+    text = trimmedStart.slice(2).trimStart();
+  } else {
+    text = trimmedStart;
+  }
+
+  const lowerText = text.toLowerCase();
+  if (lowerText.startsWith('with reason')) {
+    text = text.slice('with reason'.length).trimStart();
+  }
+
+  if (text.startsWith(':') || text.startsWith('-')) {
+    text = text.slice(1).trimStart();
+  }
+
+  const newlineIndex = findFirstLineBreak(text);
+  const reason = (newlineIndex === -1 ? text : text.slice(0, newlineIndex))
+    .trim();
+  return reason.length ? reason : undefined;
+}
+
+function findFirstLineBreak(text: string): number {
+  const newlineIndex = text.indexOf('\n');
+  const carriageIndex = text.indexOf('\r');
+  if (newlineIndex === -1) return carriageIndex;
+  if (carriageIndex === -1) return newlineIndex;
+  return Math.min(newlineIndex, carriageIndex);
 }
 
 // ============================================================================
