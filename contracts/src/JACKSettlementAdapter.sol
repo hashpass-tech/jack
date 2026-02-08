@@ -9,6 +9,7 @@ import {BalanceDelta, BalanceDeltaLibrary} from "v4-core/types/BalanceDelta.sol"
 import {Currency, CurrencyLibrary} from "v4-core/types/Currency.sol";
 import {PoolKey} from "v4-core/types/PoolKey.sol";
 import {SwapParams} from "v4-core/types/PoolOperation.sol";
+import {IERC20Minimal} from "v4-core/interfaces/external/IERC20Minimal.sol";
 import {JACKPolicyHook} from "./JACKPolicyHook.sol";
 
 interface IUnlockCallback {
@@ -165,15 +166,28 @@ contract JACKSettlementAdapter is EIP712, ReentrancyGuard, IUnlockCallback {
         int128 amount1 = delta.amount1();
 
         if (amount0 > 0) {
-            poolKey.currency0.settle(poolManager, payer, uint256(uint128(amount0)), false);
+            _settle(poolKey.currency0, payer, uint256(uint128(amount0)));
         } else if (amount0 < 0) {
-            poolKey.currency0.take(poolManager, payer, uint256(uint128(-amount0)), false);
+            poolManager.take(poolKey.currency0, payer, uint256(uint128(-amount0)));
         }
 
         if (amount1 > 0) {
-            poolKey.currency1.settle(poolManager, payer, uint256(uint128(amount1)), false);
+            _settle(poolKey.currency1, payer, uint256(uint128(amount1)));
         } else if (amount1 < 0) {
-            poolKey.currency1.take(poolManager, payer, uint256(uint128(-amount1)), false);
+            poolManager.take(poolKey.currency1, payer, uint256(uint128(-amount1)));
+        }
+    }
+
+    function _settle(Currency currency, address payer, uint256 amount) internal {
+        if (amount == 0) return;
+
+        poolManager.sync(currency);
+        if (currency.isAddressZero()) {
+            poolManager.settle{value: amount}();
+        } else {
+            // Transfer tokens from payer to poolManager
+            IERC20Minimal(Currency.unwrap(currency)).transferFrom(payer, address(poolManager), amount);
+            poolManager.settle();
         }
     }
 }

@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0",
+  "network": "sepolia",
+  "chainId": 11155111,
+  "deployedAt": 1770532367,
+  "contracts": {
+    "policyHook": {
+      "address": "0xE8142B1Ff0DA631866fec5771f4291CbCe718080",
+      "txHash": "0xfe8a64c351c62df57919d79b85a952bacb5dd410e684d6342e01f060ef18929e",
+      "blockNumber": "0x9be12f",
+      "verified": true,
+      "verificationUrl": "https://sepolia.etherscan.io/address/0xE8142B1Ff0DA631866fec5771f4291CbCe718080#code",
+      "verificationMethod": "Sourcify"
+    },
+    "settlementAdapter": {
+      "address": "0xd8f0415b488F2BA18EF14F5C41989EEf90E51D1A",
+      "txHash": "0xf9ce7f6309ce153e66bc4e2160ae5338e6db3fc82e77edc7fadef3ab567098f5",
+      "blockNumber": "0x9be12f",
+      "verified": true,
+      "verificationUrl": "https://sepolia.etherscan.io/address/0xd8f0415b488F2BA18EF14F5C41989EEf90E51D1A#code",
+      "verificationMethod": "Sourcify"
+    }
+  },
+  "poolManager": "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543",
+  "deployer": "0x114d72D97Aa9C413A1ba3f0Cd37F439D668EA1aD",
+  "previousVersion": "",
+  "create2Salt": "23048"
+}

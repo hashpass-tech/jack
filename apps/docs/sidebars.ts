@@ -32,6 +32,7 @@ const sidebars: SidebarsConfig = {
       link: { type: "doc", id: "contracts/index" },
       items: [
         "contracts/settlement-adapter",
+        "contracts/uniswap-v4-deployment",
       ],
     },
     {
