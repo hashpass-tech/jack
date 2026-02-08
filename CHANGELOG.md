@@ -1,3 +1,19 @@
+## [0.1.56](https://github.com/hashpass-tech/JACK/compare/v0.1.55-testnet.2...v0.1.56) (2026-02-08)
+
+
+### Bug Fixes
+
+* **release:** properly route CDN and Cloud Build config per environment ([b56780d](https://github.com/hashpass-tech/JACK/commit/b56780dd1d622a91752ce88d7327d21487340b1a))
+
+
+### Features
+
+* **dashboard:** proper fullscreen toggle for walkthrough video modal ([c84073f](https://github.com/hashpass-tech/JACK/commit/c84073fa738ac2aa21352a91e82564723ed3c628))
+
+
+
+
+
 ## [0.1.55](https://github.com/hashpass-tech/JACK/compare/v0.1.53-testnet.1...v0.1.55) (2026-02-08)
 
 
