@@ -1,13 +1,21 @@
-import { makeConfig } from "@remotion/eslint-config-flat";
 import security from "eslint-plugin-security";
 
-const conf = makeConfig({
-  remotionDir: ["remotion/**"],
-});
-
-// Add security rules to the config
+/**
+ * Root-level ESLint configuration with security rules
+ * This configuration is inherited by all workspace packages
+ */
 export default [
-  ...conf,
+  {
+    ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.next/**",
+      "**/out/**",
+      "**/build/**",
+      "**/.turbo/**",
+      "**/coverage/**",
+    ],
+  },
   {
     plugins: {
       security,
@@ -24,7 +32,7 @@ export default [
       "security/detect-non-literal-fs-filename": "warn",
       "security/detect-non-literal-regexp": "warn",
       "security/detect-non-literal-require": "warn",
-      "security/detect-object-injection": "off",
+      "security/detect-object-injection": "off", // Too many false positives
       "security/detect-possible-timing-attacks": "warn",
       "security/detect-pseudoRandomBytes": "error",
       "security/detect-bidi-characters": "error",

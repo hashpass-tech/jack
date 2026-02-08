@@ -54,6 +54,9 @@ importers:
       '@types/blessed':
         specifier: ^0.1.27
         version: 0.1.27
+      '@types/eslint-plugin-security':
+        specifier: ^3.0.1
+        version: 3.0.1
       '@types/js-yaml':
         specifier: ^4.0.9
         version: 4.0.9
@@ -81,6 +84,9 @@ importers:
       dotenv:
         specifier: ^16.4.5
         version: 16.6.1
+      eslint-plugin-security:
+        specifier: ^3.0.1
+        version: 3.0.1
       husky:
         specifier: ^9.1.7
         version: 9.1.7
@@ -355,9 +361,18 @@ importers:
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.31
+      '@typescript-eslint/eslint-plugin':
+        specifier: ^8.54.0
+        version: 8.54.0(@typescript-eslint/parser@8.54.0)(eslint@9.39.2)(typescript@5.9.3)
+      '@typescript-eslint/parser':
+        specifier: ^8.54.0
+        version: 8.54.0(eslint@9.39.2)(typescript@5.9.3)
       '@vitest/coverage-v8':
         specifier: ^1.0.0
         version: 1.6.1(vitest@1.6.1)
+      eslint:
+        specifier: ^9
+        version: 9.39.2
       fast-check:
         specifier: ^3.23.2
         version: 3.23.2
@@ -7917,6 +7932,12 @@ packages:
     resolution: {integrity: sha512-AX22jp8Y7wwaBgAixaSvkoG4M/+PlAcm3Qs4OW8yT9DM4xUpWKeFhLueTAyZF39pviAdcDdeJoACapiAceqNcw==}
     dev: false
 
+  /@types/eslint-plugin-security@3.0.1:
+    resolution: {integrity: sha512-z+v78aGgONHyq7mMaXgzG+10HonH0HBubSLDbTXdNGyCLtM3c29MdDc9hQzHO9pDan4WYHWdULVOJyzszqDuqg==}
+    dependencies:
+      '@types/eslint': 9.6.1
+    dev: true
+
   /@types/eslint-scope@3.7.7:
     resolution: {integrity: sha512-MzMFlSLBqNF2gcHWO0G1vP/YQyfvrxZ0bF+u7mzUdZ1/xK4A4sru+nraZz5i3iEIk1l1uyicaDVTB4QbbEkAYg==}
     dependencies:
@@ -9950,7 +9971,7 @@ packages:
     dependencies:
       ansi-align: 3.0.1
       camelcase: 7.0.1
-      chalk: 5.0.1
+      chalk: 5.6.2
       cli-boxes: 3.0.0
       string-width: 5.1.2
       type-fest: 2.19.0
@@ -12524,6 +12545,13 @@ packages:
       semver: 6.3.1
       string.prototype.matchall: 4.0.12
       string.prototype.repeat: 1.0.0
+
+  /eslint-plugin-security@3.0.1:
+    resolution: {integrity: sha512-XjVGBhtDZJfyuhIxnQ/WMm385RbX3DBu7H1J7HNNhmB2tnGxMeqVSnYv79oAj992ayvIBZghsymwkYFS6cGH4Q==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    dependencies:
+      safe-regex: 2.1.1
+    dev: true
 
   /eslint-plugin-testing-library@5.11.1(eslint@9.39.2)(typescript@5.9.3):
     resolution: {integrity: sha512-5eX9e1Kc2PqVRed3taaLnAAqPZGEX75C+M/rXzUAI3wIg/ZxzUm1OVAwfe/O+vE+6YXOLetSe9g5GKD2ecXipw==}
@@ -18084,6 +18112,11 @@ packages:
     resolution: {integrity: sha512-zrceR/XhGYU/d/opr2EKO7aRHUeiBI8qjtfHqADTwZd6Szfy16la6kqD0MIUs5z5hx6AaKa+PixpPrR289+I0A==}
     dev: false
 
+  /regexp-tree@0.1.27:
+    resolution: {integrity: sha512-iETxpjK6YoRWJG5o6hXLwvjYAoW+FEZn9os0PD/b6AP6xQwsa/Y7lCVgIixBbUPMfhu+i2LtdeAqVTgGlQarfA==}
+    hasBin: true
+    dev: true
+
   /regexp.prototype.flags@1.5.4:
     resolution: {integrity: sha512-dYqgNSZbDwkaJ2ceRd9ojCGjBq+mOm9LmtXnAnEGyHhN/5R7iDW2TRw3h+o/jCFxus3P2LfWIIiwowAjANm7IA==}
     engines: {node: '>= 0.4'}
@@ -18490,6 +18523,12 @@ packages:
       call-bound: 1.0.4
       es-errors: 1.3.0
       is-regex: 1.2.1
+
+  /safe-regex@2.1.1:
+    resolution: {integrity: sha512-rx+x8AMzKb5Q5lQ95Zoi6ZbJqwCLkqi3XuJXp5P3rT8OEc6sZCJG5AE5dU3lsgRr/F4Bs31jSlVN+j5KrsGu9A==}
+    dependencies:
+      regexp-tree: 0.1.27
+    dev: true
 
   /safer-buffer@2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}

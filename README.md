@@ -124,6 +124,30 @@ jack/
 - **X (Twitter)**: [@Jack_kernel](https://x.com/Jack_kernel)
 - **GitHub**: [hashpass-tech/JACK](https://github.com/hashpass-tech/JACK)
 
+## Security
+
+JACK enforces multiple layers of security linting to protect against common vulnerabilities:
+
+- **Pre-commit hooks**: Automated checks before each commit
+- **ESLint security rules**: Detects command injection, unsafe patterns, and more
+- **Secret detection**: Prevents accidental exposure of credentials
+- **CI/CD enforcement**: All PRs are automatically scanned for security issues
+
+For detailed information, see [Security Linting Documentation](./docs/SECURITY_LINTING.md).
+
+### Running Security Checks Locally
+
+```bash
+# Run all linters
+pnpm run lint
+
+# Check for secrets
+npx secretlint "**/*"
+
+# Custom secret check
+./scripts/check-secrets.sh
+```
+
 ## Contributing
 
 We welcome contributions! Please read our [Contributing Guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.

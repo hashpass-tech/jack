@@ -1,19 +1,31 @@
-import { makeConfig } from "@remotion/eslint-config-flat";
 import security from "eslint-plugin-security";
+import tseslint from "@typescript-eslint/eslint-plugin";
+import parser from "@typescript-eslint/parser";
 
-const conf = makeConfig({
-  remotionDir: ["remotion/**"],
-});
-
-// Add security rules to the config
+/**
+ * ESLint configuration for @jack-kernel/sdk package
+ * Extends root security rules
+ */
 export default [
-  ...conf,
   {
+    ignores: ["dist/**", "node_modules/**", "coverage/**"],
+  },
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
     plugins: {
       security,
+      "@typescript-eslint": tseslint,
+    },
+    languageOptions: {
+      parser: parser,
+      parserOptions: {
+        ecmaVersion: "latest",
+        sourceType: "module",
+        project: "./tsconfig.json",
+      },
     },
     rules: {
-      // Security rules to prevent common vulnerabilities
+      // Inherit security rules from root config
       "security/detect-unsafe-regex": "error",
       "security/detect-buffer-noassert": "error",
       "security/detect-child-process": "warn",

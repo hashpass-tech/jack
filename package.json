@@ -60,6 +60,7 @@
     "@secretlint/quick-start": "^11.3.1",
     "@secretlint/secretlint-rule-preset-recommend": "^11.3.1",
     "@types/blessed": "^0.1.27",
+    "@types/eslint-plugin-security": "^3.0.1",
     "@types/js-yaml": "^4.0.9",
     "@types/node": "^25.2.0",
     "@types/react": "^18.3.3",
@@ -69,6 +70,7 @@
     "blessed": "^0.1.81",
     "concurrently": "^8.2.2",
     "dotenv": "^16.4.5",
+    "eslint-plugin-security": "^3.0.1",
     "husky": "^9.1.7",
     "js-yaml": "^4.1.1",
     "lint-staged": "^16.2.7",
@@ -95,6 +97,10 @@
     "appWorkingDirectory": "npm-shim"
   },
   "lint-staged": {
+    "*.{js,jsx,ts,tsx,mjs,cjs}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
     "*": "secretlint"
   }
 }

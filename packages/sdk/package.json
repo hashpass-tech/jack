@@ -55,7 +55,10 @@
   "devDependencies": {
     "@fast-check/vitest": "^0.2.4",
     "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.54.0",
+    "@typescript-eslint/parser": "^8.54.0",
     "@vitest/coverage-v8": "^1.0.0",
+    "eslint": "^9",
     "fast-check": "^3.23.2",
     "msw": "^2.0.0",
     "typescript": "^5.0.0",
