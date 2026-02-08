@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getIntents, saveIntent } from '@/lib/store';
 import { fetchLifiQuote, fetchLifiRoute, fetchLifiStatus, type LifiFallback } from '@/lib/lifi';
+import { getYellowProvider } from '@/lib/yellow';
 import type { IntentParams } from '../../../../../../packages/sdk';
 
 type FallbackReason = LifiFallback & { stage: 'QUOTE' | 'ROUTE' | 'STATUS' };
@@ -506,6 +507,26 @@ export async function POST(request: NextRequest) {
             }
 
             saveIntent(body.intentId, intent);
+
+            // Update YellowProvider local channel state if available (Requirement 12.2)
+            // This is fire-and-forget: we don't await or block the response.
+            // The existing notification ingestion path above is preserved for backward compatibility.
+            if (channelId) {
+                const yellowProvider = getYellowProvider();
+                if (yellowProvider) {
+                    try {
+                        // Trigger a cache refresh by querying the channel state.
+                        // getChannelState updates the ChannelStateManager's local cache
+                        // with the latest on-chain data for this channel.
+                        yellowProvider.getChannelState(channelId).catch(() => {
+                            // Non-fatal: swallow errors from the async cache refresh
+                        });
+                    } catch {
+                        // Non-fatal: notification processing must not fail
+                        // if YellowProvider update fails
+                    }
+                }
+            }
 
             return NextResponse.json({ intentId: body.intentId, status: intent.status });
         }

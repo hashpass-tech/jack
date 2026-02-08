@@ -69,6 +69,39 @@ export { AgentUtils } from './agent.js';
 // Re-export JackClient
 export { JackClient } from './client.js';
 
+// Re-export Yellow Network provider and configuration
+export { YellowProvider } from './yellow/yellow-provider.js';
+export type { YellowConfig } from './yellow/yellow-provider.js';
+export { NitroliteClient } from './yellow/yellow-provider.js';
+export type { NitroliteClientConfig } from './yellow/yellow-provider.js';
+export { mapErrorToReasonCode, extractRevertReason } from './yellow/yellow-provider.js';
+
+// Re-export all Yellow types
+export type {
+  YellowProviderStatus,
+  YellowReasonCode,
+  YellowFallback,
+  ChannelState,
+  ChannelAllocation,
+  YellowQuote,
+  ClearingResult,
+  SettlementProof,
+  YellowConnectionResult,
+  YellowChannelResult,
+  YellowTransferResult,
+  YellowExecutionResult,
+  YellowChannelsResult,
+  YellowEvent,
+  YellowEventHandler,
+  CreateChannelParams,
+  ResizeChannelParams,
+  CloseChannelParams,
+  TransferParams
+} from './yellow/types.js';
+
+// Re-export Yellow event mapper functions
+export { mapYellowEvent, mapChannelStatus, mapStateIntent, inferMapping } from './yellow/event-mapper.js';
+
 // Import manager classes
 import { JackClient } from './client.js';
 import { IntentManager } from './intents.js';
@@ -76,8 +109,28 @@ import { ExecutionTracker } from './execution.js';
 import { CostTracker } from './costs.js';
 import { AgentUtils } from './agent.js';
 
+// Import Yellow provider and config for SDK integration
+import { YellowProvider } from './yellow/yellow-provider.js';
+import type { YellowConfig } from './yellow/yellow-provider.js';
+
 // Import types and enums for use in this file
 import { ExecutionStatus, type ClientConfig, type IntentParams, type Intent } from './types.js';
+
+// Import WalletClient type from viem for YellowSDKConfig
+import type { WalletClient } from 'viem';
+
+/**
+ * Extended Yellow configuration for JACK_SDK integration.
+ *
+ * Extends YellowConfig with a walletClient field, which is required by
+ * YellowProvider for signing transactions and EIP-712 messages.
+ *
+ * **Validates: Requirements 1.6, 1.7**
+ */
+export interface YellowSDKConfig extends YellowConfig {
+  /** viem WalletClient for signing transactions and EIP-712 messages */
+  walletClient: WalletClient;
+}
 
 /**
  * Main SDK class for JACK cross-chain execution kernel
@@ -129,6 +182,14 @@ export class JACK_SDK {
   public readonly agent: AgentUtils;
 
   /**
+   * Yellow Network provider - state channel management, clearing, and settlement.
+   * Only available when YellowSDKConfig is provided during initialization.
+   *
+   * **Validates: Requirements 1.6, 1.7**
+   */
+  public readonly yellow?: YellowProvider;
+
+  /**
    * Internal HTTP client (exposed for advanced use cases)
    */
   private readonly client: JackClient;
@@ -140,8 +201,10 @@ export class JACK_SDK {
    * includes the base URL for the API and optional settings for timeout, retries,
    * caching, and custom headers.
    * 
-   * @param config - Client configuration (baseUrl required, other options optional)
+   * @param config - Client configuration (baseUrl required, other options optional). Optionally includes
+   *   a `yellow` field with YellowSDKConfig to enable Yellow Network integration.
    * @throws ValidationError if configuration is invalid
+   * @throws Error if YellowProvider initialization fails when yellow config is provided
    * 
    * @example
    * ```typescript
@@ -157,9 +220,21 @@ export class JACK_SDK {
    *   cacheTTL: 120000,
    *   headers: { 'Authorization': 'Bearer token' }
    * });
+   *
+   * // With Yellow Network integration
+   * const sdk = new JACK_SDK({
+   *   baseUrl: 'https://api.jack.example',
+   *   yellow: {
+   *     custodyAddress: '0x...',
+   *     adjudicatorAddress: '0x...',
+   *     chainId: 1,
+   *     walletClient: myWalletClient,
+   *   }
+   * });
+   * console.log(sdk.yellow); // YellowProvider instance
    * ```
    */
-  constructor(config: ClientConfig) {
+  constructor(config: ClientConfig & { yellow?: YellowSDKConfig }) {
     // Initialize core HTTP client
     this.client = new JackClient(config);
 
@@ -168,6 +243,11 @@ export class JACK_SDK {
     this.execution = new ExecutionTracker(this.client);
     this.costs = new CostTracker(this.client);
     this.agent = new AgentUtils(this.client);
+
+    // Conditionally initialize YellowProvider (Requirements 1.6, 1.7)
+    if (config.yellow !== undefined) {
+      this.yellow = new YellowProvider(config.yellow, config.yellow.walletClient);
+    }
   }
 
   /**
