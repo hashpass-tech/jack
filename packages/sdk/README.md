@@ -2,7 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/@jack-kernel/sdk.svg)](https://www.npmjs.com/package/@jack-kernel/sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Discord](https://img.shields.io/discord/YOUR_DISCORD_ID?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/7k8CdmYHpn)
+[![Discord](https://img.shields.io/discord/1131014788072349827?color=7289da&label=Discord&logo=discord&logoColor=white)](https://discord.gg/7k8CdmYHpn)
 [![X (Twitter)](https://img.shields.io/badge/Follow-%40Jack__kernel-1DA1F2?logo=x&logoColor=white)](https://x.com/Jack_kernel)
 
 TypeScript SDK for the JACK cross-chain execution kernel. Provides a comprehensive, type-safe interface for creating and managing cross-chain intents, tracking execution, and monitoring costs.
