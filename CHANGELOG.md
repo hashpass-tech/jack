@@ -1,3 +1,15 @@
+## [0.1.59](https://github.com/hashpass-tech/JACK/compare/v0.1.58-testnet.1...v0.1.59) (2026-02-09)
+
+
+### Features
+
+* **dashboard:** wire Yellow Network + v4 hook settlement into UI ([cf26b4b](https://github.com/hashpass-tech/JACK/commit/cf26b4be793fdceabe3548f30b0c9b8e8ced92e2))
+* **v4:** Uniswap v4 hook Sepolia testnet proof — 4 on-chain txs ([bade222](https://github.com/hashpass-tech/JACK/commit/bade222953ab04ab9bc2723817d1a7850011620f))
+
+
+
+
+
 ## [0.1.58](https://github.com/hashpass-tech/JACK/compare/v0.1.55-testnet.1...v0.1.58) (2026-02-09)
 
 
