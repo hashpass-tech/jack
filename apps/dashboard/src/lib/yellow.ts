@@ -1,34 +1,45 @@
-import { YellowProvider } from '@jack-kernel/sdk';
-import type { YellowConfig } from '@jack-kernel/sdk';
-import type { WalletClient } from 'viem';
+import { YellowProvider } from "@jack-kernel/sdk";
+import type { YellowConfig } from "@jack-kernel/sdk";
+import type { WalletClient } from "viem";
+
+// Yellow Network contracts on Sepolia (ClearNode sandbox)
+export const SEPOLIA_YELLOW_ADDRESSES = {
+  custody: "0x019B65A265EB3363822f2752141b3dF16131b262" as `0x${string}`,
+  adjudicator: "0x7c7ccbc98469190849BCC6c926307794fDfB11F2" as `0x${string}`,
+} as const;
+
+export const CLEARNODE_WS_URL = "wss://clearnet-sandbox.yellow.com/ws";
+export const CLEARNODE_FAUCET_URL =
+  "https://clearnet-sandbox.yellow.com/faucet/requestTokens";
 
 let provider: YellowProvider | null = null;
 
 /**
  * Initialize the singleton YellowProvider instance for the dashboard.
- *
- * Creates a new YellowProvider with the given config and wallet client,
- * replacing any previously initialized instance.
- *
- * @param config - Yellow Network configuration (custody/adjudicator addresses, chain ID, etc.)
- * @param walletClient - viem WalletClient for signing transactions and EIP-712 messages
- * @returns The initialized YellowProvider instance
- *
- * Requirements: 12.3
  */
-export function initYellowProvider(config: YellowConfig, walletClient: WalletClient): YellowProvider {
+export function initYellowProvider(
+  config: YellowConfig,
+  walletClient: WalletClient,
+): YellowProvider {
   provider = new YellowProvider(config, walletClient);
   return provider;
 }
 
 /**
+ * Create a default Sepolia YellowConfig.
+ */
+export function createSepoliaYellowConfig(): YellowConfig {
+  return {
+    custodyAddress: SEPOLIA_YELLOW_ADDRESSES.custody,
+    adjudicatorAddress: SEPOLIA_YELLOW_ADDRESSES.adjudicator,
+    chainId: 11155111,
+    challengeDuration: 3600,
+    clearNodeUrl: CLEARNODE_WS_URL,
+  };
+}
+
+/**
  * Get the current singleton YellowProvider instance.
- *
- * Returns null if initYellowProvider has not been called yet.
- *
- * @returns The YellowProvider instance, or null if not initialized
- *
- * Requirements: 12.3
  */
 export function getYellowProvider(): YellowProvider | null {
   return provider;
@@ -36,8 +47,6 @@ export function getYellowProvider(): YellowProvider | null {
 
 /**
  * Reset the singleton YellowProvider instance.
- *
- * Useful for testing and cleanup. Sets the internal provider reference to null.
  */
 export function resetYellowProvider(): void {
   provider = null;
