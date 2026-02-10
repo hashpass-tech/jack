@@ -31,6 +31,9 @@ contract JACKSettlementAdapter is EIP712, ReentrancyGuard, IUnlockCallback {
     error IntentExpired(uint256 deadline, uint256 currentTimestamp);
     error QuotedAmountOutTooLow(uint256 quotedAmountOut, uint256 minAmountOut);
     error Unauthorized();
+    error IntentAlreadySettled(bytes32 intentId);
+    error PoolMismatch();
+    error NativeEthNotSupported();
 
     event IntentSettled(bytes32 indexed intentId, address indexed solver);
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
@@ -62,7 +65,9 @@ contract JACKSettlementAdapter is EIP712, ReentrancyGuard, IUnlockCallback {
     JACKPolicyHook public immutable policyHook;
     IPoolManager public immutable poolManager;
     address public owner;
+    address public pendingOwner;
     mapping(address => bool) public authorizedSolvers;
+    mapping(bytes32 => bool) public settledIntents;
 
     constructor(address _policyHook) EIP712("JACKSettlementAdapter", "1") {
         policyHook = JACKPolicyHook(_policyHook);
@@ -85,8 +90,14 @@ contract JACKSettlementAdapter is EIP712, ReentrancyGuard, IUnlockCallback {
 
     function transferOwnership(address newOwner) external onlyOwner {
         if (newOwner == address(0)) revert Unauthorized();
-        emit OwnershipTransferred(owner, newOwner);
-        owner = newOwner;
+        pendingOwner = newOwner;
+    }
+
+    function acceptOwnership() external {
+        if (msg.sender != pendingOwner) revert Unauthorized();
+        emit OwnershipTransferred(owner, pendingOwner);
+        owner = pendingOwner;
+        delete pendingOwner;
     }
 
     function setAuthorizedSolver(address solver, bool authorized) external onlyOwner {
@@ -132,6 +143,12 @@ contract JACKSettlementAdapter is EIP712, ReentrancyGuard, IUnlockCallback {
             revert InvalidSignature();
         }
 
+        if (settledIntents[intent.id]) revert IntentAlreadySettled(intent.id);
+
+        if (intent.tokenIn == address(0)) revert NativeEthNotSupported();
+
+        _validatePoolMatchesIntent(poolKey, intent);
+
         (bool allowed, bytes32 reason) = policyHook.checkPolicy(intent.id, quotedAmountOut);
         if (!allowed) revert PolicyRejected(intent.id, reason);
 
@@ -145,7 +162,17 @@ contract JACKSettlementAdapter is EIP712, ReentrancyGuard, IUnlockCallback {
 
         poolManager.unlock(abi.encode(settlement));
 
+        settledIntents[intent.id] = true;
         emit IntentSettled(intent.id, msg.sender);
+    }
+
+    function _validatePoolMatchesIntent(PoolKey calldata poolKey, Intent calldata intent) internal pure {
+        Currency tokenInCur = Currency.wrap(intent.tokenIn);
+        Currency tokenOutCur = Currency.wrap(intent.tokenOut);
+        bool valid =
+            (tokenInCur == poolKey.currency0 && tokenOutCur == poolKey.currency1) ||
+            (tokenInCur == poolKey.currency1 && tokenOutCur == poolKey.currency0);
+        if (!valid) revert PoolMismatch();
     }
 
     function unlockCallback(bytes calldata data) external override returns (bytes memory) {
@@ -183,7 +210,7 @@ contract JACKSettlementAdapter is EIP712, ReentrancyGuard, IUnlockCallback {
 
         poolManager.sync(currency);
         if (currency.isAddressZero()) {
-            poolManager.settle{value: amount}();
+            revert NativeEthNotSupported();
         } else {
             // Transfer tokens from payer to poolManager
             IERC20Minimal(Currency.unwrap(currency)).transferFrom(payer, address(poolManager), amount);

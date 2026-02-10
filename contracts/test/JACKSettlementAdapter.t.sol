@@ -5,6 +5,7 @@ import {Test} from "forge-std/Test.sol";
 import {JACKSettlementAdapter} from "../src/JACKSettlementAdapter.sol";
 import {JACKPolicyHook} from "../src/JACKPolicyHook.sol";
 import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
+import {IHooks} from "v4-core/interfaces/IHooks.sol";
 import {Hooks} from "v4-core/libraries/Hooks.sol";
 import {BalanceDelta} from "v4-core/types/BalanceDelta.sol";
 import {Currency} from "v4-core/types/Currency.sol";
@@ -106,7 +107,13 @@ contract JACKSettlementAdapterTest is Test {
     }
 
     function _defaultSwapParams() internal pure returns (PoolKey memory, SwapParams memory) {
-        PoolKey memory key;
+        PoolKey memory key = PoolKey({
+            currency0: Currency.wrap(address(0x1)),
+            currency1: Currency.wrap(address(0x2)),
+            fee: 3000,
+            tickSpacing: 60,
+            hooks: IHooks(address(0))
+        });
         SwapParams memory params = SwapParams({zeroForOne: true, amountSpecified: -int256(100), sqrtPriceLimitX96: 0});
         return (key, params);
     }
@@ -186,8 +193,56 @@ contract JACKSettlementAdapterTest is Test {
 
         vm.prank(solver);
         vm.expectRevert(
-            abi.encodeWithSelector(JACKSettlementAdapter.PolicyRejected.selector, intent.id, hook.REASON_POLICY_EXPIRED())
+            abi.encodeWithSelector(JACKSettlementAdapter.IntentExpired.selector, deadline, block.timestamp)
         );
+        adapter.settleIntent(intent, key, params, intent.minAmountOut);
+    }
+
+    function testRejectsIntentReplay() public {
+        uint256 deadline = block.timestamp + 1 days;
+        JACKSettlementAdapter.Intent memory intent = _buildIntent(deadline);
+        intent.signature = _signIntent(intent);
+
+        hook.setPolicyWithSlippage(intent.id, intent.minAmountOut, intent.minAmountOut, 0, deadline, address(this));
+
+        (PoolKey memory key, SwapParams memory params) = _defaultSwapParams();
+
+        vm.prank(solver);
+        adapter.settleIntent(intent, key, params, intent.minAmountOut);
+
+        vm.prank(solver);
+        vm.expectRevert(abi.encodeWithSelector(JACKSettlementAdapter.IntentAlreadySettled.selector, intent.id));
+        adapter.settleIntent(intent, key, params, intent.minAmountOut);
+    }
+
+    function testRejectsPoolMismatch() public {
+        uint256 deadline = block.timestamp + 1 days;
+        JACKSettlementAdapter.Intent memory intent = _buildIntent(deadline);
+        intent.signature = _signIntent(intent);
+
+        hook.setPolicyWithSlippage(intent.id, intent.minAmountOut, intent.minAmountOut, 0, deadline, address(this));
+
+        (PoolKey memory key, SwapParams memory params) = _defaultSwapParams();
+        key.currency0 = Currency.wrap(address(0x99));
+        key.currency1 = Currency.wrap(address(0xAA));
+
+        vm.prank(solver);
+        vm.expectRevert(JACKSettlementAdapter.PoolMismatch.selector);
+        adapter.settleIntent(intent, key, params, intent.minAmountOut);
+    }
+
+    function testRejectsNativeEthIntent() public {
+        uint256 deadline = block.timestamp + 1 days;
+        JACKSettlementAdapter.Intent memory intent = _buildIntent(deadline);
+        intent.tokenIn = address(0);
+        intent.signature = _signIntent(intent);
+
+        hook.setPolicyWithSlippage(intent.id, intent.minAmountOut, intent.minAmountOut, 0, deadline, address(this));
+
+        (PoolKey memory key, SwapParams memory params) = _defaultSwapParams();
+
+        vm.prank(solver);
+        vm.expectRevert(JACKSettlementAdapter.NativeEthNotSupported.selector);
         adapter.settleIntent(intent, key, params, intent.minAmountOut);
     }
 

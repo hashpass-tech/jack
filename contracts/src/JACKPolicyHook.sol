@@ -41,6 +41,7 @@ contract JACKPolicyHook is BaseHook {
     }
 
     address public owner;
+    address public pendingOwner;
     mapping(bytes32 => Policy) public policies;
 
     constructor(IPoolManager _poolManager) BaseHook(_poolManager) {
@@ -61,8 +62,14 @@ contract JACKPolicyHook is BaseHook {
 
     function transferOwnership(address newOwner) external onlyOwner {
         if (newOwner == address(0)) revert Unauthorized();
-        emit OwnershipTransferred(owner, newOwner);
-        owner = newOwner;
+        pendingOwner = newOwner;
+    }
+
+    function acceptOwnership() external {
+        if (msg.sender != pendingOwner) revert Unauthorized();
+        emit OwnershipTransferred(owner, pendingOwner);
+        owner = pendingOwner;
+        delete pendingOwner;
     }
 
     function getHookPermissions() public pure override returns (Hooks.Permissions memory) {
