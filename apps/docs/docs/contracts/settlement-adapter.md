@@ -429,7 +429,10 @@ settledIntents[intent.id] = true;
 - Eliminates edge cases with native currency transfers
 - Maintains consistency with Uniswap v4's currency model
 
-**Important**: When creating intents involving ETH, use the WETH contract address, not address(0).
+**Important**: When creating intents involving ETH, use the network-appropriate WETH contract address (not address(0)):
+- Ethereum Mainnet: `0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2`
+- Sepolia Testnet: `0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9`
+- For other networks, refer to the [WETH deployment addresses](https://etherscan.io/token/0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2)
 
 ### Pool Validation
 
@@ -548,7 +551,7 @@ async function settleUserIntent(intent: Intent) {
 ### For Users
 
 1. **Create Intent**: Define desired swap parameters
-   - **Important**: Use WETH address for ETH swaps, NOT address(0)
+   - **Important**: Use network-appropriate WETH address for ETH swaps (see Security Features section), NOT address(0)
    - Ensure tokenIn and tokenOut match an available Uniswap v4 pool
 2. **Sign Intent**: Use EIP-712 to sign the intent
 3. **Submit Off-Chain**: Send signed intent to solver network
