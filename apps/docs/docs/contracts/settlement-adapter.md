@@ -16,7 +16,10 @@ sidebar_position: 1
 - **Policy Integration**: Validates intents through `JACKPolicyHook` before execution
 - **Atomic Swaps**: Leverages Uniswap v4's unlock/callback pattern for atomic execution
 - **Reentrancy Protection**: Guards against reentrancy attacks
-- **Owner Management**: Supports ownership transfer and solver authorization updates
+- **Two-Step Ownership Transfer**: Safe ownership transfers with explicit acceptance
+- **Intent Replay Protection**: Prevents duplicate settlement of the same intent
+- **Pool Validation**: Ensures pool currencies match intent tokens
+- **WETH-Only Settlement**: Requires wrapped ETH for all token settlements (native ETH not supported)
 
 ## Architecture
 
@@ -108,11 +111,14 @@ function settleIntent(
 - `quotedAmountOut`: Expected output amount for policy validation
 
 **Validation Steps**:
-1. Verify intent deadline hasn't expired
-2. Check quoted output meets minimum requirement
-3. Validate EIP-712 signature
-4. Query policy hook for approval
-5. Execute swap via unlock/callback pattern
+1. Verify intent hasn't been settled before (replay protection)
+2. Verify native ETH is not used (tokenIn must not be address(0))
+3. Verify intent deadline hasn't expired
+4. Check quoted output meets minimum requirement
+5. Validate EIP-712 signature
+6. Validate pool currencies match intent tokens
+7. Query policy hook for approval
+8. Execute swap via unlock/callback pattern
 
 ### 3. Atomic Execution
 
@@ -155,9 +161,12 @@ Settles a user intent by validating signatures and policy, then executing the sw
 **Emits**: `IntentSettled(intentId, solver)`
 
 **Reverts**:
+- `IntentAlreadySettled`: Intent has already been settled (replay protection)
+- `NativeEthNotSupported`: Intent uses native ETH (address(0)) instead of WETH
 - `IntentExpired`: Intent deadline has passed
 - `QuotedAmountOutTooLow`: Quoted output below minimum
 - `InvalidSignature`: EIP-712 signature verification failed
+- `PoolMismatch`: Pool currencies don't match intent tokens
 - `PolicyRejected`: Policy hook rejected the intent
 - `UnauthorizedSolver`: Caller not authorized
 
@@ -177,13 +186,27 @@ Computes the EIP-712 hash of an intent for signature verification.
 function transferOwnership(address newOwner) external onlyOwner
 ```
 
-Transfers contract ownership to a new address.
+Initiates a two-step ownership transfer by setting a pending owner. The new owner must call `acceptOwnership()` to complete the transfer.
 
 **Access**: Only current owner  
-**Emits**: `OwnershipTransferred(previousOwner, newOwner)`
+**Emits**: None (ownership transfer completes on acceptance)
 
 **Reverts**:
 - `Unauthorized`: Caller is not owner or newOwner is zero address
+
+### acceptOwnership
+
+```solidity
+function acceptOwnership() external
+```
+
+Completes the ownership transfer. Must be called by the pending owner.
+
+**Access**: Only pending owner  
+**Emits**: `OwnershipTransferred(previousOwner, newOwner)`
+
+**Reverts**:
+- `Unauthorized`: Caller is not the pending owner
 
 ### setAuthorizedSolver
 
@@ -284,6 +307,36 @@ Emitted when solver authorization status changes.
 
 ## Errors
 
+### IntentAlreadySettled
+
+```solidity
+error IntentAlreadySettled(bytes32 intentId)
+```
+
+Thrown when attempting to settle an intent that has already been settled.
+
+**When**: Provides replay protection by preventing the same intent from being settled multiple times
+
+### PoolMismatch
+
+```solidity
+error PoolMismatch()
+```
+
+Thrown when pool currencies don't match the intent's tokenIn and tokenOut addresses.
+
+**When**: Validates that the pool being used for settlement corresponds to the tokens specified in the intent
+
+### NativeEthNotSupported
+
+```solidity
+error NativeEthNotSupported()
+```
+
+Thrown when attempting to settle an intent with native ETH (address(0)).
+
+**When**: Intent uses address(0) for tokenIn or when settling native currency. **Always use WETH (Wrapped ETH) instead of native ETH for all settlements.**
+
 ### PolicyRejected
 
 ```solidity
@@ -356,6 +409,77 @@ Thrown for general authorization failures.
 
 ## Security Features
 
+### Intent Replay Protection
+
+The contract tracks settled intents using a `settledIntents` mapping to prevent the same intent from being settled multiple times. Each intent can only be settled once.
+
+```solidity
+mapping(bytes32 => bool) public settledIntents;
+
+// In settleIntent():
+if (settledIntents[intent.id]) revert IntentAlreadySettled(intent.id);
+settledIntents[intent.id] = true;
+```
+
+### Native ETH Restriction
+
+**The contract does not support native ETH (address(0)).** All token settlements must use ERC-20 tokens, including WETH for ETH-based swaps. This design choice:
+- Simplifies token handling logic
+- Reduces gas costs
+- Eliminates edge cases with native currency transfers
+- Maintains consistency with Uniswap v4's currency model
+
+**Important**: When creating intents involving ETH, use the WETH contract address, not address(0).
+
+### Pool Validation
+
+Before executing a swap, the contract validates that the pool's currencies match the intent's token addresses. This prevents:
+- Malicious solvers from using incorrect pools
+- Accidental settlement through wrong liquidity pools
+- Price manipulation through pool mismatch attacks
+
+```solidity
+function _validatePoolMatchesIntent(Intent calldata intent, PoolKey calldata poolKey) internal pure {
+    Currency currency0 = poolKey.currency0;
+    Currency currency1 = poolKey.currency1;
+    address token0 = Currency.unwrap(currency0);
+    address token1 = Currency.unwrap(currency1);
+    
+    bool matchesForward = (token0 == intent.tokenIn && token1 == intent.tokenOut);
+    bool matchesReverse = (token0 == intent.tokenOut && token1 == intent.tokenIn);
+    
+    if (!matchesForward && !matchesReverse) revert PoolMismatch();
+}
+```
+
+### Two-Step Ownership Transfer
+
+The contract implements a two-step ownership transfer pattern for enhanced security:
+
+1. Current owner calls `transferOwnership(newOwner)` to set a pending owner
+2. New owner calls `acceptOwnership()` to complete the transfer
+3. Only then does ownership actually change
+
+This prevents accidental transfers to wrong addresses and ensures the new owner has access to the address.
+
+```solidity
+address public owner;
+address public pendingOwner;
+
+function transferOwnership(address newOwner) external onlyOwner {
+    if (newOwner == address(0)) revert Unauthorized();
+    pendingOwner = newOwner;
+}
+
+function acceptOwnership() external {
+    if (msg.sender != pendingOwner) revert Unauthorized();
+    address oldOwner = owner;
+    owner = pendingOwner;
+    pendingOwner = address(0);
+    emit OwnershipTransferred(oldOwner, owner);
+}
+```
+
 ### Reentrancy Protection
 
 The contract uses OpenZeppelin's `ReentrancyGuard` to prevent reentrancy attacks on the `settleIntent` function. The unlock/callback pattern is carefully designed to prevent nested calls.
@@ -424,16 +548,20 @@ async function settleUserIntent(intent: Intent) {
 ### For Users
 
 1. **Create Intent**: Define desired swap parameters
+   - **Important**: Use WETH address for ETH swaps, NOT address(0)
+   - Ensure tokenIn and tokenOut match an available Uniswap v4 pool
 2. **Sign Intent**: Use EIP-712 to sign the intent
 3. **Submit Off-Chain**: Send signed intent to solver network
 4. **Monitor Settlement**: Watch for `IntentSettled` event
+   - Note: Each intent can only be settled once (replay protection)
 
 ### For Protocol Operators
 
 1. **Deploy Contract**: Deploy with `JACKPolicyHook` address
 2. **Authorize Solvers**: Use `setAuthorizedSolver()` to manage solver network
-3. **Monitor Events**: Track settlement activity and policy rejections
-4. **Update Policies**: Work with policy hook to refine validation rules
+3. **Transfer Ownership**: Use two-step `transferOwnership()` / `acceptOwnership()` pattern for safe ownership changes
+4. **Monitor Events**: Track settlement activity and policy rejections
+5. **Update Policies**: Work with policy hook to refine validation rules
 
 ## Policy Hook Integration
 
@@ -498,8 +626,11 @@ The contract includes a comprehensive test suite at `contracts/test/JACKSettleme
 - ✅ Minimum output validation
 - ✅ Policy rejection scenarios
 - ✅ Reentrancy attack prevention
-- ✅ Ownership transfer
+- ✅ Two-step ownership transfer
 - ✅ Solver authorization updates
+- ✅ Intent replay protection
+- ✅ Pool validation (currency matching)
+- ✅ Native ETH rejection
 - ✅ Delta settlement logic
 - ✅ Unlock callback security
 
