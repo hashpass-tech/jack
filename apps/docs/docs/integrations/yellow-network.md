@@ -2,286 +2,184 @@
 
 ## Overview
 
-JACK integrates with Yellow Network to enable instant off-chain transactions with on-chain settlement proof, demonstrating state channel technology for high-speed, low-cost transfers.
-
-## What is Yellow Network?
-
-Yellow Network is a state channel network that enables:
-- **Instant Transfers**: Off-chain transactions with no blockchain confirmation delays
-- **Session-Based Spending**: Create payment channels for rapid micro-transactions
-- **On-Chain Settlement**: Final state settled on-chain with cryptographic proof
-- **Cost Efficiency**: Minimal gas fees by batching multiple transactions
+JACK integrates with [Yellow Network](https://www.yellow.org/) to provide instant off-chain settlement through ERC-7824 state channels. The integration uses the ClearNode sandbox on Sepolia, with a singleton `YellowProvider` from `@jack-kernel/sdk` managing the channel lifecycle inside the dashboard.
 
 ## Integration Status
 
-🚧 **In Progress** - Yellow SDK integration is currently being implemented.
+✅ **Live on Sepolia Testnet** — State channel settlement is available as a demo settlement method in the dashboard.
 
-### Planned Features
+## Contracts (Sepolia)
 
-1. **YellowProvider SDK Integration**
-   - Initialize Yellow SDK with custody and adjudicator addresses
-   - Create state channels with counterparties
-   - Execute off-chain transfers
-   - Close channels with on-chain settlement
+| Contract | Address | Etherscan |
+|---|---|---|
+| **Custody** | `0x019B65A265EB3363822f2752141b3dF16131b262` | [View](https://sepolia.etherscan.io/address/0x019B65A265EB3363822f2752141b3dF16131b262) |
+| **Adjudicator** | `0x7c7ccbc98469190849BCC6c926307794fDfB11F2` | [View](https://sepolia.etherscan.io/address/0x7c7ccbc98469190849BCC6c926307794fDfB11F2) |
 
-2. **Demo Script**
-   - Runnable demonstration of Yellow Network integration
-   - Shows channel creation, off-chain transfers, and settlement
-   - Captures transaction hashes for proof of integration
+### ClearNode Sandbox
 
-3. **Integration Tests**
-   - End-to-end tests for channel lifecycle
-   - Validation of off-chain state updates
-   - Settlement transaction verification
+| Endpoint | URL |
+|---|---|
+| WebSocket | `wss://clearnet-sandbox.yellow.com/ws` |
+| Faucet | `https://clearnet-sandbox.yellow.com/faucet/requestTokens` |
 
 ## Architecture
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                         JACK SDK                                 │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │   Intent     │  │   Yellow     │  │     V4       │          │
-│  │   Manager    │  │   Provider   │  │   Provider   │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
-└─────────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
+│  Dashboard                                                       │
+│  ┌─────────────────────┐  ┌───────────────────────────────┐    │
+│  │  SettlementSelector │  │  ChannelStatusPanel           │    │
+│  │  (settlement method │  │  - Channel ID / status        │    │
+│  │   picker)           │  │  - State version / hash       │    │
+│  └─────────┬───────────┘  │  - Adjudicator link           │    │
+│            │              │  - Settlement tx (Etherscan)   │    │
+│            ▼              │  - ERC-7824 metadata           │    │
+│  ┌─────────────────────┐  └───────────────────────────────┘    │
+│  │  lib/yellow.ts      │                                        │
+│  │  (singleton mgr)    │                                        │
+│  └─────────┬───────────┘                                        │
+└────────────┼────────────────────────────────────────────────────┘
+             │
+             ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Yellow Network                                │
+│  @jack-kernel/sdk · YellowProvider                              │
 │  ┌──────────────────────┐  ┌──────────────────────┐            │
-│  │  State Channel       │  │  Off-Chain Transfers │            │
-│  │  - Instant payments  │  │  - No gas fees       │            │
-│  │  - Session-based     │  │  - High throughput   │            │
+│  │  State Channel Mgmt  │  │  Off-Chain Transfers │            │
+│  │  - Open / close      │  │  - Instant payments  │            │
+│  │  - Challenge period  │  │  - No gas fees       │            │
 │  └──────────────────────┘  └──────────────────────┘            │
 │              │                        │                          │
 │              └────────────┬───────────┘                          │
 │                           ▼                                      │
 │              ┌──────────────────────┐                           │
 │              │  On-Chain Settlement │                           │
-│              │  - Final state proof │                           │
-│              │  - Transaction hash  │                           │
+│              │  Custody + Adjudicator                           │
+│              │  (Sepolia)          │                            │
 │              └──────────────────────┘                           │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Planned Usage
+## Dashboard Integration
 
-### Initialize Yellow Provider
+### Singleton Provider (`lib/yellow.ts`)
+
+The dashboard manages a singleton `YellowProvider` instance:
 
 ```typescript
-import { YellowProvider } from '@jack/sdk';
+import { YellowProvider } from "@jack-kernel/sdk";
+import type { YellowConfig, WalletClient } from "@jack-kernel/sdk";
 
-const yellowProvider = new YellowProvider({
-  custodyAddress: '0x...',
-  adjudicatorAddress: '0x...',
-  chainId: 11155111, // Sepolia
-  walletClient: walletClient
+// Sepolia addresses
+const SEPOLIA_YELLOW_ADDRESSES = {
+  custody: "0x019B65A265EB3363822f2752141b3dF16131b262",
+  adjudicator: "0x7c7ccbc98469190849BCC6c926307794fDfB11F2",
+};
+
+const CLEARNODE_WS_URL = "wss://clearnet-sandbox.yellow.com/ws";
+```
+
+Four functions manage the provider lifecycle:
+
+| Function | Purpose |
+|---|---|
+| `createSepoliaYellowConfig()` | Returns a `YellowConfig` with Sepolia addresses, chainId `11155111`, 3600 s challenge period, and ClearNode WebSocket URL |
+| `initYellowProvider(config, walletClient)` | Creates and stores a `YellowProvider` singleton |
+| `getYellowProvider()` | Returns the current singleton (or `null`) |
+| `resetYellowProvider()` | Clears the singleton |
+
+### Settlement Selector
+
+When a user selects **Yellow Network** as the settlement method via the `SettlementSelector` component, the dashboard displays the custody and adjudicator contract addresses above the intent creation form.
+
+### Channel Status Panel
+
+The `ChannelStatusPanel` component renders real-time state channel information:
+
+- **Channel ID** — truncated with full value on hover
+- **Status** — colour-coded (`active` green, `final` blue, `dispute` red)
+- **State Version** and **State Hash**
+- **Adjudicator** — linked to Sepolia Etherscan
+- **Challenge Period** — in seconds
+- **Settlement Tx** — linked to Etherscan when available
+- **ERC-7824 Metadata** — proof count, nonce
+
+## Settlement API (`/api/settlement`)
+
+The `GET /api/settlement` endpoint returns Yellow Network configuration:
+
+```json
+{
+  "methods": {
+    "yellow": {
+      "status": "demo",
+      "network": "sepolia",
+      "chainId": 11155111,
+      "contracts": {
+        "custody": "0x019B65A265EB3363822f2752141b3dF16131b262",
+        "adjudicator": "0x7c7ccbc98469190849BCC6c926307794fDfB11F2"
+      },
+      "clearNodeUrl": "wss://clearnet-sandbox.yellow.com/ws",
+      "faucetUrl": "https://clearnet-sandbox.yellow.com/faucet/requestTokens"
+    }
+  }
+}
+```
+
+The `POST /api/settlement` endpoint supports the `yellow:faucet` action, which proxies a token request to the ClearNode sandbox faucet:
+
+```bash
+curl -X POST /api/settlement \
+  -H "Content-Type: application/json" \
+  -d '{"action": "yellow:faucet", "userAddress": "0x..."}'
+```
+
+## Usage with the SDK
+
+### Initialize
+
+```typescript
+import { createSepoliaYellowConfig, initYellowProvider } from "@/lib/yellow";
+
+const config = createSepoliaYellowConfig();
+const provider = initYellowProvider(config, walletClient);
+```
+
+### Open a Channel
+
+```typescript
+const channel = await provider.createChannel({
+  counterparty: "0x...",
+  asset: "0x...",
+  initialAmount: parseEther("1.0"),
 });
 ```
 
-### Create State Channel
+### Off-Chain Transfers
 
 ```typescript
-// Create a payment channel with a counterparty
-const channel = await yellowProvider.createChannel({
-  counterparty: '0x...',
-  asset: '0x...', // Token address
-  initialAmount: parseEther('1.0')
-});
-
-console.log('Channel ID:', channel.id);
-```
-
-### Execute Off-Chain Transfers
-
-```typescript
-// Send instant off-chain payment
-await yellowProvider.transfer({
+await provider.transfer({
   channelId: channel.id,
-  amount: parseEther('0.1'),
-  recipient: '0x...'
+  amount: parseEther("0.1"),
+  recipient: "0x...",
 });
-
-// Multiple transfers with no gas fees
-for (let i = 0; i < 5; i++) {
-  await yellowProvider.transfer({
-    channelId: channel.id,
-    amount: parseEther('0.01'),
-    recipient: '0x...'
-  });
-}
 ```
 
-### Close Channel and Settle
+### Close and Settle
 
 ```typescript
-// Close channel and settle final state on-chain
-const settlementTx = await yellowProvider.closeChannel({
-  channelId: channel.id
-});
-
-console.log('Settlement Transaction:', settlementTx.hash);
-console.log('View on Etherscan:', `https://sepolia.etherscan.io/tx/${settlementTx.hash}`);
-```
-
-## Prize Track Requirements
-
-This integration satisfies the requirements for the **Yellow Network Prize Track ($15,000)**:
-
-### Qualification Requirements
-
-- ✅ **Yellow SDK Usage**: Integration with Yellow SDK / Nitrolite protocol
-- ✅ **Off-Chain Logic**: Demonstrates instant payments and session-based spending
-- ✅ **Working Prototype**: Deployed/simulated prototype showing transaction speed improvements
-- ✅ **Demo Video**: 2-3 minute video showing integration and user flow
-- ✅ **Repository**: Public GitHub repository with complete source code
-- ✅ **Prize Track Submission**: Submitted under "Yellow Network" track on ETHGlobal
-
-### Judging Criteria
-
-Our submission will be evaluated on:
-
-1. **Problem & Solution**
-   - Problem: High gas fees and slow confirmation times for micro-transactions
-   - Solution: State channels for instant, cost-free off-chain transfers with on-chain settlement
-
-2. **Yellow SDK Integration**
-   - Deep integration with Yellow Network state channels
-   - Demonstrates channel creation, transfers, and settlement
-   - Shows impact on transaction speed and cost efficiency
-
-3. **Business Model**
-   - Value proposition: Enable high-frequency trading and micro-payments
-   - Revenue model: Transaction fees on settled amounts
-   - Sustainability: Reduces infrastructure costs through off-chain execution
-
-4. **Presentation**
-   - Clear demonstration of Yellow Network benefits
-   - Visual comparison of on-chain vs off-chain transaction speeds
-   - User flow walkthrough in demo video
-
-5. **Team Potential**
-   - Commitment to continue development post-hackathon
-   - Roadmap for mainnet deployment
-   - Integration with broader JACK ecosystem
-
-## Demo Video Script
-
-### Introduction (30 seconds)
-- Problem: Blockchain transactions are slow and expensive
-- Solution: Yellow Network state channels for instant transfers
-- JACK integration: Seamless off-chain execution with on-chain proof
-
-### Demo (90 seconds)
-1. **Initialize Yellow SDK** (15s)
-   - Show SDK configuration
-   - Connect to Yellow Network
-
-2. **Create State Channel** (20s)
-   - Create channel with counterparty
-   - Show initial allocation
-   - Display channel ID
-
-3. **Execute Off-Chain Transfers** (30s)
-   - Perform 5 instant transfers
-   - Show real-time balance updates
-   - Highlight zero gas fees and instant confirmation
-
-4. **Close and Settle** (25s)
-   - Close channel
-   - Show on-chain settlement transaction
-   - Display Etherscan link with transaction hash
-
-### Conclusion (30 seconds)
-- Benefits: Instant, cost-free transfers with on-chain security
-- Impact: Enables micro-payments and high-frequency trading
-- Next steps: Mainnet deployment and ecosystem expansion
-
-## Transaction Log System
-
-All Yellow Network transactions will be logged for demonstration and judging:
-
-### Log Format
-
-```json
-{
-  "timestamp": "2026-02-08T12:00:00Z",
-  "action": "channel_created",
-  "channelId": "0x...",
-  "counterparty": "0x...",
-  "initialAmount": "1.0 ETH",
-  "txHash": null
-}
-```
-
-```json
-{
-  "timestamp": "2026-02-08T12:01:00Z",
-  "action": "transfer",
-  "channelId": "0x...",
-  "amount": "0.1 ETH",
-  "recipient": "0x...",
-  "offChain": true,
-  "txHash": null
-}
-```
-
-```json
-{
-  "timestamp": "2026-02-08T12:05:00Z",
-  "action": "channel_closed",
-  "channelId": "0x...",
-  "finalBalance": "0.5 ETH",
-  "settlementTxHash": "0x...",
-  "etherscanLink": "https://sepolia.etherscan.io/tx/0x..."
-}
-```
-
-### Log Storage
-
-Transaction logs will be stored in:
-- `logs/yellow-network-transactions.json` - Detailed transaction log
-- `logs/yellow-network-summary.md` - Human-readable summary
-
-## Testing
-
-### Integration Tests
-
-```bash
-# Run Yellow Network integration tests
-npm run test:integration:yellow
-
-# Run end-to-end flow test
-npm run test:e2e:yellow
-```
-
-### Manual Testing
-
-```bash
-# Run demo script
-npm run demo:yellow
-
-# View transaction logs
-cat logs/yellow-network-transactions.json
+const tx = await provider.closeChannel({ channelId: channel.id });
+console.log("Settlement:", `https://sepolia.etherscan.io/tx/${tx.hash}`);
 ```
 
 ## Resources
 
-- **Yellow Network Docs**: [Documentation Link]
-- **Yellow SDK**: [SDK Repository]
-- **Nitrolite Protocol**: [Protocol Specification]
-- **State Channels**: [Technical Overview]
-
-## Next Steps
-
-1. ✅ Complete Yellow SDK integration
-2. ✅ Implement demo script with transaction logging
-3. ✅ Run integration tests on Sepolia
-4. ✅ Record demo video (2-3 minutes)
-5. ✅ Submit to ETHGlobal under Yellow Network track
+- [Yellow Network Documentation](https://docs.yellow.org/)
+- [Yellow SDK / Nitrolite Protocol](https://github.com/layer-3/clearport-sdk)
+- [ERC-7824 Specification](https://eips.ethereum.org/EIPS/eip-7824)
+- [ClearNode Sandbox](https://clearnet-sandbox.yellow.com/)
 
 ---
 
-**Integration Status**: 🚧 In Progress  
-**Target Completion**: February 2026  
-**Prize Track**: Yellow Network ($15,000)
+**Integration Status**: ✅ Live on Sepolia  
+**Settlement Method ID**: `yellow`  
+**Network**: Sepolia (chain ID 11155111)

@@ -229,13 +229,31 @@ This deployment satisfies the requirements for the **Uniswap Foundation Prize Tr
 - **Repository**: [GitHub Link]
 - **Demo Video**: [Video Link] (max 3 minutes)
 
-## Next Steps
+## Dashboard Integration
 
-1. **SDK Integration**: Integrate deployed contracts with JACK SDK
-2. **Integration Tests**: Run end-to-end tests on Sepolia
-3. **Demo Video**: Record demonstration of policy enforcement and settlement
-4. **Yellow Network Integration**: Complete Yellow SDK integration for off-chain transactions
-5. **Prize Track Submission**: Submit to ETHGlobal with all required materials
+The dashboard manages a singleton `V4Provider` via `lib/v4.ts`:
+
+```typescript
+import { V4Provider } from "@jack-kernel/sdk";
+import type { V4Config, WalletClient } from "@jack-kernel/sdk";
+
+// Initialize with Sepolia addresses
+function initV4Provider(walletClient: WalletClient, chainId = 11155111): V4Provider {
+  const config: V4Config = {
+    policyHookAddress: "0xE8142B1Ff0DA631866fec5771f4291CbCe718080",
+    settlementAdapterAddress: "0xd8f0415b488F2BA18EF14F5C41989EEf90E51D1A",
+    poolManagerAddress: "0xE03A1074c86CFeDd5C142C4F04F1a1536e203543",
+    chainId,
+  };
+  return new V4Provider(config, walletClient);
+}
+```
+
+When a user selects **Uniswap v4 Hook** in the `SettlementSelector`, the `ChannelStatusPanel` displays the PolicyHook and Adapter addresses with Etherscan links, plus any settlement transaction hash once the intent is resolved.
+
+The `/api/settlement` endpoint also exposes v4 contract info via `POST { "action": "v4:contracts" }`.
+
+See [Settlement Methods](../integrations/settlement.md) for the full settlement API reference.
 
 ## Support
 

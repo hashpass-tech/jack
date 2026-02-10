@@ -20,9 +20,7 @@ const sidebars: SidebarsConfig = {
       type: "category",
       label: "TypeScript SDK",
       link: { type: "doc", id: "sdk/index" },
-      items: [
-        "sdk/installation",
-      ],
+      items: ["sdk/installation"],
     },
     {
       type: "category",
@@ -36,9 +34,7 @@ const sidebars: SidebarsConfig = {
     {
       type: "category",
       label: "Integrations",
-      items: [
-        "integrations/yellow-network",
-      ],
+      items: ["integrations/settlement", "integrations/yellow-network"],
     },
     {
       type: "category",
